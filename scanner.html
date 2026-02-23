@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon16.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/icon48.png" />
+  <link rel="icon" type="image/png" sizes="128x128" href="/icon128.png" />
+  <link rel="apple-touch-icon" href="/icon128.png" />
+  <title>Headline Odds — Market Matcher</title>
+  <meta name="description" content="Paste any headline. See what the prediction markets say. Get a reply draft with live Kalshi odds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080a09;
+      --card: rgba(255,255,255,0.028);
+      --border: rgba(255,255,255,0.07);
+      --green: #00e38f;
+      --green-2: #00c65e;
+      --text: #eef2ef;
+      --muted: #a9b5ae;
+      --dim: #55625d;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    .grid-bg {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 52px 52px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Green glow */
+    .glow {
+      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 800px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,198,94,0.09) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Nav */
+    nav {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 68px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,10,9,0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 15px; letter-spacing: 0.015em;
+      text-decoration: none; color: var(--text);
+    }
+    .nav-logo img {
+      width: 26px; height: 26px;
+      filter: drop-shadow(0 0 9px rgba(0,227,143,0.5));
+    }
+    .nav-link {
+      color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600;
+      transition: color 200ms;
+    }
+    .nav-link:hover { color: var(--green); }
+
+    /* Main */
+    main {
+      position: relative; z-index: 1;
+      max-width: 720px; margin: 0 auto;
+      padding: 80px 24px 120px;
+    }
+
+    /* Hero */
+    .hero-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 999px;
+      background: rgba(0,198,94,0.08); border: 1px solid rgba(0,198,94,0.2);
+      font-size: 12px; font-weight: 600; color: var(--green);
+      margin-bottom: 24px;
+    }
+    .hero-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 0.4; box-shadow: 0 0 0 0 rgba(0,198,94,0.3); }
+      50% { opacity: 1; box-shadow: 0 0 0 4px rgba(0,198,94,0.1); }
+    }
+    h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1.1; margin-bottom: 16px;
+    }
+    h1 span {
+      background: linear-gradient(135deg, var(--green), var(--green-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      color: var(--muted); font-size: 17px; line-height: 1.6;
+      max-width: 540px; margin-bottom: 48px;
+    }
+
+    /* Search */
+    .search-box {
+      display: flex; gap: 12px; margin-bottom: 16px;
+    }
+    .search-input {
+      flex: 1; padding: 16px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(5,7,6,0.85);
+      color: var(--text); font-size: 16px;
+      font-family: inherit; outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .search-input::placeholder { color: var(--dim); }
+    .search-input:focus {
+      border-color: rgba(0,198,94,0.5);
+      box-shadow: 0 0 0 3px rgba(0,198,94,0.1);
+    }
+    .search-btn {
+      padding: 16px 28px; border: none; border-radius: 14px;
+      background: linear-gradient(135deg, var(--green), var(--green-2));
+      color: #061009; font-size: 15px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,198,94,0.28);
+      transition: box-shadow 200ms, transform 200ms;
+      white-space: nowrap;
+    }
+    .search-btn:hover {
+      box-shadow: 0 10px 28px rgba(0,198,94,0.44);
+      transform: translateY(-1px);
+    }
+    .search-btn:disabled {
+      opacity: 0.5; cursor: not-allowed; transform: none;
+    }
+    .search-hint {
+      font-size: 12px; color: var(--dim); margin-bottom: 48px;
+    }
+
+    /* Status */
+    .status {
+      text-align: center; padding: 40px 0;
+      color: var(--muted); font-size: 14px;
+    }
+    .status.error { color: #ff5c5c; }
+    .spinner {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 3px solid rgba(0,198,94,0.15);
+      border-top-color: var(--green);
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Results */
+    .results { display: flex; flex-direction: column; gap: 16px; }
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .results-title {
+      font-size: 13px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .results-count {
+      font-size: 12px; color: var(--dim);
+    }
+
+    /* Market card */
+    .market-card {
+      padding: 24px; border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      transition: border-color 300ms, transform 300ms, box-shadow 300ms;
+    }
+    .market-card:hover {
+      border-color: rgba(0,198,94,0.22);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+    .market-title {
+      font-size: 16px; font-weight: 700; line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .market-subtitle {
+      font-size: 13px; color: var(--muted); margin-bottom: 16px;
+    }
+
+    /* Odds row */
+    .odds-row {
+      display: flex; gap: 10px; margin-bottom: 16px;
+    }
+    .odd {
+      flex: 1; display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-radius: 12px;
+      text-decoration: none; color: var(--text);
+      transition: transform 200ms, border-color 200ms, background 200ms;
+    }
+    .odd-yes {
+      border: 1px solid rgba(0,198,94,0.35);
+      background: rgba(0,198,94,0.07);
+    }
+    .odd-yes:hover {
+      border-color: rgba(0,198,94,0.68);
+      background: rgba(0,198,94,0.14);
+      transform: translateX(3px);
+    }
+    .odd-no {
+      border: 1px solid rgba(255,92,92,0.3);
+      background: rgba(255,92,92,0.07);
+    }
+    .odd-no:hover {
+      border-color: rgba(255,92,92,0.62);
+      background: rgba(255,92,92,0.14);
+      transform: translateX(3px);
+    }
+    .odd-label { font-size: 13px; font-weight: 600; }
+    .odd-value { font-size: 16px; font-weight: 800; }
+    .odd-yes .odd-value { color: var(--green); }
+    .odd-no .odd-value { color: #ff5c5c; }
+
+    /* Meta row */
+    .market-meta {
+      display: flex; gap: 20px; margin-bottom: 16px;
+      font-size: 12px; color: var(--dim);
+    }
+    .market-meta strong { color: var(--muted); font-weight: 600; }
+
+    /* Actions */
+    .market-actions {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .btn-copy {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 999px;
+      border: 1px solid rgba(0,198,94,0.3);
+      background: rgba(0,198,94,0.08);
+      color: var(--green); font-size: 13px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      transition: background 200ms, border-color 200ms, transform 200ms;
+    }
+    .btn-copy:hover {
+      background: rgba(0,198,94,0.16);
+      border-color: rgba(0,198,94,0.5);
+      transform: translateY(-1px);
+    }
+    .btn-copy.copied {
+      background: rgba(0,198,94,0.2);
+      border-color: var(--green);
+    }
+    .btn-view {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted); font-size: 13px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      text-decoration: none;
+      transition: background 200ms, border-color 200ms, color 200ms;
+    }
+    .btn-view:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+
+    /* Empty state */
+    .empty {
+      text-align: center; padding: 60px 20px;
+      border: 1px dashed rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 12px; }
+    .empty-text { color: var(--muted); font-size: 15px; }
+
+    /* Footer */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center; padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--dim);
+    }
+    footer a { color: var(--green); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; height: 60px; }
+      main { padding: 48px 16px 80px; }
+      h1 { font-size: 28px; }
+      .hero-sub { font-size: 15px; }
+      .search-box { flex-direction: column; }
+      .search-btn { width: 100%; text-align: center; }
+      .odds-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="glow"></div>
+
+  <nav>
+    <a href="https://headlineodds.fun" class="nav-logo">
+      <img src="/logo.png" alt="Headline Odds" />
+      <span>Headline Odds</span>
+    </a>
+    <a href="https://headlineodds.fun" class="nav-link">headlineodds.fun</a>
+  </nav>
+
+  <main>
+    <div class="hero-label"><span class="hero-dot"></span> Live Kalshi Data</div>
+    <h1>What do the <span>markets</span> say?</h1>
+    <p class="hero-sub">Paste any headline, tweet, or news story. We'll match it against live Kalshi prediction markets and draft a reply with real odds.</p>
+
+    <div class="search-box">
+      <input type="text" class="search-input" id="headlineInput"
+        placeholder="Paste a headline — e.g. &quot;Fed signals rate cut&quot;"
+        autocomplete="off" />
+      <button class="search-btn" id="searchBtn">Find Markets</button>
+    </div>
+    <p class="search-hint">Try: "Elon Musk", "Bitcoin hits $200k", "Trump executive order", "AI regulation"</p>
+
+    <div id="resultsArea"></div>
+  </main>
+
+  <footer>
+    <p>Built by <a href="https://headlineodds.fun">Headline Odds</a> — real-time prediction market odds on every headline.</p>
+  </footer>
+
+  <script>
+    const input = document.getElementById("headlineInput");
+    const btn = document.getElementById("searchBtn");
+    const results = document.getElementById("resultsArea");
+
+    async function search() {
+      const headline = input.value.trim();
+      if (headline.length < 5) return;
+
+      btn.disabled = true;
+      btn.textContent = "Searching...";
+      results.innerHTML = `<div class="status"><div class="spinner"></div>Scanning Kalshi markets...</div>`;
+
+      try {
+        const res = await fetch("/api/match", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ headline }),
+        });
+        const data = await res.json();
+
+        if (!data.ok || !data.results || data.results.length === 0) {
+          results.innerHTML = `
+            <div class="empty">
+              <div class="empty-icon">🔍</div>
+              <div class="empty-text">No matching markets found for this headline.<br>Try different keywords or a broader topic.</div>
+            </div>`;
+          return;
+        }
+
+        let html = `
+          <div class="results-header">
+            <span class="results-title">Matched Markets</span>
+            <span class="results-count">${data.results.length} of ${(data.marketCount || 0).toLocaleString()} scanned</span>
+          </div>
+          <div class="results">`;
+
+        for (const m of data.results) {
+          const yes = m.yes_bid != null ? `${m.yes_bid}\u00a2` : "\u2014";
+          const no = m.no_bid != null ? `${m.no_bid}\u00a2` : "\u2014";
+          const vol = m.volume != null ? `$${Math.round(m.volume * (m.last_price || m.yes_bid || 50) / 100).toLocaleString()}` : "\u2014";
+          const close = m.close_time
+            ? new Date(m.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+            : "\u2014";
+
+          const shortHeadline = headline.length > 100 ? headline.slice(0, 97) + "\u2026" : headline;
+          const replyText = `"${shortHeadline}"\n\nMarket says: ${yes} yes \u2192 ${m.title}\n\nvia @headlineodds \uD83D\uDFE2\nheadlineodds.fun`;
+
+          html += `
+            <div class="market-card">
+              <div class="market-title">${esc(m.title)}</div>
+              ${m.subtitle ? `<div class="market-subtitle">${esc(m.subtitle)}</div>` : ""}
+              <div class="odds-row">
+                <a class="odd odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
+                  <span class="odd-label">Yes</span>
+                  <span class="odd-value">${yes}</span>
+                </a>
+                <a class="odd odd-no" href="${esc(m.url)}" target="_blank" rel="noopener">
+                  <span class="odd-label">No</span>
+                  <span class="odd-value">${no}</span>
+                </a>
+              </div>
+              <div class="market-meta">
+                <span>Vol: <strong>${vol}</strong></span>
+                <span>Closes: ${close}</span>
+              </div>
+              <div class="market-actions">
+                <button class="btn-copy" onclick="copyReply(this, ${esc(JSON.stringify(replyText))})">📋 Copy Reply</button>
+                <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi →</a>
+              </div>
+            </div>`;
+        }
+
+        html += `</div>`;
+        results.innerHTML = html;
+      } catch (err) {
+        results.innerHTML = `<div class="status error">Error: ${esc(err.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Find Markets";
+      }
+    }
+
+    function copyReply(el, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        el.classList.add("copied");
+        el.innerHTML = "✓ Copied!";
+        setTimeout(() => {
+          el.classList.remove("copied");
+          el.innerHTML = "📋 Copy Reply";
+        }, 2000);
+      });
+    }
+
+    function esc(str) {
+      const d = document.createElement("div");
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    btn.addEventListener("click", search);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") search();
+    });
+
+    // Auto-focus input
+    input.focus();
+  </script>
+</body>
+</html>

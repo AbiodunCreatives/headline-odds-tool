@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon16.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/icon48.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/icon128.png" />
+    <link rel="apple-touch-icon" href="/icon128.png" />
+    <title>Privacy Policy - Headline Odds</title>
+    <style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Space Grotesk", "Satoshi", "Geist", "Avenir Next", "Helvetica Neue", sans-serif;
+    background: radial-gradient(120% 120% at 0% 0%, #1c1f1d 0%, #101211 48%, #0b0d0c 100%);
+    color: #f5f6f5;
+  }
+  .page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 18px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .glow {
+    position: absolute;
+    width: 540px;
+    height: 540px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(0, 198, 94, 0.18), rgba(0, 198, 94, 0));
+    filter: blur(10px);
+    top: -220px;
+    right: -160px;
+    pointer-events: none;
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .shell {
+    width: min(700px, 100%);
+    position: relative;
+    z-index: 1;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #72f2b0;
+    text-decoration: none;
+    margin-bottom: 36px;
+  }
+  .brand img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 198, 94, 0.35));
+  }
+  h1 {
+    margin: 0 0 6px;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .accent { color: #00e38f; }
+  .updated {
+    color: #a8b4ae;
+    font-size: 13px;
+    margin: 0 0 40px;
+  }
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #f0f5f1;
+    margin: 36px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.09);
+  }
+  p {
+    margin: 0 0 14px;
+    color: #d2dbd6;
+    font-size: 15px;
+    line-height: 1.72;
+  }
+  ul {
+    margin: 0 0 14px;
+    padding-left: 22px;
+    color: #d2dbd6;
+    font-size: 15px;
+    line-height: 1.72;
+  }
+  li { margin-bottom: 6px; }
+  a { color: #00e38f; text-underline-offset: 3px; }
+  .callout {
+    margin: 24px 0;
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 198, 94, 0.3);
+    background: rgba(0, 198, 94, 0.07);
+    color: #d8f0e4;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .callout strong { color: #72f2b0; }
+  .footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    color: #8f9994;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 560px) {
+    h1 { font-size: 26px; }
+    h2 { font-size: 15px; }
+    p, ul { font-size: 14px; }
+  }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="glow"></div>
+      <div class="grid"></div>
+      <div class="shell">
+
+        <a class="brand" href="index.html">
+          <img src="logo.png" alt="Headline Odds" />
+          Headline Odds
+        </a>
+
+        <h1>Privacy <span class="accent">Policy</span></h1>
+        <p class="updated">Last updated: February 2026</p>
+
+        <div class="callout">
+          <strong>Short version:</strong> Headline Odds does not collect, store, or sell any personal data.
+          Headlines are matched locally inside your browser. The only external calls made are to the
+          public Kalshi market API to fetch live odds data.
+        </div>
+
+        <h2>1. What Headline Odds Does</h2>
+        <p>
+          Headline Odds is a Chrome browser extension that reads news headlines on the pages you visit
+          and displays real-time prediction market odds from Kalshi alongside those headlines.
+          All matching logic runs entirely inside your browser.
+        </p>
+
+        <h2>2. Data We Do Not Collect</h2>
+        <p>Headline Odds does <strong>not</strong>:</p>
+        <ul>
+          <li>Collect, record, or transmit the headlines or URLs you view</li>
+          <li>Track your browsing history or activity</li>
+          <li>Store any information about you on our servers</li>
+          <li>Use cookies, fingerprinting, or any other tracking mechanism</li>
+          <li>Share any data with third parties (other than the Kalshi API call described below)</li>
+          <li>Require an account or sign-in of any kind</li>
+        </ul>
+
+        <h2>3. Kalshi API Calls</h2>
+        <p>
+          The extension's background service worker fetches a list of open prediction markets from the
+          public Kalshi API (<code>api.elections.kalshi.com</code> or <code>api.kalshi.com</code>).
+          This is a standard outbound request to retrieve market data — no information about you, your
+          device, or the pages you visit is included in these requests beyond what is normal for any
+          HTTPS request (such as your IP address, which is handled according to
+          <a href="https://kalshi.com/privacy-policy" target="_blank" rel="noopener">Kalshi's Privacy Policy</a>).
+        </p>
+        <p>
+          Market data is cached locally in the extension's service worker memory for up to 5 minutes
+          to minimize network requests. This cache is cleared when the service worker restarts and is
+          never written to disk or synced.
+        </p>
+
+        <h2>4. Waitlist (headlineoddds.com)</h2>
+        <p>
+          If you join the waitlist on our website, you provide your name and email address.
+          This information is processed by <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener">Formspree</a>
+          and is used solely to notify you when early access opens. We will never send unsolicited
+          emails or share your contact details with any third party.
+        </p>
+        <p>You can request deletion of your waitlist entry at any time by emailing us.</p>
+
+        <h2>5. Permissions Used</h2>
+        <p>The extension requests the following Chrome permissions:</p>
+        <ul>
+          <li>
+            <strong>Host permissions</strong> for <code>api.elections.kalshi.com</code> and
+            <code>api.kalshi.com</code> — required to fetch live market data from Kalshi's API.
+          </li>
+          <li>
+            <strong>Alarms</strong> — used to keep the background service worker alive so the
+            extension can respond when you open a page. No data is stored or transmitted by this.
+          </li>
+          <li>
+            <strong>Content scripts</strong> on supported news sites — required to read headlines
+            and inject the odds pill UI. No content is transmitted off your device.
+          </li>
+        </ul>
+
+        <h2>6. Children's Privacy</h2>
+        <p>
+          Headline Odds is not directed at children under 13 and does not knowingly collect any
+          information from children.
+        </p>
+
+        <h2>7. Changes to This Policy</h2>
+        <p>
+          If we make material changes to this policy, we will update the date at the top of this page.
+          Continued use of the extension after changes constitutes acceptance of the updated policy.
+        </p>
+
+        <h2>8. Contact</h2>
+        <p>
+          Questions about this privacy policy? Email us at
+          <a href="mailto:headlineoddds@gmail.com">headlineoddds@gmail.com</a>.
+        </p>
+
+        <div class="footer">
+          <span>Headline Odds &mdash; &copy; 2026</span>
+          <a href="index.html">Back to home</a>
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>
