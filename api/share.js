@@ -43,7 +43,6 @@ export default function handler(req, res) {
   <meta name="twitter:description" content="${esc(description)}" />
   <meta name="twitter:image" content="${esc(ogImage)}" />
 
-  <meta http-equiv="refresh" content="2;url=${esc(url)}" />
   <style>
     body {
       margin: 0; min-height: 100vh;
@@ -56,6 +55,12 @@ export default function handler(req, res) {
     p { color: #a9b5ae; font-size: 16px; }
     a { color: #00e38f; }
   </style>
+  <script>
+    // Redirect humans to Kalshi, but let bots read the meta tags
+    if (!/bot|crawl|spider|twitter|facebook|telegram|slack|discord/i.test(navigator.userAgent)) {
+      setTimeout(function() { window.location.href = "${url.replace(/"/g, '\\"')}"; }, 1500);
+    }
+  </script>
 </head>
 <body>
   <div class="wrap">
@@ -67,6 +72,7 @@ export default function handler(req, res) {
 </html>`;
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300");
   return res.status(200).send(html);
 }
 
