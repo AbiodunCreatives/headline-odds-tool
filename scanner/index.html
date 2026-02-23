@@ -401,12 +401,21 @@
             : "\u2014";
 
           const yesPct = m.yes_bid || 0;
+          const shareParams = new URLSearchParams({
+            title: m.title,
+            yes: m.yes_bid || "—",
+            no: m.no_bid || "—",
+            vol: vol,
+            closes: close,
+            url: m.url,
+          });
+          const shareLink = `${window.location.origin}/api/share?${shareParams}`;
           const tweetText = yesPct >= 70
-            ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds\nheadlineodds.fun/scanner`
+            ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
             : yesPct >= 40
-            ? `This one's a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds\nheadlineodds.fun/scanner`
-            : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds\nheadlineodds.fun/scanner`;
-          const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+            ? `This one's a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
+            : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
+          const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
 
           html += `
             <div class="market-card">

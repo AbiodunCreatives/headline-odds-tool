@@ -5,5 +5,8 @@
   "description": "Headline Odds Market Matcher — paste a headline, find matching Kalshi markets",
   "scripts": {
     "dev": "npx vercel dev"
+  },
+  "dependencies": {
+    "@vercel/og": "^0.6.0"
   }
 }
