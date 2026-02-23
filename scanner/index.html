@@ -415,7 +415,7 @@
             : yesPct >= 40
             ? `This one's a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
             : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
-          const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText + "\n\nheadlineodds.fun/scanner")}`;
+          const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
 
           html += `
             <div class="market-card">
