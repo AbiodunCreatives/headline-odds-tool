@@ -194,9 +194,18 @@
       transform: translateY(-3px);
       box-shadow: 0 16px 40px rgba(0,0,0,0.3);
     }
+    .market-header {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+      margin-bottom: 4px;
+    }
     .market-title {
       font-size: 16px; font-weight: 700; line-height: 1.4;
-      margin-bottom: 4px;
+    }
+    .match-badge {
+      flex-shrink: 0; font-size: 11px; font-weight: 600;
+      color: var(--green); background: rgba(0,227,143,0.1);
+      border: 1px solid rgba(0,227,143,0.25);
+      border-radius: 20px; padding: 3px 10px; white-space: nowrap;
     }
     .market-subtitle {
       font-size: 13px; color: var(--muted); margin-bottom: 16px;
@@ -392,7 +401,10 @@
 
           html += `
             <div class="market-card">
-              <div class="market-title">${esc(m.title)}</div>
+              <div class="market-header">
+                <div class="market-title">${esc(m.title)}</div>
+                ${m.similarity ? `<span class="match-badge">${m.similarity}% match</span>` : ""}
+              </div>
               ${m.subtitle ? `<div class="market-subtitle">${esc(m.subtitle)}</div>` : ""}
               <div class="odds-row">
                 <a class="odd odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">

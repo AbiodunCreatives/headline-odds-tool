@@ -1,62 +1,45 @@
 // Vercel serverless function — matches a headline against live Kalshi markets
+// Uses Cloudflare Workers AI (bge-small-en-v1.5) for semantic embedding matching
 
 const KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2";
+const EMBED_API = "https://headline-embed.abiodunfaboyode007.workers.dev/";
 const CACHE_TTL = 5 * 60 * 1000;
-let cache = { data: [], ts: 0 };
+let marketCache = { data: [], ts: 0 };
+let embedCache = { vectors: [], ts: 0 }; // cache market embeddings too
 
-const STOP_WORDS = new Set([
-  "the","a","an","is","are","was","were","be","been","being","have","has","had",
-  "do","does","did","will","would","could","should","may","might","can","shall",
-  "to","of","in","for","on","with","at","by","from","as","into","through","during",
-  "before","after","above","below","between","out","off","over","under","again",
-  "further","then","once","here","there","when","where","why","how","all","both",
-  "each","few","more","most","other","some","such","no","nor","not","only","own",
-  "same","so","than","too","very","just","because","but","and","or","if","while",
-  "about","up","its","it","this","that","these","those","he","she","they","them",
-  "his","her","their","what","which","who","whom","new","says","said","report",
-  "reports","according","also","get","gets","got","going","make","makes","made",
-  "take","takes","look","year","years","day","days","week","weeks","month","months",
-  "time","way","us","back","first","last","next","now","still","even","many","much",
-  "well","long","right","left","big","old","high","low",
-]);
-
-function extractKeywords(text) {
-  return text.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/)
-    .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+function cosineSim(a, b) {
+  let dot = 0, magA = 0, magB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    magA += a[i] * a[i];
+    magB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(magA) * Math.sqrt(magB));
 }
 
-function scoreMatch(headlineKw, market) {
-  const marketText = [market.title, market.subtitle, market.event_title, market.category]
-    .join(" ").toLowerCase();
-  const marketKw = new Set(extractKeywords(marketText));
-
-  let matches = 0;
-  const matched = [];
-  for (const kw of headlineKw) {
-    if (marketKw.has(kw) || marketText.includes(kw)) {
-      matches++;
-      matched.push(kw);
-    }
+async function getEmbeddings(texts) {
+  // CF Worker accepts up to 100 texts at a time
+  const allEmbeddings = [];
+  for (let i = 0; i < texts.length; i += 100) {
+    const batch = texts.slice(i, i + 100);
+    const res = await fetch(EMBED_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texts: batch }),
+    });
+    if (!res.ok) throw new Error(`Embed API ${res.status}`);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    allEmbeddings.push(...json.embeddings);
   }
-  if (matches === 0) return 0;
-
-  const bonus = matched.reduce((sum, kw) => sum + (kw.length > 5 ? 0.1 : 0), 0);
-
-  let bigramBonus = 0;
-  for (let i = 0; i < headlineKw.length - 1; i++) {
-    const bg = `${headlineKw[i]} ${headlineKw[i + 1]}`;
-    if (bg.length > 6 && marketText.includes(bg)) {
-      bigramBonus = 0.2;
-      break;
-    }
-  }
-
-  return matches / headlineKw.length + bonus + bigramBonus;
+  return allEmbeddings;
 }
 
 async function getAllMarkets() {
   const now = Date.now();
-  if (cache.data.length && now - cache.ts < CACHE_TTL) return cache.data;
+  if (marketCache.data.length && now - marketCache.ts < CACHE_TTL) {
+    return marketCache.data;
+  }
 
   const allMarkets = [];
   let cursor = null;
@@ -101,8 +84,26 @@ async function getAllMarkets() {
     if (!cursor || (json.events || []).length < 200) break;
   }
 
-  cache = { data: allMarkets, ts: Date.now() };
+  marketCache = { data: allMarkets, ts: Date.now() };
+  // Invalidate embed cache when markets refresh
+  embedCache = { vectors: [], ts: 0 };
   return allMarkets;
+}
+
+async function getMarketEmbeddings(markets) {
+  const now = Date.now();
+  if (embedCache.vectors.length === markets.length && now - embedCache.ts < CACHE_TTL) {
+    return embedCache.vectors;
+  }
+
+  // Build a searchable text for each market
+  const texts = markets.map(m =>
+    [m.title, m.subtitle, m.event_title].filter(Boolean).join(" — ")
+  );
+
+  const vectors = await getEmbeddings(texts);
+  embedCache = { vectors, ts: Date.now() };
+  return vectors;
 }
 
 export default async function handler(req, res) {
@@ -120,19 +121,23 @@ export default async function handler(req, res) {
 
   try {
     const markets = await getAllMarkets();
-    const headlineKw = extractKeywords(headline.trim());
-    if (headlineKw.length < 1) {
-      return res.json({ ok: true, results: [], marketCount: markets.length });
+    if (markets.length === 0) {
+      return res.json({ ok: true, results: [], marketCount: 0 });
     }
 
+    // Get embeddings: headline first, then all markets
+    const [headlineEmbed] = await getEmbeddings([headline.trim()]);
+    const marketEmbeds = await getMarketEmbeddings(markets);
+
+    // Score by cosine similarity
     const results = markets
-      .map(m => ({ ...m, score: scoreMatch(headlineKw, m) }))
-      .filter(m => m.score > 0.15)
+      .map((m, i) => ({ ...m, score: cosineSim(headlineEmbed, marketEmbeds[i]) }))
+      .filter(m => m.score > 0.5)
       .sort((a, b) => b.score - a.score)
       .slice(0, 5)
-      .map(({ score, category, event_title, subtitle, ...rest }) => ({
+      .map(({ score, category, event_title, ...rest }) => ({
         ...rest,
-        subtitle,
+        similarity: Math.round(score * 100),
       }));
 
     return res.json({ ok: true, results, marketCount: markets.length });
