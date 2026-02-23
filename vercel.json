@@ -1,6 +1,4 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/scanner", "destination": "/scanner.html" }
-  ]
+  "cleanUrls": true
 }
