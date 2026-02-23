@@ -132,9 +132,9 @@ export default async function handler(req, res) {
     // Score by cosine similarity
     const results = markets
       .map((m, i) => ({ ...m, score: cosineSim(headlineEmbed, marketEmbeds[i]) }))
-      .filter(m => m.score > 0.5)
+      .filter(m => m.score > 0.35)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 5)
+      .slice(0, 8)
       .map(({ score, category, event_title, ...rest }) => ({
         ...rest,
         similarity: Math.round(score * 100),
