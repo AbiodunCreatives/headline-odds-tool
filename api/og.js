@@ -80,27 +80,13 @@ export default function handler(req) {
                   },
                   children: [
                     {
-                      type: "div",
+                      type: "img",
                       props: {
+                        src: `${new URL(req.url).origin}/logo.png`,
+                        width: "36",
+                        height: "36",
                         style: {
-                          width: "36px",
-                          height: "36px",
                           borderRadius: "50%",
-                          background: "linear-gradient(135deg, #00e38f, #00c65e)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        },
-                        children: {
-                          type: "div",
-                          props: {
-                            style: {
-                              width: "12px",
-                              height: "12px",
-                              borderRadius: "50%",
-                              background: "#080a09",
-                            },
-                          },
                         },
                       },
                     },
