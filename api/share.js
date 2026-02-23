@@ -1,31 +1,31 @@
 // Serves a lightweight HTML page with OG meta tags for X card previews
 // When X crawls this URL, it sees the og:image pointing to /api/og
 
-export const config = { runtime: "edge" };
-
-export default async function handler(req) {
-  const { searchParams } = new URL(req.url);
-  const title = searchParams.get("title") || "Prediction Market";
-  const yes = searchParams.get("yes") || "—";
-  const no = searchParams.get("no") || "—";
-  const vol = searchParams.get("vol") || "";
-  const closes = searchParams.get("closes") || "";
-  const url = searchParams.get("url") || "https://kalshi.com/markets";
+export default function handler(req, res) {
+  const q = req.query;
+  const title = q.title || "Prediction Market";
+  const yes = q.yes || "\u2014";
+  const no = q.no || "\u2014";
+  const vol = q.vol || "";
+  const closes = q.closes || "";
+  const url = q.url || "https://kalshi.com/markets";
 
   // Build OG image URL with same params
+  const proto = req.headers["x-forwarded-proto"] || "https";
+  const host = req.headers["x-forwarded-host"] || req.headers.host;
+  const baseUrl = `${proto}://${host}`;
   const ogParams = new URLSearchParams({ title, yes, no, vol, closes });
-  const baseUrl = new URL(req.url).origin;
   const ogImage = `${baseUrl}/api/og?${ogParams}`;
-  const shareUrl = `${baseUrl}/api/share?${searchParams}`;
+  const shareUrl = `${baseUrl}${req.url}`;
 
-  const description = `Market says ${yes}¢ yes / ${no}¢ no — ${title}`;
+  const description = `Market says ${yes}\u00a2 yes / ${no}\u00a2 no \u2014 ${title}`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${esc(title)} — Headline Odds</title>
+  <title>${esc(title)} \u2014 Headline Odds</title>
   <meta name="description" content="${esc(description)}" />
 
   <meta property="og:type" content="website" />
@@ -66,9 +66,8 @@ export default async function handler(req) {
 </body>
 </html>`;
 
-  return new Response(html, {
-    headers: { "Content-Type": "text/html; charset=utf-8" },
-  });
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  return res.status(200).send(html);
 }
 
 function esc(str) {
