@@ -262,17 +262,21 @@
       background: rgba(0,198,94,0.08);
       color: var(--green); font-size: 13px; font-weight: 600;
       font-family: inherit; cursor: pointer;
+      text-decoration: none;
       transition: background 200ms, border-color 200ms, transform 200ms;
     }
     .btn-copy:hover {
       background: rgba(0,198,94,0.16);
       border-color: rgba(0,198,94,0.5);
       transform: translateY(-1px);
+      text-decoration: none;
     }
-    .btn-copy.copied {
-      background: rgba(0,198,94,0.2);
-      border-color: var(--green);
+    .btn-copy .x-logo {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #000; flex-shrink: 0;
     }
+    .btn-copy .x-logo svg { width: 10px; height: 10px; fill: #fff; }
     .btn-view {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 9px 18px; border-radius: 999px;
@@ -426,7 +430,7 @@
                 <span>Closes: ${close}</span>
               </div>
               <div class="market-actions">
-                <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">\uD835\uDD4F Share to X</a>
+                <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to X <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span></a>
                 <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
               </div>
             </div>`;
