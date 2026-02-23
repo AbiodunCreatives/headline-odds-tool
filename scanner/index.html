@@ -396,8 +396,13 @@
             ? new Date(m.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
             : "\u2014";
 
-          const shortHeadline = headline.length > 100 ? headline.slice(0, 97) + "\u2026" : headline;
-          const replyText = `"${shortHeadline}"\n\nMarket says: ${yes} yes \u2192 ${m.title}\n\nvia @headlineodds \uD83D\uDFE2\nheadlineodds.fun`;
+          const yesPct = m.yes_bid || 0;
+          const tweetText = yesPct >= 70
+            ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds\nheadlineodds.fun/scanner`
+            : yesPct >= 40
+            ? `This one's a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds\nheadlineodds.fun/scanner`
+            : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds\nheadlineodds.fun/scanner`;
+          const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
 
           html += `
             <div class="market-card">
@@ -421,8 +426,8 @@
                 <span>Closes: ${close}</span>
               </div>
               <div class="market-actions">
-                <button class="btn-copy" onclick="copyReply(this, ${esc(JSON.stringify(replyText))})">📋 Copy Reply</button>
-                <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi →</a>
+                <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">\uD835\uDD4F Share to X</a>
+                <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
               </div>
             </div>`;
         }
@@ -437,16 +442,6 @@
       }
     }
 
-    function copyReply(el, text) {
-      navigator.clipboard.writeText(text).then(() => {
-        el.classList.add("copied");
-        el.innerHTML = "✓ Copied!";
-        setTimeout(() => {
-          el.classList.remove("copied");
-          el.innerHTML = "📋 Copy Reply";
-        }, 2000);
-      });
-    }
 
     function esc(str) {
       const d = document.createElement("div");
