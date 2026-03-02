@@ -518,8 +518,8 @@
       <a href="#faq" class="nav-link">FAQ</a>
     </div>
     <div class="nav-ctas">
-      <a href="#waitlist" class="btn btn-ghost nav-btn">Waitlist</a>
-      <a href="/scanner" class="btn btn-primary nav-btn">Try Scanner</a>
+      <a href="/scanner" class="btn btn-ghost nav-btn">Try Scanner</a>
+      <a href="https://chromewebstore.google.com/detail/headline-odds/hjgebdnolohkmokceklhdpbbnjicnkib?utm_source=item-share-cb" class="btn btn-primary nav-btn" target="_blank" rel="noopener">Add to Chrome</a>
     </div>
   </nav>
 
@@ -534,8 +534,8 @@
           <h1>The news,<br>with the <span class="grad">odds.</span></h1>
           <p class="hero-sub">Real-time prediction market probabilities next to every headline you read. No tab switching. No searching.</p>
           <div class="hero-ctas">
-            <a href="/scanner" class="btn btn-primary btn-lg">Try Scanner →</a>
-            <a href="#waitlist" class="btn btn-ghost btn-lg">Request Early Access →</a>
+            <a href="https://chromewebstore.google.com/detail/headline-odds/hjgebdnolohkmokceklhdpbbnjicnkib?utm_source=item-share-cb" class="btn btn-primary btn-lg" target="_blank" rel="noopener">Add to Chrome — Free →</a>
+            <a href="/scanner" class="btn btn-ghost btn-lg">Try Scanner →</a>
           </div>
         </div>
         <div>
@@ -855,7 +855,7 @@
     <div class="cta-glow"></div>
     <div class="cta-inner">
       <h2>Read the news<br><span class="grad">with the odds.</span></h2>
-      <p class="cta-sub">Pending Chrome Web Store review. Join the waitlist to be first in line when we launch.</p>
+      <p class="cta-sub">Now live on the Chrome Web Store. Install in seconds — completely free.</p>
       <div class="cta-cols">
         <div class="install-box fade">
           <img src="logo.png" class="install-logo" alt="Headline Odds" width="56" height="56" />
@@ -863,22 +863,12 @@
             <div class="install-name">Headline Odds</div>
             <div class="install-note">Free Chrome Extension</div>
           </div>
-          <div class="install-status">
-            <span class="status-dot-pending"></span>
-            Pending Web Store Review
-          </div>
-          <p class="install-coming-soon">Join the waitlist to get notified<br>the moment it's available.</p>
+          <a href="https://chromewebstore.google.com/detail/headline-odds/hjgebdnolohkmokceklhdpbbnjicnkib?utm_source=item-share-cb" class="btn btn-primary btn-full btn-lg" target="_blank" rel="noopener" style="margin-top:4px;">Add to Chrome — Free</a>
         </div>
         <div class="waitlist-box fade fade-d1">
-          <h3>Join the waitlist</h3>
-          <p>Be first to know about new features and updates.</p>
-          <form id="waitlistForm" class="form-col" action="https://formspree.io/f/mkovoozo" method="POST">
-            <input class="input" type="text" name="name" placeholder="Name" autocomplete="name" />
-            <input class="input" type="email" name="email" placeholder="Email address" required autocomplete="email" />
-            <button class="btn btn-primary btn-full" type="submit" style="padding:13px;font-size:15px;">Join the waitlist</button>
-          </form>
-          <div id="successMsg" class="success-msg">You're in. We'll email you when access opens.</div>
-          <p class="fine">No spam, ever. Unsubscribe anytime.</p>
+          <h3>Or try the scanner</h3>
+          <p>Don't want to install anything? Paste any headline into our AI-powered scanner and find matching markets instantly.</p>
+          <a href="/scanner" class="btn btn-ghost btn-full btn-lg" style="margin-top:8px;">Try Scanner →</a>
         </div>
       </div>
     </div>
@@ -895,6 +885,8 @@
         <div class="footer-links">
           <a href="#how">How it works</a>
           <a href="#faq">FAQ</a>
+          <a href="/scanner">Scanner</a>
+          <a href="https://chromewebstore.google.com/detail/headline-odds/hjgebdnolohkmokceklhdpbbnjicnkib?utm_source=item-share-cb" target="_blank" rel="noopener">Chrome Web Store</a>
           <a href="article.html">Article</a>
           <a href="privacy.html">Privacy Policy</a>
         </div>
@@ -925,46 +917,6 @@
       });
     });
 
-    // Nav notify popover
-    const navNotifyBtn = document.getElementById("navNotifyBtn");
-    const navPopover = document.getElementById("navPopover");
-    const navNotifyForm = document.getElementById("navNotifyForm");
-    const navNotifySuccess = document.getElementById("navNotifySuccess");
-
-    navNotifyBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      navPopover.hidden = !navPopover.hidden;
-      if (!navPopover.hidden) navPopover.querySelector("input[type=email]").focus();
-    });
-    document.addEventListener("click", () => { navPopover.hidden = true; });
-    navPopover.addEventListener("click", (e) => e.stopPropagation());
-    navNotifyForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      try {
-        const res = await fetch(navNotifyForm.action, { method: "POST", body: new FormData(navNotifyForm), headers: { Accept: "application/json" } });
-        if (res.ok) {
-          navNotifyForm.reset();
-          navNotifyForm.hidden = true;
-          navNotifySuccess.hidden = false;
-          setTimeout(() => { navPopover.hidden = true; navNotifyForm.hidden = false; navNotifySuccess.hidden = true; }, 3200);
-          return;
-        }
-        navNotifyForm.submit();
-      } catch { navNotifyForm.submit(); }
-    });
-
-    // Waitlist form
-    const form = document.getElementById("waitlistForm");
-    const success = document.getElementById("successMsg");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      success.classList.remove("show");
-      try {
-        const res = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
-        if (res.ok) { form.reset(); success.classList.add("show"); return; }
-        form.submit();
-      } catch { form.submit(); }
-    });
   </script>
 </body>
 </html>

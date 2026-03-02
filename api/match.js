@@ -27,9 +27,16 @@ async function getEmbeddings(texts) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ texts: batch }),
     });
-    if (!res.ok) throw new Error(`Embed API ${res.status}`);
+    if (!res.ok) {
+      const body = await res.text().catch(() => "<no body>");
+      console.error("Embed API error", res.status, body);
+      throw new Error(`Embed API ${res.status}`);
+    }
     const json = await res.json();
-    if (json.error) throw new Error(json.error);
+    if (json.error) {
+      console.error("Embed API returned error field", json.error);
+      throw new Error(json.error);
+    }
     allEmbeddings.push(...json.embeddings);
   }
   return allEmbeddings;
@@ -51,7 +58,12 @@ async function getAllMarkets() {
     if (cursor) params.set("cursor", cursor);
 
     const res = await fetch(`${KALSHI_API}/events?${params}`);
-    if (!res.ok) throw new Error(`Kalshi API ${res.status}`);
+    if (!res.ok) {
+      // log status and body for debugging
+      const text = await res.text().catch(() => "<no body>");
+      console.error("Kalshi API error", res.status, text);
+      throw new Error(`Kalshi API ${res.status}`);
+    }
     const json = await res.json();
 
     for (const event of json.events || []) {

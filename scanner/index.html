@@ -376,7 +376,13 @@
         });
         const data = await res.json();
 
-        if (!data.ok || !data.results || data.results.length === 0) {
+        // show any server-side error instead of silently falling back to empty state
+        if (!data.ok) {
+          results.innerHTML = `<div class="status error">${esc(data.error || "Unknown error")}</div>`;
+          return;
+        }
+
+        if (!data.results || data.results.length === 0) {
           results.innerHTML = `
             <div class="empty">
               <div class="empty-icon">🔍</div>
