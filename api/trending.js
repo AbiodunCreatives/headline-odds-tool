@@ -7,9 +7,29 @@ const EMBED_API  = "https://headline-embed.abiodunfaboyode007.workers.dev/";
 const CACHE_TTL  = 10 * 60 * 1000;
 
 const RSS_FEEDS = [
+  // US News
+  { url: "https://feeds.npr.org/1001/rss.xml",           source: "NPR"     },
+  { url: "https://rss.cnn.com/rss/edition.rss",          source: "CNN"     },
+  { url: "https://feeds.foxnews.com/foxnews/latest",     source: "Fox News" },
+  { url: "https://feeds.nytimes.com/nyt/rss/homepage",   source: "NY Times" },
+  { url: "https://feeds.washingtonpost.com/rss/world",   source: "Wash Post" },
   { url: "https://feeds.reuters.com/reuters/topNews",    source: "Reuters" },
   { url: "https://feeds.bbci.co.uk/news/rss.xml",        source: "BBC"     },
-  { url: "https://feeds.npr.org/1001/rss.xml",           source: "NPR"     },
+  
+  // Crypto & Tech
+  { url: "https://cointelegraph.com/rss",                source: "Cointelegraph" },
+  { url: "https://coindesk.com/arc/outboundfeeds/rss/",  source: "CoinDesk" },
+  
+  // Politics
+  { url: "https://feeds.npr.org/1014/rss.xml",           source: "NPR Politics" },
+  
+  // Sports
+  { url: "https://www.espn.com/espn/rss/news",           source: "ESPN"    },
+  { url: "https://rss.cnn.com/rss/edition_sport.rss",    source: "CNN Sports" },
+  
+  // Business
+  { url: "https://feeds.bloomberg.com/markets/news.rss", source: "Bloomberg" },
+  { url: "https://feeds.foxbusiness.com/foxbusiness/latest", source: "Fox Business" },
 ];
 
 let trendCache  = { data: null, ts: 0 };
