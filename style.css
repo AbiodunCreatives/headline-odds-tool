@@ -1,0 +1,441 @@
+/* Headline Odds — extension UI styles */
+
+/* ── Inline pill ──────────────────────────────────────────── */
+.kalshi-odds-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 8px;
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #d8f0e4;
+  background: rgba(5, 18, 11, 0.9);
+  border-radius: 999px;
+  border: 1px solid rgba(0, 198, 94, 0.45);
+  cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(0, 198, 94, 0.06);
+  line-height: 1.35;
+  vertical-align: middle;
+  white-space: nowrap;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 130ms ease;
+  font-family: "Space Grotesk", "Geist", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.kalshi-odds-pill:hover {
+  border-color: rgba(0, 227, 143, 0.75);
+  box-shadow: 0 0 0 3px rgba(0, 198, 94, 0.13), 0 2px 12px rgba(0, 198, 94, 0.2);
+  transform: translateY(-1px);
+}
+
+.kalshi-odds-pill:active {
+  transform: translateY(0);
+  box-shadow: 0 0 0 2px rgba(0, 198, 94, 0.08);
+}
+
+/* Live dot */
+.kalshi-pill-live {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00e38f;
+  flex-shrink: 0;
+  box-shadow: 0 0 5px rgba(0, 227, 143, 0.7);
+  animation: kalshi-live-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes kalshi-live-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 227, 143, 0.5); opacity: 1; }
+  50%       { box-shadow: 0 0 9px rgba(0, 227, 143, 1);   opacity: 0.7; }
+}
+
+.kalshi-pill-yes {
+  color: #00e38f;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  letter-spacing: -0.01em;
+}
+
+.kalshi-pill-label {
+  color: rgba(190, 215, 200, 0.55);
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kalshi-pill-text {
+  color: rgba(190, 215, 200, 0.7);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Fetching state */
+.kalshi-pill-fetching {
+  border-color: rgba(0, 198, 94, 0.2);
+  box-shadow: none;
+  animation: kalshi-pill-breathe 1.8s ease-in-out infinite;
+}
+
+.kalshi-pill-fetching .kalshi-pill-live {
+  background: rgba(0, 198, 94, 0.45);
+  box-shadow: none;
+  animation: kalshi-live-blink 1.2s ease-in-out infinite;
+}
+
+@keyframes kalshi-pill-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 0.85; }
+}
+
+@keyframes kalshi-live-blink {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.9; }
+}
+
+/* ── Divergence pill (amber) ──────────────────────────────── */
+.kalshi-pill-diverge {
+  border-color: rgba(255, 176, 0, 0.52);
+  background: rgba(28, 16, 0, 0.92);
+  box-shadow: 0 0 0 3px rgba(255, 176, 0, 0.07);
+  animation: kalshi-diverge-pulse 2.8s ease-in-out infinite;
+}
+
+.kalshi-pill-diverge:hover {
+  border-color: rgba(255, 176, 0, 0.85);
+  box-shadow: 0 0 0 3px rgba(255, 176, 0, 0.16), 0 2px 14px rgba(255, 176, 0, 0.22);
+}
+
+@keyframes kalshi-diverge-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(255, 176, 0, 0.06); border-color: rgba(255, 176, 0, 0.5); }
+  50%       { box-shadow: 0 0 0 3px rgba(255, 176, 0, 0.18), 0 0 12px rgba(255, 176, 0, 0.2); border-color: rgba(255, 176, 0, 0.82); }
+}
+
+.kalshi-pill-diverge .kalshi-pill-yes { color: #ffb800; }
+
+.kalshi-pill-diverge-icon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* ── Divergence banner inside card ───────────────────────── */
+.kalshi-diverge-banner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: rgba(255, 176, 0, 0.08);
+  border: 1px solid rgba(255, 176, 0, 0.28);
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffcc44;
+  letter-spacing: 0.01em;
+}
+
+/* ── Share to X button ────────────────────────────────────── */
+.kalshi-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(29, 155, 240, 0.08);
+  border: 1px solid rgba(29, 155, 240, 0.22);
+  color: #1d9bf0;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  transition: background 140ms ease, border-color 140ms ease, transform 120ms ease;
+  cursor: pointer;
+}
+
+.kalshi-share-btn:hover {
+  background: rgba(29, 155, 240, 0.16);
+  border-color: rgba(29, 155, 240, 0.5);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.kalshi-pill-empty {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(30, 30, 30, 0.6);
+  color: rgba(180, 180, 180, 0.6);
+  box-shadow: none;
+  cursor: default;
+}
+
+.kalshi-pill-error {
+  border-color: rgba(255, 80, 80, 0.4);
+  background: rgba(40, 10, 10, 0.85);
+  color: rgba(255, 140, 140, 0.85);
+  box-shadow: none;
+  cursor: default;
+}
+
+/* ── Market card ──────────────────────────────────────────── */
+.kalshi-market-card {
+  width: min(280px, 90vw);
+  background: #0f1110;
+  color: #f5f6f5;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  font-family: "Space Grotesk", "Satoshi", "Geist", "Avenir Next", "Helvetica Neue", sans-serif;
+}
+
+.kalshi-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 800;
+  font-size: 13px;
+  color: #00e38f;
+}
+
+.kalshi-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.kalshi-card-logo-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 198, 94, 0.35));
+}
+
+.kalshi-card-close {
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5f6f5;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.kalshi-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kalshi-market-item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.kalshi-market-title {
+  margin: 6px 0 2px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.kalshi-market-subtitle {
+  margin: 0 0 8px;
+  color: #b8c2bd;
+  font-size: 12px;
+}
+
+.kalshi-market-odds {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0 8px;
+}
+
+.kalshi-odd {
+  border-radius: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  color: #f5f6f5;
+  transition: background 140ms ease, border-color 140ms ease, transform 120ms ease, box-shadow 140ms ease;
+}
+
+.kalshi-odd-multiplier {
+  color: #c5cec9;
+  font-size: 12px;
+  margin: 0 8px;
+}
+
+.kalshi-yes {
+  border-color: rgba(0, 198, 94, 0.35);
+  background: rgba(0, 198, 94, 0.07);
+}
+
+.kalshi-yes:hover {
+  background: rgba(0, 198, 94, 0.15);
+  border-color: rgba(0, 198, 94, 0.65);
+  box-shadow: 0 2px 10px rgba(0, 198, 94, 0.15);
+  transform: translateX(2px);
+  text-decoration: none;
+}
+
+.kalshi-no {
+  border-color: rgba(255, 92, 92, 0.3);
+  background: rgba(255, 92, 92, 0.07);
+}
+
+.kalshi-no:hover {
+  background: rgba(255, 92, 92, 0.15);
+  border-color: rgba(255, 92, 92, 0.6);
+  box-shadow: 0 2px 10px rgba(255, 92, 92, 0.12);
+  transform: translateX(2px);
+  text-decoration: none;
+}
+
+.kalshi-odd-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #dfe4e0;
+}
+
+.kalshi-odd-value {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.kalshi-market-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #a9b1ac;
+  margin-bottom: 8px;
+}
+
+.kalshi-meta-strong {
+  font-weight: 700;
+  color: #f5f6f5;
+}
+
+.kalshi-market-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #00e38f;
+  text-decoration: none;
+}
+
+.kalshi-market-link:hover {
+  text-decoration: underline;
+}
+
+.kalshi-card-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.kalshi-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f5f6f5;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kalshi-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.kalshi-card-index {
+  font-size: 11px;
+  color: #a9b1ac;
+  min-width: 48px;
+  text-align: center;
+}
+
+.kalshi-slide {
+  animation: kalshi-slide-in 180ms ease;
+}
+
+@keyframes kalshi-slide-in {
+  from { transform: translateX(8px); opacity: 0; }
+  to   { transform: translateX(0);   opacity: 1; }
+}
+
+.kalshi-cta {
+  margin-top: 10px;
+  display: block;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #00e38f, #00c65e);
+  color: #0f0f0f;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(0, 198, 94, 0.35);
+}
+
+.kalshi-powered {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 11px;
+  color: #a9b1ac;
+}
+
+.kalshi-powered span {
+  color: #00e38f;
+  font-weight: 700;
+}
+
+/* ── Focus / accessibility ────────────────────────────────── */
+.kalshi-odds-pill:focus-visible,
+.kalshi-nav-btn:focus-visible,
+.kalshi-card-close:focus-visible,
+.kalshi-cta:focus-visible,
+.kalshi-odd:focus-visible {
+  outline: 2px solid #00e38f;
+  outline-offset: 2px;
+}
+
+/* ── Reduced motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .kalshi-odds-pill,
+  .kalshi-odd,
+  .kalshi-cta,
+  .kalshi-card-close,
+  .kalshi-nav-btn {
+    transition-duration: 0ms !important;
+  }
+  .kalshi-pill-live,
+  .kalshi-pill-fetching,
+  .kalshi-pill-diverge,
+  .kalshi-slide {
+    animation: none !important;
+  }
+}

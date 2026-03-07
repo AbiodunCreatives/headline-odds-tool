@@ -1,0 +1,13 @@
+{
+  "name": "headline-odds-tool",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headline Odds Market Matcher — paste a headline, find matching Kalshi markets",
+  "scripts": {
+    "dev": "npx vercel dev"
+  },
+  "dependencies": {
+    "@vercel/og": "^0.6.0"
+  }
+}
