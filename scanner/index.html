@@ -24,9 +24,9 @@
       --text: #eef2ef;
       --muted: #a9b5ae;
       --dim: #55625d;
-      --bags: #8B5CF6;
-      --bags-dark: #7C3AED;
-      --bags-glow: rgba(139,92,246,0.25);
+      --bags: #00e38f;
+      --bags-dark: #00c65e;
+      --bags-glow: rgba(0,227,143,0.25);
       color-scheme: dark;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -189,15 +189,29 @@
 
     /* Market card */
     .market-card {
-      padding: 24px; border-radius: 16px;
-      background: var(--card);
+      padding: 28px; border-radius: 20px;
+      background: linear-gradient(135deg, var(--card), rgba(255,255,255,0.015));
       border: 1px solid var(--border);
-      transition: border-color 300ms, transform 300ms, box-shadow 300ms;
+      position: relative;
+      overflow: hidden;
+      transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .market-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(0,227,143,0.05), transparent);
+      opacity: 0;
+      transition: opacity 400ms;
+      pointer-events: none;
     }
     .market-card:hover {
-      border-color: rgba(0,198,94,0.22);
-      transform: translateY(-3px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+      border-color: rgba(0,198,94,0.3);
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 20px rgba(0,227,143,0.1);
+    }
+    .market-card:hover::before {
+      opacity: 1;
     }
     .market-header {
       display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
@@ -684,7 +698,7 @@
       </div>
 
       <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">
-        Connect Wallet (Phantom / Solflare)
+        Connect Wallet (Solflare / Phantom)
       </button>
 
       <div class="swap-field">
@@ -913,9 +927,9 @@
     // ── Wallet connect ───────────────────────────────────────────────────
     async function connectWallet() {
       const btn = document.getElementById("walletBtn");
-      const provider = window.solana || window.solflare;
+      const provider = window.solflare || window.solana;
       if (!provider) {
-        setSwapStatus("Please install Phantom or Solflare wallet extension", "error");
+        setSwapStatus("Please install Solflare or Phantom wallet extension", "error");
         return;
       }
       try {
@@ -1043,7 +1057,7 @@
 
         // Deserialize + sign
         execBtn.textContent = "Awaiting signature…";
-        const provider = window.solana || window.solflare;
+        const provider = window.solflare || window.solana;
         const txBytes = Uint8Array.from(atob(sData.serializedTransaction), c => c.charCodeAt(0));
 
         let tx;
