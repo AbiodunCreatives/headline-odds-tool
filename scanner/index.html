@@ -232,34 +232,46 @@
 
     /* Odds row */
     .odds-row {
-      display: flex; gap: 10px; margin-bottom: 16px;
+      display: flex; gap: 12px; margin-bottom: 16px;
     }
     .odd {
       flex: 1; display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; border-radius: 12px;
+      padding: 14px 18px; border-radius: 24px;
       text-decoration: none; color: var(--text);
-      transition: transform 200ms, border-color 200ms, background 200ms;
+      position: relative; overflow: hidden;
+      transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .odd::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      opacity: 0; transition: opacity 300ms;
     }
     .odd-yes {
-      border: 1px solid rgba(0,198,94,0.35);
-      background: rgba(0,198,94,0.07);
+      border: 1px solid rgba(0,198,94,0.4);
+      background: linear-gradient(135deg, rgba(0,198,94,0.08), rgba(0,198,94,0.04));
     }
     .odd-yes:hover {
-      border-color: rgba(0,198,94,0.68);
-      background: rgba(0,198,94,0.14);
-      transform: translateX(3px);
+      border-color: rgba(0,198,94,0.7);
+      background: linear-gradient(135deg, rgba(0,198,94,0.15), rgba(0,198,94,0.08));
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(0,198,94,0.3);
     }
+    .odd-yes:hover::before { opacity: 1; }
     .odd-no {
-      border: 1px solid rgba(255,92,92,0.3);
-      background: rgba(255,92,92,0.07);
+      border: 1px solid rgba(255,92,92,0.4);
+      background: linear-gradient(135deg, rgba(255,92,92,0.08), rgba(255,92,92,0.04));
     }
     .odd-no:hover {
-      border-color: rgba(255,92,92,0.62);
-      background: rgba(255,92,92,0.14);
-      transform: translateX(3px);
+      border-color: rgba(255,92,92,0.7);
+      background: linear-gradient(135deg, rgba(255,92,92,0.15), rgba(255,92,92,0.08));
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(255,92,92,0.3);
     }
-    .odd-label { font-size: 13px; font-weight: 600; }
-    .odd-value { font-size: 16px; font-weight: 800; }
+    .odd-no:hover::before { opacity: 1; }
+    .odd-label { font-size: 13px; font-weight: 600; z-index: 1; position: relative; }
+    .odd-value { font-size: 18px; font-weight: 800; z-index: 1; position: relative; }
     .odd-yes .odd-value { color: var(--green); }
     .odd-no .odd-value { color: #ff5c5c; }
 
@@ -506,6 +518,30 @@
     }
     .swap-status-msg a { color: inherit; text-decoration: underline; }
 
+    /* Market modal */
+    .market-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(8,10,9,0.8); backdrop-filter: blur(20px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .market-modal {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 24px; padding: 32px; max-width: 600px; width: 100%;
+      max-height: 80vh; overflow-y: auto;
+      position: relative;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+    .market-close {
+      position: absolute; top: 20px; right: 20px;
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.05);
+      color: var(--muted); font-size: 20px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-family: inherit; transition: background 200ms, color 200ms;
+    }
+    .market-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
     @media (max-width: 640px) {
       .bags-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
       .bags-bar-right { margin-left: 0; width: 100%; }
@@ -729,6 +765,14 @@
     </div>
   </div>
 
+  <!-- Market detail modal -->
+  <div class="market-overlay" id="marketOverlay" style="display:none" onclick="handleMarketOverlayClick(event)">
+    <div class="market-modal">
+      <button class="market-close" onclick="closeMarketModal()">×</button>
+      <div id="marketDetailContent"></div>
+    </div>
+  </div>
+
   <footer>
     <p>Built by <a href="https://headlineodds.fun">Headline Odds</a> — real-time prediction market odds on every headline.</p>
   </footer>
@@ -737,6 +781,8 @@
     const input = document.getElementById("headlineInput");
     const btn = document.getElementById("searchBtn");
     const results = document.getElementById("resultsArea");
+
+    let tickerData = []; // Store full market data for ticker items
 
     async function search() {
       const headline = input.value.trim();
@@ -924,6 +970,74 @@
     }
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSwapModal(); });
 
+    // ── Market modal ─────────────────────────────────────────────────────
+    function openMarketModal(index) {
+      const item = tickerData[index];
+      if (!item) return;
+
+      const m = item.market;
+      const yes = m.yes_bid != null ? `${m.yes_bid}¢` : "—";
+      const no = m.no_bid != null ? `${m.no_bid}¢` : "—";
+      const vol = m.volume != null ? `$${Math.round(m.volume * (m.last_price || m.yes_bid || 50) / 100).toLocaleString()}` : "—";
+      const close = m.close_time
+        ? new Date(m.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+        : "—";
+
+      const yesPct = m.yes_bid || 0;
+      const shareParams = new URLSearchParams({
+        title: m.title, yes: m.yes_bid || "—", no: m.no_bid || "—",
+        vol: vol, closes: close, url: m.url,
+      });
+      const shareLink = `${window.location.origin}/api/share?${shareParams}`;
+      const tweetText = yesPct >= 70
+        ? `The market is ${yesPct}% confident on this → ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
+        : yesPct >= 40
+        ? `This one's a toss-up — market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
+        : `Market only gives this ${yesPct}% odds → ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
+      const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
+
+      const html = `
+        <div class="market-card" style="margin: 0; box-shadow: none; border: none; background: transparent;">
+          <div class="market-header" style="margin-bottom: 24px;">
+            <div class="market-title" style="font-size: 24px; line-height: 1.3;">${esc(m.title)}</div>
+          </div>
+          ${m.subtitle ? `<div class="market-subtitle" style="font-size: 16px; margin-bottom: 24px;">${esc(m.subtitle)}</div>` : ""}
+          <div class="odds-row" style="gap: 16px;">
+            <a class="odd odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
+              <span class="odd-label">Yes</span>
+              <span class="odd-value">${yes}</span>
+            </a>
+            <a class="odd odd-no" href="${esc(m.url)}" target="_blank" rel="noopener">
+              <span class="odd-label">No</span>
+              <span class="odd-value">${no}</span>
+            </a>
+          </div>
+          ${(m.volume || m.close_time) ? `
+          <div class="market-meta" style="margin-top: 20px; font-size: 14px;">
+            ${m.volume ? `<span>Volume: <strong>${vol}</strong></span>` : ""}
+            ${m.close_time ? `<span>Closes: ${close}</span>` : ""}
+          </div>` : ""}
+          <div class="market-actions" style="margin-top: 24px; justify-content: center;">
+            <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to X
+              <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
+            </a>
+            <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi →</a>
+          </div>
+        </div>`;
+
+      document.getElementById("marketDetailContent").innerHTML = html;
+      document.getElementById("marketOverlay").style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+    function closeMarketModal() {
+      document.getElementById("marketOverlay").style.display = "none";
+      document.body.style.overflow = "";
+    }
+    function handleMarketOverlayClick(e) {
+      if (e.target === document.getElementById("marketOverlay")) closeMarketModal();
+    }
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMarketModal(); });
+
     // ── Wallet connect ───────────────────────────────────────────────────
     async function connectWallet() {
       const btn = document.getElementById("walletBtn");
@@ -1100,11 +1214,13 @@
       const items = results.filter(r => r.market.yes_bid != null).slice(0, 7);
       if (!items.length) return;
 
-      const html = items.map(r => {
+      tickerData = items; // Store for modal access
+
+      const html = items.map((r, index) => {
         const label = r.market.title.length > 55
           ? r.market.title.slice(0, 55) + "…"
           : r.market.title;
-        return `<div class="ticker-item">
+        return `<div class="ticker-item" onclick="openMarketModal(${index})" style="cursor: pointer;">
           <span class="t-title">${esc(label)}</span>
           <span class="ticker-dot"></span>
           <span class="t-yes">${r.market.yes_bid}¢ YES</span>
