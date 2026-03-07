@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /c/headline-odds/ log --oneline -15)",
+      "Bash(wc -l api/*.js scanner/*.html style.css)",
+      "Bash(find /c/headline* -maxdepth 1 -name \"README*\" -o -name \"readme*\")",
+      "Bash(git -C /c/headline-odds-tool log --oneline -1 --format=\"%ai %s\")",
+      "Bash(git -C /c/headline-odds log --oneline -1 --format=\"%ai %s\")",
+      "Bash(git -C /c/headline-odds status)",
+      "Bash(gh repo view AbiodunCreatives/headlineodds --json description,updatedAt,pushedAt)",
+      "Bash(gh --version)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh\" auth status)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(nslookup headlineodds.fun)",
+      "Bash(npx vercel --version)",
+      "Bash(npx vercel domains ls)",
+      "Bash(npx vercel domains inspect headlineodds.fun)",
+      "Bash(npx vercel --prod)",
+      "Bash(npx vercel --prod --yes)",
+      "Bash(npx vercel dev --listen 3000)",
+      "Bash(du -sh /c/headline-odds-tool/*)"
+    ]
+  }
+}

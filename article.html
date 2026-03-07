@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon16.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/icon48.png" />
+  <link rel="icon" type="image/png" sizes="128x128" href="/icon128.png" />
+  <link rel="apple-touch-icon" href="/icon128.png" />
+  <title>The Odds Are Right There — Headline Odds</title>
+  <meta name="description" content="How a tiny green number next to a headline is changing the way we read the news — and why it matters more than you think." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://headlineodds.fun/article.html" />
+  <meta property="og:title" content="The Odds Are Right There — Headline Odds" />
+  <meta property="og:description" content="How a tiny green number next to a headline is changing the way we read the news — and why it matters more than you think." />
+  <meta property="og:image" content="https://headlineodds.fun/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Headline Odds" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@headlineodds" />
+  <meta name="twitter:title" content="The Odds Are Right There — Headline Odds" />
+  <meta name="twitter:description" content="How a tiny green number next to a headline is changing the way we read the news — and why it matters more than you think." />
+  <meta name="twitter:image" content="https://headlineodds.fun/og-image.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080a09;
+      --card: rgba(255,255,255,0.028);
+      --border: rgba(255,255,255,0.07);
+      --green: #00e38f;
+      --green-2: #00c65e;
+      --text: #eef2ef;
+      --muted: #a9b5ae;
+      --dim: #55625d;
+      color-scheme: dark;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; }
+
+    /* Grid texture */
+    .grid-bg {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 52px 52px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── BUTTONS ─────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 22px; border-radius: 999px;
+      font-weight: 700; font-size: 14px; cursor: pointer;
+      transition: transform 140ms, box-shadow 140ms, background 140ms;
+      border: none; font-family: inherit; white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--green), var(--green-2));
+      color: #061009;
+      box-shadow: 0 6px 20px rgba(0,198,94,0.28);
+    }
+    .btn-primary:hover { box-shadow: 0 10px 28px rgba(0,198,94,0.44); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+    /* ── NAV ─────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 68px;
+      border-bottom: 1px solid transparent;
+      transition: background 280ms, border-color 280ms;
+    }
+    nav.scrolled {
+      background: rgba(8,10,9,0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-color: var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 15px; letter-spacing: 0.015em;
+    }
+    .nav-logo img { width: 26px; height: 26px; filter: drop-shadow(0 0 9px rgba(0,227,143,0.5)); }
+    .nav-back {
+      font-size: 13px; color: var(--muted); font-weight: 500;
+      display: flex; align-items: center; gap: 6px;
+      transition: color 180ms;
+    }
+    .nav-back:hover { color: var(--text); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+
+    /* ── ARTICLE HERO ────────────────────── */
+    .article-hero {
+      position: relative; z-index: 1;
+      padding: 148px 28px 0;
+      text-align: center;
+    }
+    .article-hero-glow {
+      position: absolute; width: 900px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,198,94,0.09) 0%, transparent 65%);
+      top: 0; left: 50%; transform: translateX(-50%); pointer-events: none;
+    }
+    .article-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 999px;
+      border: 1px solid rgba(0,227,143,0.25);
+      background: rgba(0,227,143,0.07);
+      font-size: 11px; font-weight: 700; color: var(--green);
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 28px;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 7px rgba(0,227,143,0.9);
+      animation: live-p 2.4s ease-in-out infinite;
+    }
+    @keyframes live-p { 0%,100% { box-shadow: 0 0 4px rgba(0,227,143,0.4); } 50% { box-shadow: 0 0 14px rgba(0,227,143,1); } }
+
+    .article-hero h1 {
+      font-size: clamp(34px, 5.5vw, 68px);
+      font-weight: 900; letter-spacing: -0.038em; line-height: 1.01;
+      max-width: 800px; margin: 0 auto 20px;
+    }
+    .grad { background: linear-gradient(130deg, var(--green) 0%, #7af5c0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .article-deck {
+      font-size: clamp(16px, 2vw, 20px); color: var(--muted); line-height: 1.65;
+      max-width: 600px; margin: 0 auto 40px;
+    }
+    .article-meta {
+      display: flex; align-items: center; justify-content: center; gap: 20px;
+      font-size: 12px; color: var(--dim); font-weight: 500;
+      margin-bottom: 64px;
+    }
+    .article-meta-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--dim); }
+
+    /* ── HERO BROWSER MOCKUP ─────────────── */
+    .hero-mockup {
+      position: relative; z-index: 1;
+      max-width: 820px; margin: 0 auto 0;
+      padding: 0 28px;
+    }
+    .browser-chrome {
+      background: rgba(11,14,12,0.98);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px 16px 0 0;
+      padding: 14px 18px 0;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(0,198,94,0.04);
+    }
+    .browser-bar {
+      display: flex; align-items: center; gap: 7px; margin-bottom: 14px;
+    }
+    .mac-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .browser-url {
+      flex: 1; margin-left: 8px; background: rgba(255,255,255,0.05);
+      border-radius: 6px; padding: 5px 12px; font-size: 11px; color: var(--dim);
+    }
+    .browser-body {
+      padding: 24px 24px 0; background: rgba(8,11,9,0.6);
+      border-radius: 8px 8px 0 0; min-height: 220px;
+    }
+    .browser-site-name {
+      font-size: 11px; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 18px;
+    }
+    .browser-headlines { display: flex; flex-direction: column; gap: 0; }
+    .bhl {
+      display: flex; align-items: flex-start; flex-wrap: wrap; gap: 10px;
+      padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 14px; font-weight: 600; color: #c8d4ce; line-height: 1.4;
+    }
+    .bhl:last-child { border-bottom: none; }
+    .bhl-dim { padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; font-weight: 600; color: rgba(140,160,150,0.22); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px 3px 8px; background: rgba(4,16,10,0.95);
+      border: 1px solid rgba(0,198,94,0.45); border-radius: 999px;
+      font-size: 11px; font-weight: 700; color: #d8f0e4; white-space: nowrap;
+      animation: pill-breathe 3.8s ease-in-out infinite; flex-shrink: 0;
+    }
+    @keyframes pill-breathe {
+      0%,100% { box-shadow: 0 0 0 3px rgba(0,198,94,0.05); border-color: rgba(0,198,94,0.45); }
+      50% { box-shadow: 0 0 0 3px rgba(0,198,94,0.15), 0 2px 14px rgba(0,198,94,0.2); border-color: rgba(0,198,94,0.78); }
+    }
+    .pdot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px rgba(0,227,143,0.7); flex-shrink: 0; animation: live-p 2.2s ease-in-out infinite; }
+    .pyes { color: var(--green); font-weight: 800; font-size: 11.5px; }
+    .plabel { color: rgba(180,210,192,0.5); font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Fade edge on mockup bottom */
+    .mockup-fade {
+      height: 80px; margin-top: -80px; position: relative; z-index: 2;
+      background: linear-gradient(to bottom, transparent, var(--bg));
+      pointer-events: none;
+    }
+
+    /* ── ARTICLE BODY ────────────────────── */
+    .article-wrap {
+      position: relative; z-index: 1;
+      max-width: 700px; margin: 72px auto 0; padding: 0 28px 120px;
+    }
+    .article-body p {
+      font-size: 17px; line-height: 1.78; color: #c8d4ce;
+      margin-bottom: 26px; font-weight: 400;
+    }
+    .article-body p:first-child::first-letter {
+      font-size: 4.2em; font-weight: 900; line-height: 0.82;
+      float: left; margin: 6px 12px 0 0; color: var(--green);
+    }
+    .article-body h2 {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--text); margin: 52px 0 18px; line-height: 1.2;
+    }
+    .article-body h2::before {
+      content: ""; display: block; width: 28px; height: 3px;
+      background: linear-gradient(90deg, var(--green), var(--green-2));
+      border-radius: 2px; margin-bottom: 14px;
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      margin: 48px -32px; padding: 32px 40px;
+      border-left: 3px solid var(--green);
+      background: rgba(0,227,143,0.04);
+      border-radius: 0 16px 16px 0;
+    }
+    .pull-quote p {
+      font-size: 21px !important; font-weight: 700 !important;
+      line-height: 1.45 !important; color: var(--text) !important;
+      margin-bottom: 0 !important; letter-spacing: -0.015em;
+    }
+    .pull-quote p::first-letter { all: unset; }
+    .pull-quote cite {
+      display: block; margin-top: 12px;
+      font-size: 12px; color: var(--dim); font-style: normal; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+
+    /* Inline screenshot slot */
+    .screenshot-slot {
+      margin: 44px 0; border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+    .screenshot-slot img {
+      width: 100%; height: auto; display: block;
+    }
+    /* CSS mockup used when no real screenshot */
+    .screenshot-mockup {
+      background: rgba(11,14,12,0.98); padding: 24px;
+    }
+    .screenshot-mockup .sm-label {
+      font-size: 10px; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 18px;
+    }
+    .market-card-demo {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 20px; max-width: 340px;
+    }
+    .mcd-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .mcd-title { display: flex; align-items: center; gap: 8px; }
+    .mcd-title img { width: 18px; height: 18px; }
+    .mcd-title span { font-size: 10px; font-weight: 800; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+    .mcd-q { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.4; margin-bottom: 16px; }
+    .mcd-odds { display: flex; gap: 10px; margin-bottom: 16px; }
+    .mcd-yes, .mcd-no {
+      flex: 1; border-radius: 10px; padding: 10px 12px; text-align: center;
+    }
+    .mcd-yes { background: rgba(0,198,94,0.1); border: 1px solid rgba(0,198,94,0.3); }
+    .mcd-no { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+    .mcd-yn-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); margin-bottom: 4px; }
+    .mcd-yn-val { font-size: 20px; font-weight: 900; }
+    .mcd-yes .mcd-yn-val { color: var(--green); }
+    .mcd-no .mcd-yn-val { color: var(--muted); }
+    .mcd-meta { display: flex; gap: 16px; font-size: 11px; color: var(--dim); font-weight: 500; }
+    .mcd-meta strong { color: var(--muted); font-weight: 700; }
+
+    /* Stat callouts */
+    .stat-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin: 44px 0;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 18px; text-align: center;
+    }
+    .stat-num {
+      font-size: 28px; font-weight: 900; letter-spacing: -0.02em;
+      background: linear-gradient(130deg, var(--green) 0%, #7af5c0 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 6px;
+    }
+    .stat-label { font-size: 12px; color: var(--dim); font-weight: 600; line-height: 1.4; }
+
+    /* Divider */
+    .article-divider {
+      width: 48px; height: 2px; margin: 52px auto;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    /* Author card */
+    .author-card {
+      display: flex; align-items: center; gap: 16px;
+      padding: 24px; margin: 56px 0 0;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .author-logo { width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0; filter: drop-shadow(0 0 14px rgba(0,227,143,0.4)); }
+    .author-info p { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 0 !important; }
+    .author-info p::first-letter { all: unset; }
+    .author-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+
+    /* CTA end-of-article */
+    .article-cta {
+      margin: 64px 0 0; padding: 44px 40px; text-align: center;
+      background: rgba(0,227,143,0.05); border: 1px solid rgba(0,227,143,0.15);
+      border-radius: 24px;
+      box-shadow: 0 0 80px rgba(0,198,94,0.05);
+    }
+    .article-cta h3 { font-size: 24px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .article-cta p { font-size: 15px; color: var(--muted); margin-bottom: 24px !important; }
+    .article-cta p::first-letter { all: unset; }
+
+    /* ── FOOTER ──────────────────────────── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 40px 0 32px;
+    }
+    .footer-inner {
+      max-width: 1080px; margin: 0 auto; padding: 0 28px;
+      display: flex; justify-content: space-between; align-items: center; gap: 24px;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; }
+    .footer-logo img { width: 20px; height: 20px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 13px; color: var(--dim); transition: color 180ms; }
+    .footer-links a:hover { color: var(--muted); }
+    .footer-copy { font-size: 12px; color: var(--dim); }
+
+    /* ── RESPONSIVE ──────────────────────── */
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .article-hero { padding: 120px 20px 0; }
+      .article-wrap { padding: 56px 20px 80px; }
+      .pull-quote { margin: 40px 0; border-radius: 12px; padding: 24px 24px; }
+      .pull-quote p { font-size: 17px !important; }
+      .stat-row { grid-template-columns: 1fr 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .footer-links { flex-wrap: wrap; gap: 16px; }
+      .article-cta { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Headline Odds" width="26" height="26" />
+      Headline Odds
+    </a>
+    <div class="nav-right">
+      <a href="index.html" class="nav-back">← Back to site</a>
+      <a href="index.html#waitlist" class="btn btn-primary" style="padding:9px 18px;font-size:13px;">Request Access</a>
+    </div>
+  </nav>
+
+  <!-- ARTICLE HERO -->
+  <div class="article-hero">
+    <div class="article-hero-glow"></div>
+    <div class="article-tag"><span class="live-dot"></span>Feature</div>
+    <h1>The Odds Are<br><span class="grad">Right There</span></h1>
+    <p class="article-deck">How a tiny green number next to a headline is changing the way we read the news — and why it matters more than you think.</p>
+    <div class="article-meta">
+      <span>Headline Odds</span>
+      <span class="article-meta-sep"></span>
+      <span>February 2026</span>
+      <span class="article-meta-sep"></span>
+      <span>7 min read</span>
+    </div>
+  </div>
+
+  <!-- HERO BROWSER MOCKUP -->
+  <div class="hero-mockup">
+    <div class="browser-chrome">
+      <div class="browser-bar">
+        <span class="mac-dot" style="background:#ff5f57"></span>
+        <span class="mac-dot" style="background:#febc2e"></span>
+        <span class="mac-dot" style="background:#28c840"></span>
+        <span class="browser-url">reuters.com — Top Stories</span>
+      </div>
+      <div class="browser-body">
+        <div class="browser-site-name">Reuters · World News</div>
+        <div class="browser-headlines">
+          <div class="bhl">
+            <span>Fed signals rate cuts ahead amid cooling inflation</span>
+            <span class="pill"><span class="pdot"></span><span class="pyes">72¢</span><span class="plabel">yes</span></span>
+          </div>
+          <div class="bhl">
+            <span>Trump signs sweeping executive order on trade</span>
+            <span class="pill"><span class="pdot"></span><span class="pyes">89¢</span><span class="plabel">yes</span></span>
+          </div>
+          <div class="bhl-dim">EU reaches landmark deal on AI regulation</div>
+          <div class="bhl">
+            <span>Bitcoin breaks $100k resistance again</span>
+            <span class="pill"><span class="pdot"></span><span class="pyes">41¢</span><span class="plabel">yes</span></span>
+          </div>
+          <div class="bhl-dim">Senate votes on climate spending package</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup-fade"></div>
+
+  <!-- ARTICLE BODY -->
+  <main class="article-wrap">
+    <article class="article-body">
+
+      <p>There is a particular kind of vertigo that comes from reading the news in 2026. You open a browser tab. A headline says the Federal Reserve is signaling rate cuts. Another says the opposite. A third says both are true depending on the quarter. By the time you've scrolled through three more contradictory takes, you've spent twelve minutes consuming information that has left you measurably less certain about the world than when you started.</p>
+
+      <p>This is not a failure of journalism. It is a failure of signal. For decades, we've been trained to read headlines as declarative statements — things that either happened or are about to happen. But the world doesn't work in sentences. The world works in probabilities. And somewhere in the gap between how we write about events and how events actually unfold, we lost the most important piece of information a headline could ever carry: the odds.</p>
+
+      <p>Headline Odds is a browser extension that gives them back to you.</p>
+
+      <h2>The Wisdom That Was Always There</h2>
+
+      <p>In October 2024, as the U.S. presidential election approached, something unusual was happening on Kalshi, the federally regulated prediction market. While cable news anchors argued in sharp declarative terms, the market told a different story. Contracts tied to the outcome traded with a quiet, ruthless arithmetic. By the first week of November, the market had priced in an outcome that most major media outlets were still calling a toss-up. The market was right. It had been right for weeks.</p>
+
+      <div class="pull-quote">
+        <p>"The market had priced in an outcome that most major media outlets were still calling a toss-up. The market was right. It had been right for weeks."</p>
+        <cite>Prediction markets vs. consensus media, Nov 2024</cite>
+      </div>
+
+      <p>This is not a coincidence. It is a property of markets. The economist Friedrich Hayek called it the "knowledge problem" — the idea that no single mind, no matter how expert, can aggregate all the dispersed, constantly updating information that millions of people hold simultaneously. But a market can. A prediction market, where people put real money behind their beliefs, forces every participant to be honest about what they actually think. The result is a number. A probability. A price that encodes the collective intelligence of thousands of people who have skin in the game.</p>
+
+      <p>Kalshi, launched in 2021 and now one of the largest federally regulated prediction markets in the United States, has built an exchange with contracts on everything from Federal Reserve rate decisions to election outcomes, Bitcoin price levels, geopolitical events, and earnings surprises. In 2023, the CFTC formally recognized it as a designated contract market — the same designation held by the Chicago Mercantile Exchange. For the first time in American history, a prediction market carries full federal regulatory standing.</p>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num">3,800+</div>
+          <div class="stat-label">Active Kalshi markets tracked</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">25+</div>
+          <div class="stat-label">Major news sites supported</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">&lt;2s</div>
+          <div class="stat-label">Match time per headline</div>
+        </div>
+      </div>
+
+      <h2>The Green Number</h2>
+
+      <p>Install the extension, and something subtle but profound happens to the web. You're on Reuters. A headline reads: <em>"Fed signals rate cuts ahead amid cooling inflation."</em> Next to it, in a small green pill — the same green you'd see on a trading floor ticker — a number appears: <strong>72¢ yes.</strong></p>
+
+      <p>That's what the market thinks. Not a pundit's guess. Not an editor's judgment call. The aggregated belief of every person who looked at the same information you're looking at, added up their private knowledge, and put money on it. Scroll down. <em>"Bitcoin breaks $100K resistance again."</em> <strong>41¢ yes.</strong> The market is skeptical. <em>"Trump signs executive order on trade."</em> <strong>89¢ yes.</strong> Near certainty. Move on.</p>
+
+      <p>The experience is almost physical. The news stops being a flat stream of equally-weighted assertions and becomes a textured landscape of confidence levels. Once you can see it, you cannot unsee it. This is what financial professionals have always had — Bloomberg terminals, futures curves, options markets that price in the probability of every macro event before it happens. That advantage has been the exclusive province of those who could afford a $24,000-a-year terminal subscription. Headline Odds costs nothing.</p>
+
+      <!-- REPLACE with @headlineodds screenshot of extension in use -->
+      <div class="screenshot-slot">
+        <div class="screenshot-mockup">
+          <div class="sm-label">Market card — click any pill to expand</div>
+          <div class="market-card-demo">
+            <div class="mcd-header">
+              <div class="mcd-title">
+                <img src="logo.png" alt="logo" />
+                <span>Odds on this story</span>
+              </div>
+              <span style="font-size:11px;color:var(--dim);">1/2 ›</span>
+            </div>
+            <div class="mcd-q">Will the Fed cut rates at the March 2026 FOMC meeting?</div>
+            <div class="mcd-odds">
+              <div class="mcd-yes">
+                <div class="mcd-yn-label">Yes</div>
+                <div class="mcd-yn-val">72¢</div>
+              </div>
+              <div class="mcd-no">
+                <div class="mcd-yn-label">No</div>
+                <div class="mcd-yn-val">28¢</div>
+              </div>
+            </div>
+            <div class="mcd-meta">
+              <span>Vol: <strong>$1.2M</strong></span>
+              <span>Closes: Mar 19, 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2>How the Machine Reads the News</h2>
+
+      <p>Matching a headline to a Kalshi market is a harder problem than it sounds. A headline might say: <em>"Central bank holds borrowing costs steady amid growth concerns."</em> The corresponding market might be titled: <em>"Fed funds rate above 4.5% at March meeting."</em> There is no word overlap. The same concept is expressed in two completely different vocabularies. A naive search finds nothing.</p>
+
+      <p>Headline Odds solves this with a three-layer AI matching system. The first layer is keyword matching — rapid extraction of entities and named concepts from the headline text, cross-referenced against all active markets. The second is semantic clustering — a hand-built taxonomy of twelve topic domains (monetary policy, elections, crypto, geopolitics, AI, energy, and more) that understands "central bank," "FOMC," "rate decision," and "borrowing costs" all live in the same conceptual neighborhood.</p>
+
+      <p>The third layer is the leap: vector embedding. Every market in the Kalshi catalog is processed through a Cloudflare-hosted AI model that converts natural language into points in a 384-dimensional semantic space. When a headline arrives, it's embedded into the same space. The distance between two points is the distance between two meanings — headlines semantically close to a market get matched, even with zero vocabulary overlap. All of this runs invisibly, in under two seconds, while you read.</p>
+
+      <h2>The Epistemics of Reading Differently</h2>
+
+      <p>The deeper claim of Headline Odds is not really about convenience. It is about epistemology. When you read a headline without probability information, your brain assigns a subjective probability based on how confidently it's written, who wrote it, and whether it confirms things you already believe. This process is fast, effortless, and systematically biased — vulnerable to motivated reasoning, anchoring, and political priors.</p>
+
+      <div class="pull-quote">
+        <p>"The green number is an interruption. A small, quiet one — but an interruption nonetheless. It says: here is what the market thinks."</p>
+      </div>
+
+      <p>That comparison — repeated hundreds of times across hundreds of headlines — is a kind of continuous calibration. You learn, gradually, to distinguish between headlines written with high confidence and events that are actually highly probable. They are not the same thing. The superforecasters studied by Philip Tetlock — who consistently outperform experts in predicting world events — share one habit above all others: they think in probabilities, they update frequently, and they separate confidence of language from confidence of outcome. Headline Odds nudges every news reader, with every headline, toward exactly these habits.</p>
+
+      <h2>The Design of Restraint</h2>
+
+      <p>One of the most deliberate things about Headline Odds is what it doesn't do. It doesn't replace the headline. The journalism remains the journalism. It doesn't take you away from the page — the market card opens inline, directly under the headline, without a new tab or context switch. You see the yes/no prices, the trading volume, the closing date, then close it and keep reading. And it doesn't track you. No analytics, no user accounts, no behavioral data collection. The extension has never seen your browsing history and has no mechanism to see it.</p>
+
+      <p>These choices reflect a philosophy: add signal without adding noise, augment reading without hijacking it. The extension should feel like a lens correction — not a new pair of glasses.</p>
+
+      <h2>What Comes Next</h2>
+
+      <p>We are at an early moment in the relationship between prediction markets and public epistemics. For most of human history, the only way to encode collective belief about the future was language — editorial language, expert commentary, institutional consensus. These are powerful tools. They are also slow, expensive, and vulnerable to incentive structures that have nothing to do with truth.</p>
+
+      <p>Prediction markets are something different: a fast, difficult-to-manipulate signal that aggregates belief at scale. At their best — and the history of Kalshi's most liquid markets suggests they are often at their best — they are the closest thing we have to a truth machine running in real time. Headline Odds is a bet, in both the literal and metaphorical sense, that people want access to this machine. That given a choice between reading the news with a probability estimate and without one, readers will choose the richer, more honest, more calibrated version. That given a chance to see the green number, they will not want to go back to a world without it.</p>
+
+      <div class="article-divider"></div>
+
+      <div class="author-card">
+        <img src="logo.png" alt="Headline Odds" class="author-logo" width="48" height="48" />
+        <div class="author-info">
+          <div class="author-name">Headline Odds</div>
+          <p>A free Chrome extension that shows real-time Kalshi prediction market odds next to every headline you read. Currently pending Chrome Web Store review.</p>
+        </div>
+      </div>
+
+      <div class="article-cta">
+        <h3>Read the news with the <span class="grad">odds.</span></h3>
+        <p>Join the waitlist. Be first to know when we launch.</p>
+        <a href="index.html#waitlist" class="btn btn-primary" style="padding:14px 32px;font-size:15px;">Request Early Access →</a>
+      </div>
+
+    </article>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="Headline Odds" width="20" height="20" />
+        Headline Odds
+      </div>
+      <div class="footer-links">
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+      <div class="footer-copy">&copy; 2026 Headline Odds</div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById("nav");
+    window.addEventListener("scroll", () => nav.classList.toggle("scrolled", scrollY > 24), { passive: true });
+  </script>
+</body>
+</html>
