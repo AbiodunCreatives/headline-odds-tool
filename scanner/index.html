@@ -1260,21 +1260,29 @@
 
     // ── Trending section ─────────────────────────────────────────────────
 
-    function renderTrendingCards(results) {
+    let trendOffset = 0;        // how many results we've loaded so far
+    let trendTotal  = 0;        // total available from API
+    let swipedCount = 0;        // cards swiped away
+    let isFetchingMore = false; // prevent duplicate fetches
+
+    function renderTrendingCards(results, append = false) {
       const container = document.getElementById("trendResults");
       const section   = document.getElementById("trendingSection");
       const countEl   = document.getElementById("trendCount");
 
-      if (!results.length) {
+      if (!results.length && !append) {
         container.innerHTML = `<div class="empty"><div class="empty-icon">📡</div><div class="empty-text">No strong matches right now — try searching manually.</div></div>`;
         section.style.display = "";
         return;
       }
 
-      countEl.textContent = `${results.length} matched`;
+      const existingCount = container.querySelectorAll('.swipe-card').length;
+      countEl.textContent = `${trendTotal || results.length} matched`;
 
       let html = "";
-      for (let index = 0; index < results.length; index++) {
+      const startIndex = append ? existingCount : 0;
+      for (let i = 0; i < results.length; i++) {
+        const index = startIndex + i;
         const r = results[index];
         const m    = r.market;
         const yes  = m.yes_bid  != null ? `${m.yes_bid}\u00a2`  : "\u2014";
@@ -1344,9 +1352,14 @@
           </div>`;
       }
 
-      container.innerHTML = html;
+      if (append) {
+        container.insertAdjacentHTML('beforeend', html);
+      } else {
+        container.innerHTML = html;
+        swipedCount = 0;
+      }
       section.style.display = "";
-      
+
       // Initialize swipe functionality for new cards
       initSwipeCards();
     }
@@ -1365,10 +1378,13 @@
       }
 
       try {
-        const url = force ? "/api/trending?force=1" : "/api/trending";
+        const url = force ? "/api/trending?force=1&limit=20" : "/api/trending?limit=20";
         const res = await fetch(url);
         const d   = await res.json();
         if (!d.ok) throw new Error(d.error || "Failed");
+
+        trendOffset = d.results.length;
+        trendTotal  = d.total || d.results.length;
 
         populateTicker(d.results);
         if (!hasSearchResults) renderTrendingCards(d.results);
@@ -1386,9 +1402,10 @@
     // ── Swipe functionality ──────────────────────────────────────────────
 
     function initSwipeCards() {
-      const cards = document.querySelectorAll('.swipe-card');
-      
+      const cards = document.querySelectorAll('.swipe-card:not([data-swipe-init])');
+
       cards.forEach(card => {
+        card.setAttribute('data-swipe-init', '1');
         let startX = 0;
         let currentX = 0;
         let isDragging = false;
@@ -1466,12 +1483,31 @@
       });
     }
     
+    async function fetchMoreTrending() {
+      if (isFetchingMore || trendOffset >= trendTotal) return;
+      isFetchingMore = true;
+      try {
+        const res = await fetch(`/api/trending?offset=${trendOffset}&limit=10`);
+        const d = await res.json();
+        if (d.ok && d.results.length) {
+          trendOffset += d.results.length;
+          trendTotal = d.total || trendTotal;
+          renderTrendingCards(d.results, true);
+        }
+      } catch (e) {
+        console.warn("Failed to fetch more trending:", e);
+      } finally {
+        isFetchingMore = false;
+      }
+    }
+
     function handleSwipeBet(card, direction) {
       const marketId = card.dataset.marketId;
-      
-      // For now, show "Coming Soon" since bags features are disabled
-      // In the future, this would integrate with the betting API
-      
+
+      // Track swipe and fetch more when threshold reached
+      swipedCount++;
+      if (swipedCount % 10 === 0) fetchMoreTrending();
+
       // Animate the card off screen
       const exitX = direction === 'yes' ? window.innerWidth : -window.innerWidth;
       card.style.transition = 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1)';

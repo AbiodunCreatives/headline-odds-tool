@@ -52,7 +52,7 @@ function parseRssTitles(xml) {
   const out = [];
   const itemRx  = /<item[\s\S]*?<\/item>/g;
   const titleRx = /<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/;
-  for (const item of (xml.match(itemRx) || []).slice(0, 6)) {
+  for (const item of (xml.match(itemRx) || []).slice(0, 10)) {
     const m = item.match(titleRx);
     if (!m?.[1]) continue;
     const t = m[1]
@@ -154,8 +154,12 @@ export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
 
   const force = req.query.force === "1";
+  const offset = parseInt(req.query.offset) || 0;
+  const limit  = parseInt(req.query.limit)  || 20;
+
   if (!force && trendCache.data && Date.now() - trendCache.ts < CACHE_TTL) {
-    return res.json({ ok: true, results: trendCache.data, cached: true });
+    const page = trendCache.data.slice(offset, offset + limit);
+    return res.json({ ok: true, results: page, total: trendCache.data.length, cached: true });
   }
 
   try {
@@ -202,10 +206,12 @@ export default async function handler(req, res) {
     const deduped = pairs
       .sort((a, b) => b.similarity - a.similarity)
       .filter(p => { if (seen.has(p.market.title)) return false; seen.add(p.market.title); return true; })
-      .slice(0, 20);
+      .slice(0, 50);
 
     trendCache = { data: deduped, ts: Date.now() };
-    return res.json({ ok: true, results: deduped });
+
+    const page = deduped.slice(offset, offset + limit);
+    return res.json({ ok: true, results: page, total: deduped.length });
   } catch (err) {
     console.error("trending error", err);
     // Return stale cache rather than a hard error if we have previous data
