@@ -202,7 +202,7 @@ export default async function handler(req, res) {
     const deduped = pairs
       .sort((a, b) => b.similarity - a.similarity)
       .filter(p => { if (seen.has(p.market.title)) return false; seen.add(p.market.title); return true; })
-      .slice(0, 10);
+      .slice(0, 20);
 
     trendCache = { data: deduped, ts: Date.now() };
     return res.json({ ok: true, results: deduped });
