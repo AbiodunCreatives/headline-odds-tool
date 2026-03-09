@@ -355,16 +355,7 @@
 
     /* ── Bags ─────────────────────────────────────────────────────── */
 
-    /* SOL price badge in nav */
     .nav-right { display: flex; align-items: center; gap: 14px; }
-    .sol-badge {
-      font-size: 12px; font-weight: 700;
-      color: var(--bags);
-      background: rgba(139,92,246,0.1);
-      border: 1px solid rgba(139,92,246,0.25);
-      border-radius: 999px; padding: 4px 12px;
-      letter-spacing: 0.02em;
-    }
 
     /* Bags bar */
     .bags-bar {
@@ -552,15 +543,15 @@
     .ticker-wrap {
       position: relative; z-index: 9;
       display: none; align-items: center;
-      height: 34px; overflow: hidden;
+      height: 44px; overflow: hidden;
       background: rgba(0,0,0,0.35);
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .ticker-label {
       flex-shrink: 0; height: 100%;
       display: flex; align-items: center;
-      padding: 0 14px;
-      font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0 18px;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
       color: var(--green); background: rgba(0,227,143,0.08);
       border-right: 1px solid rgba(0,227,143,0.15);
       white-space: nowrap;
@@ -576,15 +567,15 @@
       100% { transform: translateX(-50%); }
     }
     .ticker-item {
-      display: flex; align-items: center; gap: 8px;
-      padding: 0 24px; white-space: nowrap;
-      font-size: 12px; font-weight: 600; color: var(--muted);
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 32px; white-space: nowrap;
+      font-size: 14px; font-weight: 600; color: var(--muted);
       border-right: 1px solid rgba(255,255,255,0.04);
     }
-    .ticker-item .t-title { color: var(--text); max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
-    .ticker-item .t-yes   { color: var(--green); }
-    .ticker-item .t-no    { color: #ff5c5c; }
-    .ticker-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
+    .ticker-item .t-title { color: var(--text); max-width: 400px; overflow: hidden; text-overflow: ellipsis; }
+    .ticker-item .t-yes   { color: var(--green); font-weight: 800; }
+    .ticker-item .t-no    { color: #ff5c5c; font-weight: 800; }
+    .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
 
     /* ── Trending section ─────────────────────────────────────────────── */
     .trending-section { margin-bottom: 8px; }
@@ -649,6 +640,34 @@
     .trend-meta strong { color: var(--muted); }
     .trend-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
+    /* Swipe functionality */
+    .swipe-card {
+      position: relative;
+      overflow: hidden;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+    .swipe-card:active { cursor: grabbing; }
+    .swipe-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 800; color: white;
+      opacity: 0; transition: opacity 200ms;
+      pointer-events: none; z-index: 10;
+    }
+    .swipe-yes {
+      background: linear-gradient(135deg, rgba(0,198,94,0.9), rgba(0,227,143,0.9));
+      transform: translateX(-100%);
+    }
+    .swipe-no {
+      background: linear-gradient(135deg, rgba(255,92,92,0.9), rgba(255,120,120,0.9));
+      transform: translateX(100%);
+    }
+    .swipe-card.swipe-yes-active .swipe-yes { opacity: 1; transform: translateX(0); }
+    .swipe-card.swipe-no-active .swipe-no { opacity: 1; transform: translateX(0); }
+    .swipe-card.swipe-yes-active { transform: translateX(60px) rotate(5deg); }
+    .swipe-card.swipe-no-active { transform: translateX(-60px) rotate(-5deg); }
+
     @media (max-width: 640px) {
       .ticker-item .t-title { max-width: 200px; }
     }
@@ -664,7 +683,6 @@
       <span>Headline Odds</span>
     </a>
     <div class="nav-right">
-      <span class="sol-badge" id="solBadge" style="display:none">SOL $—</span>
       <a href="https://headlineodds.fun" class="nav-link">headlineodds.fun</a>
     </div>
   </nav>
@@ -941,18 +959,11 @@
         const d = await r.json();
         if (!d.ok) return;
 
-        const priceStr = d.solPrice != null ? `SOL $${d.solPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : null;
-        const poolStr  = d.poolCount != null ? `${d.poolCount.toLocaleString()} tokens launched` : null;
-
-        // Nav badge
-        const badge = document.getElementById("solBadge");
-        if (badge && priceStr) { badge.textContent = priceStr; badge.style.display = ""; }
+        const poolStr = d.poolCount != null ? `${d.poolCount.toLocaleString()} tokens launched` : null;
 
         // Bags bar stats
         const poolEl = document.getElementById("bagsPoolCount");
-        const solEl  = document.getElementById("bagsSolPrice");
         if (poolEl && poolStr) poolEl.textContent = poolStr;
-        if (solEl  && priceStr) solEl.textContent  = priceStr;
       } catch {}
     }
     loadBagsStats();
@@ -1289,43 +1300,54 @@
         const logoUrl = SOURCE_LOGOS[r.source] || "https://via.placeholder.com/20x20/00e38f/ffffff?text=?";
 
         html += `
-          <div class="trending-card">
-            <div class="trend-headline-row">
-              <span class="trend-source">
-                <img src="${logoUrl}" alt="${esc(r.source)}" style="width: 16px; height: 16px; border-radius: 2px; object-fit: contain;" />
-              </span>
-              <span class="trend-headline-text">"${esc(r.headline)}"</span>
+          <div class="trending-card swipe-card" data-market-id="${index}">
+            <div class="swipe-overlay swipe-yes">
+              <div class="swipe-text">YES</div>
             </div>
-            <div class="trend-divider"></div>
-            <div class="trend-match-label">Matched Market · ${r.similarity}% relevance</div>
-            <div class="trend-market-title">${esc(m.title)}</div>
-            <div class="trend-odds-row">
-              <a class="trend-odd trend-odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
-                <span class="trend-odd-label">Yes</span>
-                <span class="trend-odd-value">${yes}</span>
-              </a>
-              <a class="trend-odd trend-odd-no" href="${esc(m.url)}" target="_blank" rel="noopener">
-                <span class="trend-odd-label">No</span>
-                <span class="trend-odd-value">${no}</span>
-              </a>
+            <div class="swipe-overlay swipe-no">
+              <div class="swipe-text">NO</div>
             </div>
-            ${(m.vol || m.close) ? `
-            <div class="trend-meta">
-              ${m.vol   ? `<span>Vol: <strong>${esc(m.vol)}</strong></span>` : ""}
-              ${m.close ? `<span>Closes: ${esc(m.close)}</span>` : ""}
-            </div>` : ""}
-            <div class="trend-actions">
-              <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to
-                <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
-              </a>
-              <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
-              ${cryptoCta}
+            <div class="card-content">
+              <div class="trend-headline-row">
+                <span class="trend-source">
+                  <img src="${logoUrl}" alt="${esc(r.source)}" style="width: 16px; height: 16px; border-radius: 2px; object-fit: contain;" />
+                </span>
+                <span class="trend-headline-text">"${esc(r.headline)}"</span>
+              </div>
+              <div class="trend-divider"></div>
+              <div class="trend-match-label">Matched Market · ${r.similarity}% relevance</div>
+              <div class="trend-market-title">${esc(m.title)}</div>
+              <div class="trend-odds-row">
+                <a class="trend-odd trend-odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
+                  <span class="trend-odd-label">Yes</span>
+                  <span class="trend-odd-value">${yes}</span>
+                </a>
+                <a class="trend-odd trend-odd-no" href="${esc(m.url)}" target="_blank" rel="noopener">
+                  <span class="trend-odd-label">No</span>
+                  <span class="trend-odd-value">${no}</span>
+                </a>
+              </div>
+              ${(m.vol || m.close) ? `
+              <div class="trend-meta">
+                ${m.vol   ? `<span>Vol: <strong>${esc(m.vol)}</strong></span>` : ""}
+                ${m.close ? `<span>Closes: ${esc(m.close)}</span>` : ""}
+              </div>` : ""}
+              <div class="trend-actions">
+                <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to
+                  <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
+                </a>
+                <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
+                ${cryptoCta}
+              </div>
             </div>
           </div>`;
       }
 
       container.innerHTML = html;
       section.style.display = "";
+      
+      // Initialize swipe functionality for new cards
+      initSwipeCards();
     }
 
     async function loadTrending(force = false) {
@@ -1358,6 +1380,125 @@
       } finally {
         if (btn) btn.classList.remove("spinning");
       }
+    }
+
+    // ── Swipe functionality ──────────────────────────────────────────────
+
+    function initSwipeCards() {
+      const cards = document.querySelectorAll('.swipe-card');
+      
+      cards.forEach(card => {
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+        let startTime = 0;
+        
+        const handleStart = (e) => {
+          isDragging = true;
+          startTime = Date.now();
+          startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+          card.style.transition = 'none';
+          card.classList.remove('swipe-yes-active', 'swipe-no-active');
+        };
+        
+        const handleMove = (e) => {
+          if (!isDragging) return;
+          
+          const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+          currentX = clientX - startX;
+          
+          // Limit swipe distance
+          const maxSwipe = 120;
+          currentX = Math.max(-maxSwipe, Math.min(maxSwipe, currentX));
+          
+          // Apply transform
+          card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
+          
+          // Show overlay based on swipe direction
+          if (currentX > 40) {
+            card.classList.add('swipe-yes-active');
+            card.classList.remove('swipe-no-active');
+          } else if (currentX < -40) {
+            card.classList.add('swipe-no-active');
+            card.classList.remove('swipe-yes-active');
+          } else {
+            card.classList.remove('swipe-yes-active', 'swipe-no-active');
+          }
+        };
+        
+        const handleEnd = (e) => {
+          if (!isDragging) return;
+          
+          isDragging = false;
+          const duration = Date.now() - startTime;
+          const velocity = Math.abs(currentX) / duration;
+          
+          // Check if swipe was fast enough or far enough
+          const threshold = 60;
+          const fastThreshold = 0.5;
+          
+          if (Math.abs(currentX) > threshold || velocity > fastThreshold) {
+            if (currentX > 0) {
+              // Swiped right - YES bet
+              handleSwipeBet(card, 'yes');
+            } else {
+              // Swiped left - NO bet
+              handleSwipeBet(card, 'no');
+            }
+          } else {
+            // Reset position
+            card.style.transition = 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+            card.style.transform = '';
+            card.classList.remove('swipe-yes-active', 'swipe-no-active');
+          }
+        };
+        
+        // Mouse events
+        card.addEventListener('mousedown', handleStart);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+        
+        // Touch events
+        card.addEventListener('touchstart', handleStart, { passive: true });
+        document.addEventListener('touchmove', handleMove, { passive: true });
+        document.addEventListener('touchend', handleEnd, { passive: true });
+      });
+    }
+    
+    function handleSwipeBet(card, direction) {
+      const marketId = card.dataset.marketId;
+      
+      // For now, show "Coming Soon" since bags features are disabled
+      // In the future, this would integrate with the betting API
+      
+      // Animate the card off screen
+      const exitX = direction === 'yes' ? window.innerWidth : -window.innerWidth;
+      card.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)';
+      card.style.transform = `translateX(${exitX}px) rotate(${direction === 'yes' ? 15 : -15}deg)`;
+      
+      // Show success message
+      setTimeout(() => {
+        const message = direction === 'yes' 
+          ? 'YES bet placed! (Coming Soon)' 
+          : 'NO bet placed! (Coming Soon)';
+        
+        // Create a temporary success message
+        const successMsg = document.createElement('div');
+        successMsg.style.cssText = `
+          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+          background: ${direction === 'yes' ? 'var(--green)' : '#ff5c5c'};
+          color: white; padding: 12px 24px; border-radius: 8px;
+          font-weight: 600; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        successMsg.textContent = message;
+        document.body.appendChild(successMsg);
+        
+        // Remove message and card after animation
+        setTimeout(() => {
+          successMsg.remove();
+          card.remove();
+        }, 2000);
+      }, 200);
     }
 
     // Load on start, auto-refresh every 5 minutes
