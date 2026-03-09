@@ -1274,7 +1274,8 @@
       countEl.textContent = `${results.length} matched`;
 
       let html = "";
-      for (const r of results) {
+      for (let index = 0; index < results.length; index++) {
+        const r = results[index];
         const m    = r.market;
         const yes  = m.yes_bid  != null ? `${m.yes_bid}\u00a2`  : "\u2014";
         const no   = m.no_bid   != null ? `${m.no_bid}\u00a2`   : "\u2014";
