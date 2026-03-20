@@ -103,7 +103,21 @@ function truncateAddress(address) {
 
 function parseKalshiOddsValue(value) {
   const numeric = Number(value);
-  return Number.isFinite(numeric) ? numeric : null;
+  if (!Number.isFinite(numeric)) return null;
+
+  const normalized = numeric > 0 && numeric <= 1 ? numeric * 100 : numeric;
+  if (!Number.isFinite(normalized)) return null;
+  return Math.min(100, Math.max(0, normalized));
+}
+
+function firstFiniteValue(...values) {
+  for (const value of values) {
+    const numeric = parseKalshiOddsValue(value);
+    if (numeric != null) {
+      return numeric;
+    }
+  }
+  return null;
 }
 
 function resolveKalshiOdds(yesValue, noValue) {
@@ -119,6 +133,23 @@ function resolveKalshiOdds(yesValue, noValue) {
   }
 
   return { yes, no };
+}
+
+function resolveMarketOdds(market) {
+  if (!market) {
+    return { yes: null, no: null };
+  }
+
+  const lastPrice = parseKalshiOddsValue(market.last_price);
+  const yes = firstFiniteValue(market.yes_bid, market.yes_ask, lastPrice);
+  const no = firstFiniteValue(
+    market.no_bid,
+    market.no_ask,
+    yes != null ? 100 - yes : null,
+    lastPrice != null ? 100 - lastPrice : null,
+  );
+
+  return resolveKalshiOdds(yes, no);
 }
 
 function formatKalshiSide(value, side) {
@@ -393,7 +424,7 @@ function buildTweetUrl(title, yesOdds, volume, closeDate, url) {
 
 function renderLiveTicker(results) {
   const items = results
-    .map((item) => ({ ...item, resolvedOdds: resolveKalshiOdds(item.market?.yes_bid, item.market?.no_bid) }))
+    .map((item) => ({ ...item, resolvedOdds: resolveMarketOdds(item.market) }))
     .filter((item) => item.resolvedOdds.yes != null)
     .slice(0, 8);
   if (!items.length) {
@@ -422,8 +453,8 @@ function renderLiveTicker(results) {
 
 function sortByOddsPresence(items, getMarket) {
   return [...items].sort((left, right) => {
-    const leftOdds = resolveKalshiOdds(getMarket(left)?.yes_bid, getMarket(left)?.no_bid);
-    const rightOdds = resolveKalshiOdds(getMarket(right)?.yes_bid, getMarket(right)?.no_bid);
+    const leftOdds = resolveMarketOdds(getMarket(left));
+    const rightOdds = resolveMarketOdds(getMarket(right));
     const leftScore = Number(leftOdds.yes != null) + Number(leftOdds.no != null);
     const rightScore = Number(rightOdds.yes != null) + Number(rightOdds.no != null);
     return rightScore - leftScore;
@@ -471,11 +502,12 @@ function renderSearchResults(results, headline) {
 
 function renderMarketCard(item) {
   const { type, index, headline, source, similarity, market } = item;
-  const odds = resolveKalshiOdds(market.yes_bid, market.no_bid);
+  const odds = resolveMarketOdds(market);
   const yesOdds = odds.yes;
   const noOdds = odds.no;
+  const volumePrice = parseKalshiOddsValue(market.last_price) ?? yesOdds ?? 50;
   const volume = market.volume != null
-    ? formatMoney(Math.round(Number(market.volume) * ((Number(market.last_price) || Number(yesOdds) || 50) / 100)))
+    ? formatMoney(Math.round(Number(market.volume) * (volumePrice / 100)))
     : market.vol || "--";
   const closeDate = market.close_time
     ? new Date(market.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
@@ -1013,7 +1045,7 @@ function handleDocumentClick(event) {
   if (launchButton) {
     const item = getLaunchSourceItem(launchButton.dataset.launchSource, Number(launchButton.dataset.launchIndex));
     if (item?.market) {
-      const launchOdds = resolveKalshiOdds(item.market.yes_bid, item.market.no_bid).yes;
+      const launchOdds = resolveMarketOdds(item.market).yes;
       openLaunchModal({
         headline: item.headline,
         kalshiOdds: launchOdds,

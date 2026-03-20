@@ -101,6 +101,9 @@ async function getMarkets() {
         event_title: event.title || "",
         yes_bid: m.yes_bid,
         no_bid: m.no_bid,
+        yes_ask: m.yes_ask,
+        no_ask: m.no_ask,
+        last_price: m.last_price,
         volume: m.volume,
         close_time: close,
         url: seriesTicker
@@ -186,8 +189,9 @@ export default async function handler(req, res) {
       }
       if (bestSim > 0.38 && bestIdx >= 0) {
         const m = markets[bestIdx];
+        const priceForVolume = Number(m.yes_bid ?? m.yes_ask ?? m.last_price ?? 50);
         const vol = m.volume != null
-          ? `$${Math.round(m.volume * (m.yes_bid || 50) / 100).toLocaleString()}`
+          ? `$${Math.round(m.volume * priceForVolume / 100).toLocaleString()}`
           : null;
         const close = m.close_time
           ? new Date(m.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
@@ -196,7 +200,17 @@ export default async function handler(req, res) {
           headline: headlines[i].headline,
           source: headlines[i].source,
           similarity: Math.round(bestSim * 100),
-          market: { title: m.title, yes_bid: m.yes_bid, no_bid: m.no_bid, vol, close, url: m.url },
+          market: {
+            title: m.title,
+            yes_bid: m.yes_bid,
+            no_bid: m.no_bid,
+            yes_ask: m.yes_ask,
+            no_ask: m.no_ask,
+            last_price: m.last_price,
+            vol,
+            close,
+            url: m.url,
+          },
         });
       }
     }

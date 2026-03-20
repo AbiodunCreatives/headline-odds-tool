@@ -80,6 +80,8 @@ async function getAllMarkets() {
           event_title: event.title || "",
           yes_bid: m.yes_bid,
           no_bid: m.no_bid,
+          yes_ask: m.yes_ask,
+          no_ask: m.no_ask,
           last_price: m.last_price,
           volume: m.volume,
           close_time: close,
