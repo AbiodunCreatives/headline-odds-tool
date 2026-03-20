@@ -81,9 +81,33 @@
   }
 
   async function launchToken(params) {
-    const { provider, headline, kalshiOdds, userWallet, ticker } = params;
-    const prepared = await prepareLaunch({ headline, kalshiOdds, userWallet, ticker });
+    const {
+      provider,
+      headline,
+      kalshiOdds,
+      userWallet,
+      ticker,
+      name,
+      description,
+      initialBuyLamports,
+      onStatus,
+    } = params;
+
+    onStatus?.("Preparing launch package...");
+    const prepared = await prepareLaunch({
+      headline,
+      kalshiOdds,
+      userWallet,
+      ticker,
+      name,
+      description,
+      initialBuyLamports,
+    });
+
+    onStatus?.("Review and sign the launch transactions in your wallet.");
     const signedTransactions = await signTransactions(provider, prepared.transactions || []);
+
+    onStatus?.("Broadcasting the launch to Solana...");
     const submitted = await submitLaunch({
       signedTransactions,
       tokenMint: prepared.tokenMint,
@@ -96,6 +120,7 @@
       metadataUrl: prepared.metadataUrl,
       configKey: prepared.configKey,
       imageUrl: prepared.imageUrl,
+      initialBuyLamports: prepared.initialBuyLamports,
     });
     return { prepared, submitted };
   }

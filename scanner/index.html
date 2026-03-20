@@ -20,17 +20,19 @@
   />
   <style>
     :root {
-      --bg: #080a09;
-      --bg-card: rgba(255, 255, 255, 0.03);
+      --bg: #090b0c;
+      --bg-soft: #0c1011;
+      --bg-card: #101416;
       --bg-panel: #13151a;
-      --border: rgba(255, 255, 255, 0.07);
-      --text: #eef2ef;
-      --muted: #a9b5ae;
-      --dim: #61706a;
-      --green: #00e38f;
-      --green-2: #00c65e;
-      --purple: #9b7fe8;
-      --teal: #1de9b6;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text: #f1f3ef;
+      --muted: #a8b0a8;
+      --dim: #66716b;
+      --green: #1ec48b;
+      --green-2: #188f68;
+      --purple: #8d79d6;
+      --teal: #19d6aa;
       --buy: #22d87a;
       --sell: #f05252;
       --danger: #ff6b6b;
@@ -55,6 +57,7 @@
       color: var(--text);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em;
     }
 
     body.modal-open {
@@ -88,15 +91,7 @@
     }
 
     .glow {
-      position: fixed;
-      top: -220px;
-      left: 50%;
-      width: 820px;
-      height: 820px;
-      transform: translateX(-50%);
-      pointer-events: none;
-      z-index: 0;
-      background: radial-gradient(circle, rgba(0, 198, 94, 0.12) 0%, transparent 66%);
+      display: none;
     }
 
     nav {
@@ -109,7 +104,7 @@
       height: 72px;
       padding: 0 28px;
       backdrop-filter: blur(18px);
-      background: rgba(8, 10, 9, 0.82);
+      background: rgba(9, 11, 12, 0.9);
       border-bottom: 1px solid var(--border);
     }
 
@@ -146,8 +141,8 @@
       min-height: 42px;
       padding: 0 16px;
       border-radius: 999px;
-      border: 1px solid rgba(155, 127, 232, 0.45);
-      background: rgba(155, 127, 232, 0.09);
+      border: 1px solid rgba(25, 214, 170, 0.32);
+      background: rgba(11, 20, 19, 0.92);
       color: var(--purple);
       font-weight: 700;
       cursor: pointer;
@@ -156,12 +151,13 @@
 
     .wallet-pill:hover {
       transform: translateY(-1px);
-      background: rgba(155, 127, 232, 0.16);
+      background: rgba(17, 28, 26, 0.98);
+      border-color: rgba(25, 214, 170, 0.5);
     }
 
     .wallet-pill.is-connected {
-      border-color: rgba(29, 233, 182, 0.45);
-      background: rgba(29, 233, 182, 0.1);
+      border-color: rgba(25, 214, 170, 0.45);
+      background: rgba(14, 29, 25, 0.98);
       color: var(--teal);
     }
 
@@ -174,7 +170,7 @@
       gap: 16px;
       padding: 12px 24px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(10, 13, 14, 0.92);
       overflow: hidden;
     }
 
@@ -269,7 +265,65 @@
       z-index: 2;
       max-width: 1180px;
       margin: 0 auto;
-      padding: 70px 24px 110px;
+      padding: 54px 24px 110px;
+    }
+
+    .hero-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.55fr);
+      gap: 22px;
+      margin-bottom: 36px;
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      background: rgba(12, 16, 17, 0.94);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.26);
+    }
+
+    .hero-main {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .hero-main::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 0;
+      width: 2px;
+      background: rgba(25, 214, 170, 0.55);
+      border-radius: 999px;
+    }
+
+    .hero-rail {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .hero-note {
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .hero-note-label {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .hero-note-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
     }
 
     .hero-label {
@@ -279,9 +333,9 @@
       margin-bottom: 22px;
       padding: 6px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(0, 227, 143, 0.25);
-      background: rgba(0, 227, 143, 0.08);
-      color: var(--green);
+      border: 1px solid rgba(25, 214, 170, 0.22);
+      background: rgba(12, 20, 18, 0.94);
+      color: var(--teal);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.04em;
@@ -292,8 +346,8 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 0 0 rgba(0, 227, 143, 0.4);
+      background: var(--teal);
+      box-shadow: 0 0 0 0 rgba(25, 214, 170, 0.35);
       animation: pulse 2.2s infinite;
     }
 
@@ -303,7 +357,7 @@
         box-shadow: 0 0 0 0 rgba(0, 227, 143, 0.35);
       }
       50% {
-        box-shadow: 0 0 0 6px rgba(0, 227, 143, 0);
+        box-shadow: 0 0 0 6px rgba(25, 214, 170, 0);
       }
     }
 
@@ -316,10 +370,7 @@
     }
 
     h1 span {
-      background: linear-gradient(135deg, var(--green), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--teal);
     }
 
     .hero-sub {
@@ -369,8 +420,8 @@
     .search-input:focus,
     .input-field:focus,
     .textarea-field:focus {
-      border-color: rgba(0, 227, 143, 0.45);
-      box-shadow: 0 0 0 3px rgba(0, 227, 143, 0.1);
+      border-color: rgba(25, 214, 170, 0.42);
+      box-shadow: 0 0 0 3px rgba(25, 214, 170, 0.1);
     }
 
     .search-btn,
@@ -386,23 +437,23 @@
     .primary-btn {
       min-height: 58px;
       padding: 0 22px;
-      background: linear-gradient(135deg, var(--green), var(--green-2));
-      color: #08120d;
+      background: var(--green);
+      color: #07110d;
       font-weight: 800;
-      box-shadow: 0 12px 30px rgba(0, 198, 94, 0.26);
+      box-shadow: none;
     }
 
     .search-btn:hover,
     .primary-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 16px 36px rgba(0, 198, 94, 0.32);
+      background: #27d79a;
     }
 
     .secondary-btn {
       min-height: 46px;
       padding: 0 16px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.09);
       color: var(--text);
       font-weight: 700;
     }
@@ -429,6 +480,8 @@
 
     .panel-section {
       margin-top: 44px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .section-header {
@@ -473,17 +526,13 @@
       overflow: hidden;
       border-radius: 24px;
       border: 1px solid var(--border);
-      background: linear-gradient(135deg, var(--bg-card), rgba(255, 255, 255, 0.015));
+      background: var(--bg-card);
       padding: 22px;
       box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
     }
 
     .market-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(0, 227, 143, 0.05), transparent 55%);
-      pointer-events: none;
+      content: none;
     }
 
     .market-card-top,
@@ -512,7 +561,7 @@
 
     .source-chip {
       padding: 5px 10px;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.045);
       color: var(--muted);
     }
 
@@ -524,9 +573,9 @@
 
     .match-pill {
       padding: 5px 10px;
-      background: rgba(155, 127, 232, 0.1);
+      background: rgba(141, 121, 214, 0.08);
       color: var(--purple);
-      border: 1px solid rgba(155, 127, 232, 0.25);
+      border: 1px solid rgba(141, 121, 214, 0.22);
     }
 
     .headline-quote {
@@ -554,17 +603,18 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
-      margin: 20px 0 12px;
+      margin: 20px 0 14px;
     }
 
     .odd-pill {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding: 15px 16px;
+      gap: 8px;
+      min-height: 96px;
+      padding: 16px;
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.03);
     }
 
     .odd-pill span {
@@ -576,12 +626,18 @@
     }
 
     .odd-pill strong {
-      font-size: 18px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .odds-value.is-empty {
+      color: var(--dim);
+      font-size: 15px;
     }
 
     .odd-pill-yes {
-      border-color: rgba(29, 233, 182, 0.26);
-      background: rgba(29, 233, 182, 0.08);
+      border-color: rgba(25, 214, 170, 0.26);
+      background: rgba(25, 214, 170, 0.06);
     }
 
     .odd-pill-yes strong {
@@ -601,9 +657,9 @@
       width: 100%;
       min-height: 48px;
       margin-bottom: 14px;
-      border: 1px solid rgba(155, 127, 232, 0.34);
+      border: 1px solid rgba(141, 121, 214, 0.32);
       border-radius: 16px;
-      background: rgba(155, 127, 232, 0.12);
+      background: rgba(141, 121, 214, 0.08);
       color: var(--purple);
       font-weight: 800;
       letter-spacing: 0.08em;
@@ -614,7 +670,7 @@
 
     .launch-token-btn:hover {
       transform: translateY(-1px);
-      background: rgba(155, 127, 232, 0.2);
+      background: rgba(141, 121, 214, 0.14);
     }
 
     .market-meta {
@@ -634,8 +690,8 @@
     .token-link,
     .subtle-link {
       padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--muted);
     }
 
@@ -653,7 +709,7 @@
       padding: 14px 16px;
       border: 1px solid var(--border);
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(14, 17, 19, 0.94);
       margin-bottom: 18px;
     }
 
@@ -670,7 +726,7 @@
       padding: 22px;
       border-radius: 24px;
       background: var(--bg-panel);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 20px 52px rgba(0, 0, 0, 0.22);
     }
 
@@ -695,7 +751,7 @@
     .stat-block {
       padding: 14px;
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.035);
+      background: rgba(255, 255, 255, 0.025);
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
@@ -735,6 +791,10 @@
       background: rgba(240, 82, 82, 0.13);
       color: var(--sell);
       border: 1px solid rgba(240, 82, 82, 0.28);
+    }
+
+    .token-mono.is-muted {
+      color: var(--dim);
     }
 
     .mint-copy {
@@ -797,9 +857,13 @@
       overflow: auto;
       border-radius: 26px;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      background: linear-gradient(180deg, rgba(19, 21, 26, 0.98), rgba(8, 10, 9, 0.98));
+      background: rgba(14, 17, 19, 0.98);
       padding: 24px;
       box-shadow: 0 34px 100px rgba(0, 0, 0, 0.45);
+    }
+
+    .launch-modal-card {
+      width: min(100%, 720px);
     }
 
     .modal-head {
@@ -838,6 +902,93 @@
       gap: 16px;
     }
 
+    .launch-layout {
+      display: grid;
+      gap: 14px;
+    }
+
+    .launch-section {
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .launch-section-head,
+    .launch-toggle-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .launch-section-note {
+      color: var(--dim);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.5;
+      text-align: right;
+    }
+
+    .launch-project-grid {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .launch-art-tile {
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+      min-height: 196px;
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      background: #0f1216;
+    }
+
+    .launch-art-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .launch-art-mark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 96px;
+      border-radius: 18px;
+      border: 1px solid rgba(155, 127, 232, 0.22);
+      background: rgba(155, 127, 232, 0.08);
+      color: var(--purple);
+      font-family: var(--mono);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .launch-art-source {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .launch-inline-grid,
+    .launch-context-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .launch-field-full {
+      grid-column: 1 / -1;
+    }
+
     .field-label {
       display: block;
       margin-bottom: 8px;
@@ -846,6 +997,45 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+    }
+
+    .field-subcopy {
+      margin-top: 8px;
+      color: var(--dim);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .launch-mini-card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(5, 7, 8, 0.55);
+    }
+
+    .launch-mini-label {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .launch-mini-card p {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .launch-mini-card .context-chip {
+      margin-bottom: 10px;
+    }
+
+    .launch-mini-card .subtle-link {
+      display: inline-flex;
+      margin-top: 12px;
     }
 
     .context-chip,
@@ -868,6 +1058,155 @@
       color: var(--purple);
     }
 
+    .launch-toggle-copy p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .launch-toggle {
+      position: relative;
+      display: inline-flex;
+      width: 52px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .launch-toggle.is-on {
+      border-color: rgba(30, 196, 139, 0.32);
+      background: rgba(30, 196, 139, 0.15);
+    }
+
+    .toggle-knob {
+      width: 22px;
+      height: 22px;
+      margin: 3px;
+      border-radius: 50%;
+      background: #f1f3ef;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .launch-toggle.is-on .toggle-knob {
+      transform: translateX(22px);
+      background: var(--green);
+    }
+
+    .launch-admin-chip {
+      display: flex;
+      align-items: center;
+      min-height: 50px;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(5, 7, 6, 0.9);
+      color: var(--dim);
+      font-family: var(--mono);
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .launch-admin-chip.is-connected {
+      border-color: rgba(25, 214, 170, 0.22);
+      background: rgba(11, 24, 20, 0.92);
+      color: var(--teal);
+    }
+
+    .launch-ownership {
+      display: grid;
+      gap: 12px;
+    }
+
+    .prefixed-input {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-prefix,
+    .input-suffix {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .input-prefix {
+      left: 16px;
+    }
+
+    .input-suffix {
+      right: 16px;
+    }
+
+    .prefixed-input .input-field {
+      min-height: 56px;
+      padding-left: 48px;
+      padding-right: 64px;
+    }
+
+    .launch-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .launch-preset {
+      min-width: 78px;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .launch-preset:hover {
+      transform: translateY(-1px);
+    }
+
+    .launch-preset.is-active {
+      border-color: rgba(25, 214, 170, 0.32);
+      background: rgba(25, 214, 170, 0.08);
+      color: var(--teal);
+    }
+
+    .launch-fee-banner {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(240, 193, 65, 0.22);
+      background: rgba(158, 121, 19, 0.16);
+      color: #f0d77f;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .launch-terms {
+      color: var(--dim);
+      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .launch-submit-btn {
+      text-transform: lowercase;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+
     .status-box,
     .success-box {
       padding: 14px 16px;
@@ -880,6 +1219,12 @@
       background: rgba(240, 82, 82, 0.1);
       border: 1px solid rgba(240, 82, 82, 0.25);
       color: #ffb0b0;
+    }
+
+    .status-progress {
+      background: rgba(25, 214, 170, 0.08);
+      border: 1px solid rgba(25, 214, 170, 0.18);
+      color: #b7eee0;
     }
 
     .status-success,
@@ -1025,6 +1370,15 @@
     }
 
     @media (max-width: 900px) {
+      .hero-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .launch-project-grid,
+      .launch-context-grid {
+        grid-template-columns: 1fr;
+      }
+
       .quote-meta,
       .token-stats {
         grid-template-columns: 1fr;
@@ -1044,8 +1398,48 @@
         padding: 42px 16px 86px;
       }
 
+      .hero-shell {
+        padding: 18px;
+      }
+
+      .hero-main {
+        padding-left: 0;
+      }
+
+      .hero-main::before {
+        content: none;
+      }
+
       .search-box {
         grid-template-columns: 1fr;
+      }
+
+      .launch-modal-card,
+      .modal-card {
+        padding: 18px;
+      }
+
+      .launch-inline-grid,
+      .launch-context-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .launch-section-head,
+      .launch-toggle-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .launch-section-note {
+        text-align: left;
+      }
+
+      .launch-preset {
+        flex: 1 1 calc(50% - 10px);
+      }
+
+      .launch-art-tile {
+        min-height: 148px;
       }
 
       .odds-row {
@@ -1067,9 +1461,6 @@
         justify-content: center;
       }
 
-      .modal-card {
-        padding: 18px;
-      }
     }
   </style>
 </head>
@@ -1096,28 +1487,43 @@
   </section>
 
   <main>
-    <div class="hero-label">
-      <span class="hero-dot"></span>
-      Live Kalshi scanner with Bags launchpad
-    </div>
-    <h1>Turn every <span>headline match</span> into a tradable token.</h1>
-    <p class="hero-sub">
-      Scan live Kalshi markets, pick the headline with the strongest odds, and launch a Bags token for it without leaving the scanner.
-    </p>
+    <section class="hero-shell">
+      <div class="hero-main">
+        <div class="hero-label">
+          <span class="hero-dot"></span>
+          Live Kalshi scanner with Bags launchpad
+        </div>
+        <h1>Turn every <span>headline match</span> into a tradable token.</h1>
+        <p class="hero-sub">
+          Scan live Kalshi markets, pick the headline with the strongest odds, and launch a Bags token for it without leaving the scanner.
+        </p>
 
-    <div class="search-box">
-      <input
-        class="search-input"
-        id="headlineInput"
-        type="text"
-        placeholder='Paste a headline - for example "Fed signals rate cut"'
-        autocomplete="off"
-      />
-      <button class="search-btn" id="searchBtn">Find Markets</button>
-    </div>
-    <p class="search-hint">
-      Try: "Bitcoin ETF inflows surge", "Trump executive order", "OpenAI launches new model", "NBA finals upset"
-    </p>
+        <div class="search-box">
+          <input
+            class="search-input"
+            id="headlineInput"
+            type="text"
+            placeholder='Paste a headline - for example "Fed signals rate cut"'
+            autocomplete="off"
+          />
+          <button class="search-btn" id="searchBtn">Find Markets</button>
+        </div>
+        <p class="search-hint">
+          Try: "Bitcoin ETF inflows surge", "Trump executive order", "OpenAI launches new model", "NBA finals upset"
+        </p>
+      </div>
+
+      <aside class="hero-rail">
+        <div class="hero-note">
+          <span class="hero-note-label">Scanner Flow</span>
+          <p class="hero-note-copy">Match a headline, read the live Kalshi price, launch a token from the same card, then trade the launched token below.</p>
+        </div>
+        <div class="hero-note">
+          <span class="hero-note-label">Why This Layout</span>
+          <p class="hero-note-copy">The UI now leans on flatter surfaces and a tighter accent system so the data reads first and the launch action feels intentional.</p>
+        </div>
+      </aside>
+    </section>
 
     <section class="panel-section">
       <div class="section-header">
@@ -1163,37 +1569,134 @@
   </main>
 
   <div class="modal-overlay" id="launchOverlay" hidden>
-    <div class="modal-card">
+    <div class="modal-card launch-modal-card">
       <div class="modal-head">
         <div>
           <span class="mode-badge mode-buy">Launch</span>
-          <h3>Bags Token Launch</h3>
-          <p>Launch a token tied to this headline using the connected wallet as creator.</p>
+          <h3>Launch something new</h3>
+          <p>Use the matched headline as your project seed, confirm the creator wallet, and send the Bags launch without leaving the scanner.</p>
         </div>
         <button class="close-btn" type="button" data-close-launch>×</button>
       </div>
 
-      <div class="form-stack">
-        <div>
-          <label class="field-label" for="launchHeadlineField">Headline</label>
-          <textarea class="textarea-field" id="launchHeadlineField"></textarea>
-        </div>
+      <div class="launch-layout">
+        <section class="launch-section">
+          <div class="launch-section-head">
+            <div>
+              <span class="field-label">Project Info</span>
+              <div class="field-subcopy">Auto-filled from the selected headline match.</div>
+            </div>
+            <span class="launch-section-note">Name, ticker, and description can be tuned before launch.</span>
+          </div>
 
-        <div>
-          <span class="field-label">Kalshi context</span>
-          <div class="context-chip" id="launchOddsContext">--</div>
-        </div>
+          <div class="launch-project-grid">
+            <div class="launch-art-tile">
+              <span class="launch-art-label">Headline Seed</span>
+              <div class="launch-art-mark" id="launchArtMark">NEWS</div>
+              <div class="launch-art-source" id="launchSourceBadge">Kalshi-linked launch</div>
+            </div>
 
-        <div>
-          <label class="field-label" for="launchTickerField">Suggested ticker</label>
-          <input class="input-field token-mono" id="launchTickerField" type="text" maxlength="6" />
-        </div>
+            <div class="launch-inline-grid">
+              <div>
+                <label class="field-label" for="launchNameField">Name</label>
+                <input class="input-field" id="launchNameField" type="text" maxlength="20" />
+              </div>
 
-        <button class="wallet-pill" id="launchWalletBtn" data-default-label="Connect Wallet">Connect Wallet</button>
+              <div>
+                <label class="field-label" for="launchTickerField">Ticker</label>
+                <input class="input-field token-mono" id="launchTickerField" type="text" maxlength="6" />
+              </div>
+
+              <div class="launch-field-full">
+                <label class="field-label" for="launchDescriptionField">Description</label>
+                <textarea class="textarea-field" id="launchDescriptionField"></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="launch-section">
+          <div class="launch-section-head">
+            <div>
+              <span class="field-label">Market Context</span>
+              <div class="field-subcopy">The headline itself stays as the source anchor for this token.</div>
+            </div>
+            <span class="launch-section-note">Selected from the live scanner card.</span>
+          </div>
+
+          <div class="launch-context-grid">
+            <div class="launch-mini-card">
+              <span class="launch-mini-label">Source Headline</span>
+              <p id="launchHeadlinePreview">No headline selected.</p>
+            </div>
+
+            <div class="launch-mini-card">
+              <span class="launch-mini-label">Kalshi Snapshot</span>
+              <div class="context-chip" id="launchOddsContext">--</div>
+              <p id="launchMarketPreview">Matched market details will appear here.</p>
+              <a class="subtle-link" id="launchMarketLink" href="https://kalshi.com" target="_blank" rel="noopener" hidden>View matched market</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="launch-section">
+          <div class="launch-toggle-row">
+            <div class="launch-toggle-copy">
+              <span class="field-label">Fee Sharing</span>
+              <p>Partner mode stays on for launches from this scanner. Headline Odds captures a 1% swap fee through the Bags partner key after trading begins.</p>
+            </div>
+            <span class="launch-toggle is-on" aria-hidden="true">
+              <span class="toggle-knob"></span>
+            </span>
+          </div>
+        </section>
+
+        <section class="launch-section">
+          <div class="launch-toggle-row">
+            <div class="launch-toggle-copy">
+              <span class="field-label">Admin Settings</span>
+              <p>The connected wallet becomes the creator and signs every transaction locally in the browser.</p>
+            </div>
+            <button class="wallet-pill" id="launchWalletBtn" data-default-label="Connect Wallet">Connect Wallet</button>
+          </div>
+          <div class="launch-admin-chip" id="launchCreatorWallet">No wallet connected</div>
+        </section>
+
+        <section class="launch-section">
+          <div class="launch-section-head">
+            <div>
+              <span class="field-label">Ownership</span>
+              <div class="field-subcopy">Optional initial buy, similar to the Bags launch screen.</div>
+            </div>
+            <span class="launch-section-note">Launching with 0 SOL is allowed.</span>
+          </div>
+
+          <div class="launch-ownership">
+            <div>
+              <label class="field-label" for="launchInitialBuyField">Initial Buy</label>
+              <div class="prefixed-input">
+                <span class="input-prefix">SOL</span>
+                <input class="input-field token-mono" id="launchInitialBuyField" type="number" min="0" step="0.01" placeholder="0.00" value="0" />
+                <span class="input-suffix">SOL</span>
+              </div>
+              <div class="field-subcopy" id="launchOwnershipNote">0 SOL launches the token without buying upfront. Keep extra SOL for network fees.</div>
+            </div>
+
+            <div class="launch-presets">
+              <button class="launch-preset is-active" type="button" data-launch-buy="0">0.00</button>
+              <button class="launch-preset" type="button" data-launch-buy="0.10">0.10</button>
+              <button class="launch-preset" type="button" data-launch-buy="0.25">0.25</button>
+              <button class="launch-preset" type="button" data-launch-buy="0.50">0.50</button>
+              <button class="launch-preset" type="button" data-launch-buy="1.00">1.00</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="launch-fee-banner">You need enough SOL in the connected wallet to cover the launch transaction and any optional initial buy.</div>
         <div class="status-box" id="launchStatus" hidden></div>
         <div class="success-box" id="launchSuccess" hidden></div>
-        <div class="modal-note">Creator wallet stays user-side. The frontend signs launch transactions locally.</div>
-        <button class="primary-btn" id="launchConfirmBtn" type="button">Launch Token</button>
+        <div class="launch-terms">By launching, you approve the Bags transaction package from your wallet while the headline context is saved for the partner board below.</div>
+        <button class="primary-btn launch-submit-btn" id="launchConfirmBtn" type="button">launch</button>
       </div>
     </div>
   </div>

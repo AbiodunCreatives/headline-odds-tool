@@ -147,6 +147,19 @@ export function buildTokenDescription(headline, kalshiOdds) {
   return `${String(headline || "").trim()} | Kalshi odds: ${oddsLabel}`;
 }
 
+export function normalizeTokenName(name, headline = "") {
+  const clean = String(name || "")
+    .trim()
+    .replace(/\s+/g, " ");
+
+  return clean ? clean.slice(0, 20) : buildTokenName(headline);
+}
+
+export function normalizeTokenDescription(description, headline, kalshiOdds) {
+  const clean = String(description || "").trim();
+  return clean || buildTokenDescription(headline, kalshiOdds);
+}
+
 export function extractLaunchMetadata(description = "") {
   const [headlinePart, oddsPart] = String(description).split(" | Kalshi odds:");
   const oddsMatch = oddsPart?.match(/(-?\d+(?:\.\d+)?)%/);
@@ -300,6 +313,19 @@ function parseNumber(value) {
   return Number.isFinite(numeric) ? numeric : null;
 }
 
+function normalizeInitialBuyLamports(value) {
+  if (value === undefined || value === null || value === "") {
+    return 0;
+  }
+
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric < 0) {
+    throw new Error("initialBuyLamports must be a non-negative number");
+  }
+
+  return Math.round(numeric);
+}
+
 function sumIfFinite(...values) {
   const finite = values.filter((value) => Number.isFinite(Number(value))).map(Number);
   if (!finite.length) return null;
@@ -318,6 +344,7 @@ function buildLaunchRecord(record) {
     userWallet: record.userWallet,
     metadataUrl: record.metadataUrl,
     configKey: record.configKey,
+    initialBuyLamports: normalizeInitialBuyLamports(record.initialBuyLamports),
     txSignatures: record.txSignatures || [],
     launchSignature: record.launchSignature || null,
     bagsUrl: record.bagsUrl || buildBagsUrl(),
@@ -327,7 +354,15 @@ function buildLaunchRecord(record) {
   };
 }
 
-export async function prepareLaunchToken({ headline, kalshiOdds, userWallet, ticker }) {
+export async function prepareLaunchToken({
+  headline,
+  kalshiOdds,
+  userWallet,
+  ticker,
+  name,
+  description,
+  initialBuyLamports,
+}) {
   if (!headline || typeof headline !== "string") {
     throw new Error("headline is required");
   }
@@ -338,15 +373,16 @@ export async function prepareLaunchToken({ headline, kalshiOdds, userWallet, tic
 
   const creatorWallet = new PublicKey(userWallet);
   const symbol = normalizeTicker(ticker, headline);
-  const name = buildTokenName(headline);
-  const description = buildTokenDescription(headline, kalshiOdds);
+  const normalizedName = normalizeTokenName(name, headline);
+  const normalizedDescription = normalizeTokenDescription(description, headline, kalshiOdds);
+  const normalizedInitialBuyLamports = normalizeInitialBuyLamports(initialBuyLamports);
   const sdk = getSdk();
 
   const tokenInfo = await sdk.tokenLaunch.createTokenInfoAndMetadata({
     imageUrl: getLaunchImageUrl(),
-    name,
+    name: normalizedName,
     symbol,
-    description,
+    description: normalizedDescription,
   });
 
   const feeSharePayload = {
@@ -380,7 +416,7 @@ export async function prepareLaunchToken({ headline, kalshiOdds, userWallet, tic
     metadataUrl: tokenInfo.tokenMetadata,
     tokenMint: new PublicKey(tokenInfo.tokenMint),
     launchWallet: creatorWallet,
-    initialBuyLamports: 0,
+    initialBuyLamports: normalizedInitialBuyLamports,
     configKey: new PublicKey(configKey),
   });
 
@@ -388,14 +424,15 @@ export async function prepareLaunchToken({ headline, kalshiOdds, userWallet, tic
     mode: "prepare",
     tokenMint: tokenInfo.tokenMint,
     symbol,
-    name,
-    description,
+    name: normalizedName,
+    description: normalizedDescription,
     headline: headline.trim(),
     kalshiOdds: parseNumber(kalshiOdds),
     metadataUrl: tokenInfo.tokenMetadata,
     configKey,
     bagsUrl: buildBagsUrl(),
     imageUrl: getLaunchImageUrl(),
+    initialBuyLamports: normalizedInitialBuyLamports,
     transactions: [
       ...flattenFeeShareTransactions(feeShareConfig),
       {
@@ -413,6 +450,9 @@ export async function launchToken(headline, kalshiOdds, userWallet, options = {}
     kalshiOdds,
     userWallet,
     ticker: options.ticker,
+    name: options.name,
+    description: options.description,
+    initialBuyLamports: options.initialBuyLamports,
   });
 }
 
@@ -428,6 +468,7 @@ export async function submitLaunchTransactions({
   metadataUrl,
   configKey,
   imageUrl,
+  initialBuyLamports,
 }) {
   if (!Array.isArray(signedTransactions) || signedTransactions.length === 0) {
     throw new Error("signedTransactions is required");
@@ -456,6 +497,7 @@ export async function submitLaunchTransactions({
     metadataUrl,
     configKey,
     imageUrl,
+    initialBuyLamports,
     txSignatures,
     launchSignature: txSignatures.at(-1) || null,
     bagsUrl: buildBagsUrl(),

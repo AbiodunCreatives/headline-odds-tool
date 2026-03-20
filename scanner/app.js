@@ -50,10 +50,20 @@ const dom = {
   bagsTokenGrid: document.getElementById("bagsTokenGrid"),
   bagsSectionCount: document.getElementById("bagsSectionCount"),
   launchOverlay: document.getElementById("launchOverlay"),
-  launchHeadlineField: document.getElementById("launchHeadlineField"),
+  launchNameField: document.getElementById("launchNameField"),
   launchTickerField: document.getElementById("launchTickerField"),
+  launchDescriptionField: document.getElementById("launchDescriptionField"),
+  launchHeadlinePreview: document.getElementById("launchHeadlinePreview"),
   launchOddsContext: document.getElementById("launchOddsContext"),
+  launchMarketPreview: document.getElementById("launchMarketPreview"),
+  launchMarketLink: document.getElementById("launchMarketLink"),
+  launchArtMark: document.getElementById("launchArtMark"),
+  launchSourceBadge: document.getElementById("launchSourceBadge"),
   launchWalletBtn: document.getElementById("launchWalletBtn"),
+  launchCreatorWallet: document.getElementById("launchCreatorWallet"),
+  launchInitialBuyField: document.getElementById("launchInitialBuyField"),
+  launchOwnershipNote: document.getElementById("launchOwnershipNote"),
+  launchPresetBtns: document.querySelectorAll("[data-launch-buy]"),
   launchConfirmBtn: document.getElementById("launchConfirmBtn"),
   launchStatus: document.getElementById("launchStatus"),
   launchSuccess: document.getElementById("launchSuccess"),
@@ -91,9 +101,39 @@ function truncateAddress(address) {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
-function formatOdds(value) {
+function parseKalshiOddsValue(value) {
   const numeric = Number(value);
-  return Number.isFinite(numeric) ? `${Math.round(numeric)}% YES` : "--";
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function resolveKalshiOdds(yesValue, noValue) {
+  let yes = parseKalshiOddsValue(yesValue);
+  let no = parseKalshiOddsValue(noValue);
+
+  if (yes == null && no != null) {
+    yes = Math.max(0, 100 - no);
+  }
+
+  if (no == null && yes != null) {
+    no = Math.max(0, 100 - yes);
+  }
+
+  return { yes, no };
+}
+
+function formatKalshiSide(value, side) {
+  const numeric = parseKalshiOddsValue(value);
+  return numeric != null ? `${Math.round(numeric)}% ${side}` : "Quote pending";
+}
+
+function formatKalshiSnapshot(value) {
+  const numeric = parseKalshiOddsValue(value);
+  return numeric != null ? `${Math.round(numeric)}% YES` : "Snapshot unavailable";
+}
+
+function formatKalshiTickerValue(value) {
+  const numeric = parseKalshiOddsValue(value);
+  return numeric != null ? `${Math.round(numeric)}% YES` : "Quote pending";
 }
 
 function formatMoney(value) {
@@ -178,6 +218,37 @@ function deriveSuggestedTicker(headline) {
   return ticker.slice(0, 6);
 }
 
+function buildLaunchName(headline) {
+  return String(headline || "").trim().slice(0, 20).trim() || "Headline Token";
+}
+
+function buildLaunchDescription(headline, kalshiOdds) {
+  const odds = parseKalshiOddsValue(kalshiOdds);
+  const oddsLabel = odds != null ? `${Math.round(odds)}% YES` : "N/A";
+  return `${String(headline || "").trim()} | Kalshi odds: ${oddsLabel}`;
+}
+
+function cleanTickerInput(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 6);
+}
+
+function getLaunchInitialBuySol() {
+  const numeric = Number(dom.launchInitialBuyField.value);
+  return Number.isFinite(numeric) && numeric >= 0 ? numeric : 0;
+}
+
+function formatSolAmount(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "0.00";
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(numeric);
+}
+
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
@@ -220,6 +291,41 @@ function bindWalletListeners(provider) {
   state.walletListenersBound = true;
 }
 
+function syncLaunchComposer() {
+  const fallbackTicker = state.launchDraft?.headline
+    ? deriveSuggestedTicker(state.launchDraft.headline)
+    : "NEWS";
+  const typedTicker = cleanTickerInput(dom.launchTickerField.value);
+  if (dom.launchTickerField.value !== typedTicker) {
+    dom.launchTickerField.value = typedTicker;
+  }
+
+  dom.launchArtMark.textContent = typedTicker || fallbackTicker;
+
+  const sourceParts = [];
+  if (state.launchDraft?.source) {
+    sourceParts.push(state.launchDraft.source);
+  }
+  if (state.launchDraft?.similarity) {
+    sourceParts.push(`${state.launchDraft.similarity}% match`);
+  }
+  dom.launchSourceBadge.textContent = sourceParts.join(" / ") || "Kalshi-linked launch";
+
+  dom.launchCreatorWallet.textContent = state.walletAddress || "No wallet connected";
+  dom.launchCreatorWallet.classList.toggle("is-connected", Boolean(state.walletAddress));
+
+  const initialBuySol = getLaunchInitialBuySol();
+  dom.launchOwnershipNote.textContent = initialBuySol > 0
+    ? `${formatSolAmount(initialBuySol)} SOL will be included as the optional initial buy at launch. Keep extra SOL for network fees.`
+    : "0 SOL launches the token without buying upfront. Keep extra SOL for network fees.";
+
+  dom.launchPresetBtns.forEach((button) => {
+    const presetValue = Number(button.dataset.launchBuy);
+    const isActive = Math.abs(presetValue - initialBuySol) < 0.000001;
+    button.classList.toggle("is-active", isActive);
+  });
+}
+
 function updateWalletButtons() {
   const label = state.walletAddress ? truncateAddress(state.walletAddress) : "Connect Wallet";
   const buttons = [dom.navWalletBtn, dom.launchWalletBtn, dom.swapWalletBtn];
@@ -234,8 +340,10 @@ function updateWalletButtons() {
   if (!state.launchDraft) {
     dom.launchConfirmBtn.textContent = "Select a headline";
   } else {
-    dom.launchConfirmBtn.textContent = "Launch Token";
+    dom.launchConfirmBtn.textContent = "launch";
   }
+
+  syncLaunchComposer();
 
   const hasSwapAmount = Number(dom.swapInputAmount.value) > 0;
   dom.swapExecBtn.disabled = !hasSwapAmount;
@@ -268,22 +376,26 @@ async function connectWallet(options = {}) {
 }
 
 function buildTweetUrl(title, yesOdds, volume, closeDate, url) {
+  const normalizedYes = parseKalshiOddsValue(yesOdds);
   const shareParams = new URLSearchParams({
     title,
-    yes: yesOdds == null ? "--" : String(yesOdds),
-    no: yesOdds == null ? "--" : String(100 - Number(yesOdds)),
+    yes: normalizedYes == null ? "--" : String(Math.round(normalizedYes)),
+    no: normalizedYes == null ? "--" : String(Math.round(100 - normalizedYes)),
     vol: volume || "",
     closes: closeDate || "",
     url,
   });
   const shareLink = `${window.location.origin}/api/share?${shareParams.toString()}`;
-  const oddsLabel = yesOdds == null ? "--" : `${Math.round(Number(yesOdds))}%`;
+  const oddsLabel = normalizedYes == null ? "quote pending" : `${Math.round(normalizedYes)}%`;
   const tweetText = `Kalshi has this headline at ${oddsLabel} YES: ${title}\n\nWhat do you think?\n\nvia @headlineodds`;
   return `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
 }
 
 function renderLiveTicker(results) {
-  const items = results.filter((item) => item.market?.yes_bid != null).slice(0, 8);
+  const items = results
+    .map((item) => ({ ...item, resolvedOdds: resolveKalshiOdds(item.market?.yes_bid, item.market?.no_bid) }))
+    .filter((item) => item.resolvedOdds.yes != null)
+    .slice(0, 8);
   if (!items.length) {
     dom.tickerWrap.hidden = true;
     return;
@@ -298,7 +410,7 @@ function renderLiveTicker(results) {
         <div class="ticker-item">
           <span class="ticker-title">${esc(title)}</span>
           <span class="ticker-sep"></span>
-          <span class="ticker-yes">${esc(formatOdds(item.market.yes_bid))}</span>
+          <span class="ticker-yes">${esc(formatKalshiTickerValue(item.resolvedOdds.yes))}</span>
         </div>
       `;
     })
@@ -308,11 +420,21 @@ function renderLiveTicker(results) {
   dom.tickerWrap.hidden = false;
 }
 
+function sortByOddsPresence(items, getMarket) {
+  return [...items].sort((left, right) => {
+    const leftOdds = resolveKalshiOdds(getMarket(left)?.yes_bid, getMarket(left)?.no_bid);
+    const rightOdds = resolveKalshiOdds(getMarket(right)?.yes_bid, getMarket(right)?.no_bid);
+    const leftScore = Number(leftOdds.yes != null) + Number(leftOdds.no != null);
+    const rightScore = Number(rightOdds.yes != null) + Number(rightOdds.no != null);
+    return rightScore - leftScore;
+  });
+}
+
 function renderSearchResults(results, headline) {
-  state.searchResults = results;
+  state.searchResults = sortByOddsPresence(results, (item) => item);
   state.searchHeadline = headline;
 
-  if (!results.length) {
+  if (!state.searchResults.length) {
     dom.resultsArea.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">No match</div>
@@ -322,7 +444,7 @@ function renderSearchResults(results, headline) {
     return;
   }
 
-  const cards = results
+  const cards = state.searchResults
     .map((market, index) => renderMarketCard({
       type: "search",
       index,
@@ -340,7 +462,7 @@ function renderSearchResults(results, headline) {
           <p class="section-kicker">Matched Markets</p>
           <h2 class="section-title">Scanner Results</h2>
         </div>
-        <span class="section-meta">${results.length} matches</span>
+        <span class="section-meta">${state.searchResults.length} matches</span>
       </div>
       <div class="cards-grid">${cards}</div>
     </section>
@@ -349,7 +471,9 @@ function renderSearchResults(results, headline) {
 
 function renderMarketCard(item) {
   const { type, index, headline, source, similarity, market } = item;
-  const yesOdds = market.yes_bid;
+  const odds = resolveKalshiOdds(market.yes_bid, market.no_bid);
+  const yesOdds = odds.yes;
+  const noOdds = odds.no;
   const volume = market.volume != null
     ? formatMoney(Math.round(Number(market.volume) * ((Number(market.last_price) || Number(yesOdds) || 50) / 100)))
     : market.vol || "--";
@@ -374,11 +498,11 @@ function renderMarketCard(item) {
       <div class="odds-row">
         <a class="odd-pill odd-pill-yes" href="${esc(market.url)}" target="_blank" rel="noopener">
           <span>Kalshi YES</span>
-          <strong>${esc(formatOdds(yesOdds))}</strong>
+          <strong class="odds-value ${yesOdds == null ? "is-empty" : ""}">${esc(formatKalshiSide(yesOdds, "YES"))}</strong>
         </a>
         <a class="odd-pill odd-pill-no" href="${esc(market.url)}" target="_blank" rel="noopener">
           <span>Kalshi NO</span>
-          <strong>${esc(formatOdds(100 - Number(yesOdds || 0)))}</strong>
+          <strong class="odds-value ${noOdds == null ? "is-empty" : ""}">${esc(formatKalshiSide(noOdds, "NO"))}</strong>
         </a>
       </div>
       <button class="launch-token-btn" data-launch-source="${esc(type)}" data-launch-index="${index}">
@@ -397,10 +521,10 @@ function renderMarketCard(item) {
 }
 
 function renderTrending(results) {
-  state.trendResults = results;
-  dom.trendCount.textContent = `${results.length} matched headlines`;
+  state.trendResults = sortByOddsPresence(results, (item) => item.market);
+  dom.trendCount.textContent = `${state.trendResults.length} matched headlines`;
 
-  if (!results.length) {
+  if (!state.trendResults.length) {
     dom.trendResults.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">Quiet tape</div>
@@ -412,7 +536,7 @@ function renderTrending(results) {
 
   dom.trendResults.innerHTML = `
     <div class="cards-grid">
-      ${results.map((item, index) => renderMarketCard({
+      ${state.trendResults.map((item, index) => renderMarketCard({
         type: "trend",
         index,
         headline: item.headline,
@@ -468,7 +592,7 @@ function renderLaunchedTokens(tokens) {
           <div class="token-stats">
             <div class="stat-block">
               <span class="stat-label">Kalshi</span>
-              <strong class="token-kalshi token-mono">${esc(formatOdds(token.kalshiOdds))}</strong>
+              <strong class="token-kalshi token-mono ${parseKalshiOddsValue(token.kalshiOdds) == null ? "is-muted" : ""}">${esc(formatKalshiSnapshot(token.kalshiOdds))}</strong>
             </div>
             <div class="stat-block">
               <span class="stat-label">Price</span>
@@ -587,9 +711,12 @@ function getLaunchSourceItem(source, index) {
     return state.trendResults[index] || null;
   }
   if (source === "search") {
+    const market = state.searchResults[index] || null;
     return {
       headline: state.searchHeadline,
-      market: state.searchResults[index] || null,
+      source: "Search result",
+      similarity: market?.similarity,
+      market,
     };
   }
   return null;
@@ -605,13 +732,23 @@ function clearLaunchFeedback() {
 
 function openLaunchModal(payload) {
   state.launchDraft = payload;
-  dom.launchHeadlineField.value = payload.headline;
+  dom.launchNameField.value = buildLaunchName(payload.headline);
   dom.launchTickerField.value = deriveSuggestedTicker(payload.headline);
-  dom.launchOddsContext.textContent = `${formatOdds(payload.kalshiOdds)} on Kalshi`;
+  dom.launchDescriptionField.value = buildLaunchDescription(payload.headline, payload.kalshiOdds);
+  dom.launchHeadlinePreview.textContent = payload.headline;
+  dom.launchOddsContext.textContent = formatKalshiSnapshot(payload.kalshiOdds);
+  dom.launchMarketPreview.textContent = payload.marketTitle || "Matched market details will appear here.";
+  dom.launchMarketLink.hidden = !payload.marketUrl;
+  if (payload.marketUrl) {
+    dom.launchMarketLink.href = payload.marketUrl;
+  }
+  dom.launchInitialBuyField.value = "0";
   clearLaunchFeedback();
+  syncLaunchComposer();
   updateWalletButtons();
   dom.launchOverlay.hidden = false;
   document.body.classList.add("modal-open");
+  dom.launchNameField.focus();
 }
 
 function closeLaunchModal() {
@@ -630,10 +767,37 @@ async function submitLaunch() {
   const walletAddress = state.walletAddress || (await connectWallet());
   if (!walletAddress) return;
 
-  const ticker = dom.launchTickerField.value.trim().toUpperCase();
-  const headline = dom.launchHeadlineField.value.trim();
-  if (headline.length < 5) {
+  const ticker = cleanTickerInput(dom.launchTickerField.value);
+  const headline = state.launchDraft.headline?.trim();
+  const name = dom.launchNameField.value.trim();
+  const description = dom.launchDescriptionField.value.trim();
+  const initialBuySol = Number(dom.launchInitialBuyField.value);
+
+  dom.launchTickerField.value = ticker;
+  syncLaunchComposer();
+
+  if (!headline || headline.length < 5) {
     setLaunchStatus("Use a longer headline before launching.", "error");
+    return;
+  }
+
+  if (!name) {
+    setLaunchStatus("Add a token name before launching.", "error");
+    return;
+  }
+
+  if (ticker.length < 4) {
+    setLaunchStatus("Ticker must be 4 to 6 characters.", "error");
+    return;
+  }
+
+  if (!description) {
+    setLaunchStatus("Add a description before launching.", "error");
+    return;
+  }
+
+  if (!Number.isFinite(initialBuySol) || initialBuySol < 0) {
+    setLaunchStatus("Initial buy must be a non-negative SOL amount.", "error");
     return;
   }
 
@@ -649,12 +813,27 @@ async function submitLaunch() {
       kalshiOdds: state.launchDraft.kalshiOdds,
       userWallet: walletAddress,
       ticker,
+      name,
+      description,
+      initialBuyLamports: Math.round(initialBuySol * 1e9),
+      onStatus(message) {
+        setLaunchStatus(message, "progress");
+        if (message.includes("sign")) {
+          dom.launchConfirmBtn.textContent = "Awaiting signature...";
+        } else if (message.includes("Broadcasting")) {
+          dom.launchConfirmBtn.textContent = "Broadcasting...";
+        } else {
+          dom.launchConfirmBtn.textContent = "Preparing launch...";
+        }
+      },
     });
 
+    dom.launchStatus.hidden = true;
     dom.launchSuccess.hidden = false;
     dom.launchSuccess.innerHTML = `
-      <div class="success-line">Token launched.</div>
+      <div class="success-line">$${esc(result.submitted.symbol || ticker)} launched for this headline.</div>
       <div class="success-mint token-mono">${esc(result.submitted.tokenMint)}</div>
+      <div class="field-subcopy">Initial buy: ${esc(formatSolAmount(initialBuySol))} SOL</div>
       <div class="success-links">
         <a href="${esc(result.submitted.bagsUrl || "https://bags.fm")}" target="_blank" rel="noopener">Open Bags</a>
         ${result.submitted.txSignature ? `<a href="https://solscan.io/tx/${esc(result.submitted.txSignature)}" target="_blank" rel="noopener">View transaction</a>` : ""}
@@ -665,8 +844,7 @@ async function submitLaunch() {
   } catch (error) {
     setLaunchStatus(error.message || "Launch failed", "error");
   } finally {
-    dom.launchConfirmBtn.disabled = false;
-    dom.launchConfirmBtn.textContent = "Launch Token";
+    updateWalletButtons();
   }
 }
 
@@ -685,7 +863,7 @@ function updateSwapModal() {
   dom.swapModeBadge.className = `mode-badge ${isBuy ? "mode-buy" : "mode-sell"}`;
   dom.swapTokenSymbol.textContent = `$${token.symbol || "BAGS"}`;
   dom.swapTokenHeadline.textContent = token.headline || token.name || "Headline token";
-  dom.swapOddsContext.textContent = `${formatOdds(token.kalshiOdds)} on Kalshi`;
+  dom.swapOddsContext.textContent = `Kalshi ${formatKalshiSnapshot(token.kalshiOdds)}`;
   dom.swapMintLink.textContent = truncateAddress(token.tokenMint);
   dom.swapMintLink.href = token.bagsUrl || "https://bags.fm";
   dom.swapInputLabel.textContent = isBuy ? "You pay in SOL" : `You sell in ${token.symbol || "token"}`;
@@ -835,9 +1013,14 @@ function handleDocumentClick(event) {
   if (launchButton) {
     const item = getLaunchSourceItem(launchButton.dataset.launchSource, Number(launchButton.dataset.launchIndex));
     if (item?.market) {
+      const launchOdds = resolveKalshiOdds(item.market.yes_bid, item.market.no_bid).yes;
       openLaunchModal({
         headline: item.headline,
-        kalshiOdds: item.market.yes_bid,
+        kalshiOdds: launchOdds,
+        source: item.source,
+        similarity: item.similarity,
+        marketTitle: item.market.title,
+        marketUrl: item.market.url,
       });
     }
     return;
@@ -860,7 +1043,16 @@ function bindEvents() {
   dom.refreshBtn.addEventListener("click", () => loadTrending(true));
   dom.launchConfirmBtn.addEventListener("click", submitLaunch);
   dom.swapExecBtn.addEventListener("click", submitSwap);
+  dom.launchTickerField.addEventListener("input", syncLaunchComposer);
+  dom.launchInitialBuyField.addEventListener("input", syncLaunchComposer);
   dom.swapInputAmount.addEventListener("input", debounceSwapQuote);
+
+  dom.launchPresetBtns.forEach((button) => {
+    button.addEventListener("click", () => {
+      dom.launchInitialBuyField.value = button.dataset.launchBuy || "0";
+      syncLaunchComposer();
+    });
+  });
 
   dom.launchCloseBtns.forEach((button) => {
     button.addEventListener("click", closeLaunchModal);
