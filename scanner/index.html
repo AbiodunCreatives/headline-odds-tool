@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="/icon48.png" />
   <link rel="icon" type="image/png" sizes="128x128" href="/icon128.png" />
   <link rel="apple-touch-icon" href="/icon128.png" />
-  <title>Headline Odds — Market Matcher</title>
+  <title>Headline Odds - Market Matcher</title>
   <meta name="description" content="Paste any headline. See what the prediction markets say. Get a reply draft with live Kalshi odds." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -379,7 +379,7 @@
     .market-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
 
 
-    /* ── Ticker ───────────────────────────────────────────────────────── */
+    /* Ticker */
     .ticker-wrap {
       position: relative; z-index: 9;
       display: none; align-items: center;
@@ -417,7 +417,7 @@
     .ticker-item .t-no    { color: #ff5c5c; font-weight: 800; }
     .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
 
-    /* ── Trending section ─────────────────────────────────────────────── */
+    /* Trending section */
     .trending-section { margin-bottom: 8px; }
     .trending-loading {
       text-align: center; padding: 48px 0;
@@ -542,7 +542,7 @@
 
     <div class="search-box">
       <input type="text" class="search-input" id="headlineInput"
-        placeholder="Paste a headline — e.g. &quot;Fed signals rate cut&quot;"
+        placeholder="Paste a headline - e.g. &quot;Fed signals rate cut&quot;"
         autocomplete="off" />
       <button class="search-btn" id="searchBtn">Find Markets</button>
     </div>
@@ -551,7 +551,7 @@
     <!-- Trending section (default view, hidden when search is active) -->
     <section class="trending-section" id="trendingSection" style="display:none">
       <div class="results-header">
-        <span class="results-title">Trending Now</span>
+        <span class="results-title">Trending Markets</span>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="results-count" id="trendCount"></span>
           <button class="trending-refresh" id="refreshBtn" onclick="loadTrending(true)" title="Refresh">
@@ -561,7 +561,7 @@
         </div>
       </div>
       <div id="trendResults">
-        <div class="trending-loading"><div class="spinner"></div>Loading trending headlines…</div>
+        <div class="trending-loading"><div class="spinner"></div>Loading live Kalshi markets...</div>
       </div>
     </section>
 
@@ -572,13 +572,13 @@
   <!-- Market detail modal -->
   <div class="market-overlay" id="marketOverlay" style="display:none" onclick="handleMarketOverlayClick(event)">
     <div class="market-modal">
-      <button class="market-close" onclick="closeMarketModal()">×</button>
+      <button class="market-close" onclick="closeMarketModal()">&times;</button>
       <div id="marketDetailContent"></div>
     </div>
   </div>
 
   <footer>
-    <p>Built by <a href="https://headlineodds.fun">Headline Odds</a> — real-time prediction market odds on every headline.</p>
+    <p>Built by <a href="https://headlineodds.fun">Headline Odds</a> - real-time prediction market odds on every headline.</p>
   </footer>
 
   <script>
@@ -588,23 +588,49 @@
 
     let tickerData = []; // Store full market data for ticker items
 
-    // Source logo mapping
-    const SOURCE_LOGOS = {
-      "NPR": "https://www.google.com/s2/favicons?domain=npr.org&sz=64",
-      "CNN": "https://www.google.com/s2/favicons?domain=cnn.com&sz=64",
-      "Fox News": "https://www.google.com/s2/favicons?domain=foxnews.com&sz=64",
-      "NY Times": "https://www.google.com/s2/favicons?domain=nytimes.com&sz=64",
-      "Wash Post": "https://www.google.com/s2/favicons?domain=washingtonpost.com&sz=64",
-      "Reuters": "https://www.google.com/s2/favicons?domain=reuters.com&sz=64",
-      "BBC": "https://www.google.com/s2/favicons?domain=bbc.co.uk&sz=64",
-      "Cointelegraph": "https://www.google.com/s2/favicons?domain=cointelegraph.com&sz=64",
-      "CoinDesk": "https://www.google.com/s2/favicons?domain=coindesk.com&sz=64",
-      "NPR Politics": "https://www.google.com/s2/favicons?domain=npr.org&sz=64",
-      "ESPN": "https://www.google.com/s2/favicons?domain=espn.com&sz=64",
-      "CNN Sports": "https://www.google.com/s2/favicons?domain=cnn.com&sz=64",
-      "Bloomberg": "https://www.google.com/s2/favicons?domain=bloomberg.com&sz=64",
-      "Fox Business": "https://www.google.com/s2/favicons?domain=foxbusiness.com&sz=64"
-    };
+    function formatPriceCents(value) {
+      return value != null ? `${value}\u00a2` : "\u2014";
+    }
+
+    function formatCloseDate(value) {
+      return value
+        ? new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+        : "\u2014";
+    }
+
+    function formatCompactNumber(value, fractionDigits = 1) {
+      if (value == null || !Number.isFinite(Number(value))) return "\u2014";
+      const amount = Number(value);
+      return new Intl.NumberFormat("en-US", {
+        notation: amount >= 1000 ? "compact" : "standard",
+        maximumFractionDigits: amount >= 1000 ? fractionDigits : amount >= 100 ? 0 : 2,
+      }).format(amount);
+    }
+
+    function formatContractCount(value) {
+      if (value == null || !Number.isFinite(Number(value))) return "\u2014";
+      return `${formatCompactNumber(value)} contracts`;
+    }
+
+    function getReferenceYesPrice(market) {
+      return market.yes_display ?? market.yes_bid ?? market.last_price ?? null;
+    }
+
+    function getReferenceNoPrice(market) {
+      if (market.no_display != null) return market.no_display;
+      if (market.no_bid != null) return market.no_bid;
+      if (market.last_price != null) return 100 - market.last_price;
+      return null;
+    }
+
+    function formatMarketVolume(market) {
+      if (market.vol) return market.vol;
+      return formatContractCount(market.volume);
+    }
+
+    function formatMarket24hVolume(market) {
+      return formatContractCount(market.volume_24h);
+    }
 
     async function search() {
       const headline = input.value.trim();
@@ -626,7 +652,7 @@
         if (!data.ok || !data.results || data.results.length === 0) {
           results.innerHTML = `
             <div class="empty">
-              <div class="empty-icon">🔍</div>
+              <div class="empty-icon">?</div>
               <div class="empty-text">No matching markets found for this headline.<br>Try different keywords or a broader topic.</div>
             </div>`;
           return;
@@ -640,18 +666,17 @@
           <div class="results">`;
 
         for (const m of data.results) {
-          const yes = m.yes_bid != null ? `${m.yes_bid}\u00a2` : "\u2014";
-          const no = m.no_bid != null ? `${m.no_bid}\u00a2` : "\u2014";
-          const vol = m.volume != null ? `$${Math.round(m.volume * (m.last_price || m.yes_bid || 50) / 100).toLocaleString()}` : "\u2014";
-          const close = m.close_time
-            ? new Date(m.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-            : "\u2014";
-
-          const yesPct = m.yes_bid || 0;
+          const yesPrice = getReferenceYesPrice(m);
+          const noPrice = getReferenceNoPrice(m);
+          const yes = formatPriceCents(yesPrice);
+          const no = formatPriceCents(noPrice);
+          const vol = formatMarketVolume(m);
+          const close = formatCloseDate(m.close_time);
+          const yesPct = yesPrice || 0;
           const shareParams = new URLSearchParams({
             title: m.title,
-            yes: m.yes_bid || "—",
-            no: m.no_bid || "—",
+            yes: yesPrice ?? "\u2014",
+            no: noPrice ?? "\u2014",
             vol: vol,
             closes: close,
             url: m.url,
@@ -705,7 +730,7 @@
 
     function esc(str) {
       const d = document.createElement("div");
-      d.textContent = str;
+      d.textContent = str ?? "";
       return d.innerHTML;
     }
 
@@ -722,24 +747,29 @@
       if (!item) return;
 
       const m = item.market;
-      const yes = m.yes_bid != null ? `${m.yes_bid}¢` : "—";
-      const no = m.no_bid != null ? `${m.no_bid}¢` : "—";
-      const vol = m.volume != null ? `$${Math.round(m.volume * (m.last_price || m.yes_bid || 50) / 100).toLocaleString()}` : "—";
-      const close = m.close_time
-        ? new Date(m.close_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-        : "—";
+      const yesPrice = getReferenceYesPrice(m);
+      const noPrice = getReferenceNoPrice(m);
+      const yes = formatPriceCents(yesPrice);
+      const no = formatPriceCents(noPrice);
+      const volumeValue = m.volume_24h != null ? formatMarket24hVolume(m) : formatMarketVolume(m);
+      const volumeLabel = m.volume_24h != null ? "24h Vol" : "Volume";
+      const close = formatCloseDate(m.close_time);
 
-      const yesPct = m.yes_bid || 0;
+      const yesPct = yesPrice || 0;
       const shareParams = new URLSearchParams({
-        title: m.title, yes: m.yes_bid || "—", no: m.no_bid || "—",
-        vol: vol, closes: close, url: m.url,
+        title: m.title,
+        yes: yesPrice ?? "\u2014",
+        no: noPrice ?? "\u2014",
+        vol: volumeValue,
+        closes: close,
+        url: m.url,
       });
       const shareLink = `${window.location.origin}/api/share?${shareParams}`;
       const tweetText = yesPct >= 70
-        ? `The market is ${yesPct}% confident on this → ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
+        ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
         : yesPct >= 40
-        ? `This one's a toss-up — market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
-        : `Market only gives this ${yesPct}% odds → ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
+        ? `This one's a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
+        : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
       const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
 
       const html = `
@@ -758,16 +788,16 @@
               <span class="odd-value">${no}</span>
             </a>
           </div>
-          ${(m.volume || m.close_time) ? `
+          ${(m.volume || m.volume_24h || m.close_time) ? `
           <div class="market-meta" style="margin-top: 20px; font-size: 14px;">
-            ${m.volume ? `<span>Volume: <strong>${vol}</strong></span>` : ""}
+            ${volumeValue !== "\u2014" ? `<span>${volumeLabel}: <strong>${volumeValue}</strong></span>` : ""}
             ${m.close_time ? `<span>Closes: ${close}</span>` : ""}
           </div>` : ""}
           <div class="market-actions" style="margin-top: 24px; justify-content: center;">
             <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to X
               <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
             </a>
-            <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi →</a>
+            <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
           </div>
         </div>`;
 
@@ -784,23 +814,32 @@
     }
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMarketModal(); });
 
-    // ── Ticker ───────────────────────────────────────────────────────────
+    // Ticker
 
     function populateTicker(results) {
-      const items = results.filter(r => r.market.yes_bid != null).slice(0, 7);
-      if (!items.length) return;
+      const items = results
+        .filter(r => getReferenceYesPrice(r.market) != null || getReferenceNoPrice(r.market) != null)
+        .slice(0, 7);
+      if (!items.length) {
+        tickerData = [];
+        document.getElementById("tickerInner").innerHTML = "";
+        document.getElementById("tickerWrap").style.display = "none";
+        return;
+      }
 
       tickerData = items; // Store for modal access
 
       const html = items.map((r, index) => {
         const label = r.market.title.length > 55
-          ? r.market.title.slice(0, 55) + "…"
+          ? r.market.title.slice(0, 55) + "..."
           : r.market.title;
+        const yes = formatPriceCents(getReferenceYesPrice(r.market));
+        const no = formatPriceCents(getReferenceNoPrice(r.market));
         return `<div class="ticker-item" onclick="openMarketModal(${index})" style="cursor: pointer;">
           <span class="t-title">${esc(label)}</span>
           <span class="ticker-dot"></span>
-          <span class="t-yes">${r.market.yes_bid}¢ YES</span>
-          <span class="t-no">${r.market.no_bid}¢ NO</span>
+          <span class="t-yes">${yes} YES</span>
+          <span class="t-no">${no} NO</span>
         </div>`;
       }).join("");
 
@@ -809,7 +848,7 @@
       document.getElementById("tickerWrap").style.display = "flex";
     }
 
-    // ── Trending section ─────────────────────────────────────────────────
+    // Trending section
 
     let trendOffset = 0;        // how many results we've loaded so far
     let trendTotal  = 0;        // total available from API
@@ -822,23 +861,28 @@
       const countEl   = document.getElementById("trendCount");
 
       if (!results.length && !append) {
-        container.innerHTML = `<div class="empty"><div class="empty-icon">📡</div><div class="empty-text">No strong matches right now — try searching manually.</div></div>`;
+        container.innerHTML = `<div class="empty"><div class="empty-icon">LIVE</div><div class="empty-text">No active Kalshi markets are bubbling up right now.</div></div>`;
         section.style.display = "";
         return;
       }
 
       const existingCount = container.querySelectorAll('.swipe-card').length;
-      countEl.textContent = `${trendTotal || results.length} matched`;
+      countEl.textContent = `${trendTotal || results.length} live markets`;
 
       let html = "";
       const startIndex = append ? existingCount : 0;
       for (let i = 0; i < results.length; i++) {
         const index = startIndex + i;
-        const r = results[index];
+        const r = results[i];
         const m    = r.market;
-        const yes  = m.yes_bid  != null ? `${m.yes_bid}\u00a2`  : "\u2014";
-        const no   = m.no_bid   != null ? `${m.no_bid}\u00a2`   : "\u2014";
-        const yesPct = m.yes_bid || 0;
+        const yesPrice = getReferenceYesPrice(m);
+        const noPrice = getReferenceNoPrice(m);
+        const yes = formatPriceCents(yesPrice);
+        const no = formatPriceCents(noPrice);
+        const close = formatCloseDate(m.close_time);
+        const volumeValue = m.volume_24h != null ? formatMarket24hVolume(m) : formatMarketVolume(m);
+        const volumeLabel = m.volume_24h != null ? "24h Vol" : "Volume";
+        const yesPct = yesPrice || 0;
 
         const tweetText = yesPct >= 70
           ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
@@ -847,14 +891,15 @@
           : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
 
         const shareParams = new URLSearchParams({
-          title: m.title, yes: m.yes_bid || "—", no: m.no_bid || "—",
-          vol: m.vol || "", closes: m.close || "", url: m.url,
+          title: m.title,
+          yes: yesPrice ?? "\u2014",
+          no: noPrice ?? "\u2014",
+          vol: volumeValue !== "\u2014" ? volumeValue : "",
+          closes: close !== "\u2014" ? close : "",
+          url: m.url,
         });
         const shareLink = `${window.location.origin}/api/share?${shareParams}`;
         const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
-
-
-        const logoUrl = SOURCE_LOGOS[r.source] || "https://via.placeholder.com/20x20/00e38f/ffffff?text=?";
 
         html += `
           <div class="trending-card swipe-card" data-market-id="${index}">
@@ -867,12 +912,12 @@
             <div class="card-content">
               <div class="trend-headline-row">
                 <span class="trend-source">
-                  <img src="${logoUrl}" alt="${esc(r.source)}" style="width: 16px; height: 16px; border-radius: 2px; object-fit: contain;" />
+                  <span style="font-size: 11px; font-weight: 800; color: var(--green);">#${index + 1}</span>
                 </span>
-                <span class="trend-headline-text">"${esc(r.headline)}"</span>
+                <span class="trend-headline-text">${esc(r.context || "Live Kalshi market")}</span>
               </div>
               <div class="trend-divider"></div>
-              <div class="trend-match-label">Matched Market · ${r.similarity}% relevance</div>
+              <div class="trend-match-label">${esc(r.activity || "Live open market")}</div>
               <div class="trend-market-title">${esc(m.title)}</div>
               <div class="trend-odds-row">
                 <a class="trend-odd trend-odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
@@ -884,10 +929,10 @@
                   <span class="trend-odd-value">${no}</span>
                 </a>
               </div>
-              ${(m.vol || m.close) ? `
+              ${(volumeValue !== "\u2014" || close !== "\u2014") ? `
               <div class="trend-meta">
-                ${m.vol   ? `<span>Vol: <strong>${esc(m.vol)}</strong></span>` : ""}
-                ${m.close ? `<span>Closes: ${esc(m.close)}</span>` : ""}
+                ${volumeValue !== "\u2014" ? `<span>${volumeLabel}: <strong>${esc(volumeValue)}</strong></span>` : ""}
+                ${close !== "\u2014" ? `<span>Closes: ${esc(close)}</span>` : ""}
               </div>` : ""}
               <div class="trend-actions">
                 <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to
@@ -921,7 +966,7 @@
       if (!hasSearchResults) {
         document.getElementById("trendingSection").style.display = "";
         document.getElementById("trendResults").innerHTML =
-          `<div class="trending-loading"><div class="spinner"></div>Loading trending headlines…</div>`;
+          `<div class="trending-loading"><div class="spinner"></div>Loading live Kalshi markets...</div>`;
       }
 
       try {
@@ -938,7 +983,7 @@
       } catch (err) {
         if (!hasSearchResults) {
           document.getElementById("trendResults").innerHTML =
-            `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Couldn't load trending — ${esc(err.message)}</div></div>`;
+            `<div class="empty"><div class="empty-icon">!</div><div class="empty-text">Couldn't load live Kalshi markets - ${esc(err.message)}</div></div>`;
           document.getElementById("trendingSection").style.display = "";
         }
       } finally {
@@ -946,7 +991,7 @@
       }
     }
 
-    // ── Swipe functionality ──────────────────────────────────────────────
+    // Swipe functionality
 
     function initSwipeCards() {
       const cards = document.querySelectorAll('.swipe-card:not([data-swipe-init])');
@@ -1085,9 +1130,9 @@
       }, 200);
     }
 
-    // Load on start, auto-refresh every 5 minutes
+    // Load on start, auto-refresh every 60 seconds
     loadTrending();
-    setInterval(() => loadTrending(), 5 * 60 * 1000);
+    setInterval(() => loadTrending(), 60 * 1000);
   </script>
 </body>
 </html>
