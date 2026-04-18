@@ -24,9 +24,6 @@
       --text: #eef2ef;
       --muted: #a9b5ae;
       --dim: #55625d;
-      --bags: #00e38f;
-      --bags-dark: #00c65e;
-      --bags-glow: rgba(0,227,143,0.25);
       color-scheme: dark;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -353,161 +350,8 @@
       .odds-row { flex-direction: column; }
     }
 
-    /* ── Bags ─────────────────────────────────────────────────────── */
 
     .nav-right { display: flex; align-items: center; gap: 14px; }
-
-    /* Bags bar */
-    .bags-bar {
-      margin-top: 24px; padding: 14px 20px;
-      border-radius: 14px;
-      border: 1px solid rgba(139,92,246,0.28);
-      background: rgba(139,92,246,0.05);
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    }
-    .bags-bar-left { display: flex; align-items: center; gap: 8px; }
-    .bags-logo {
-      font-size: 12px; font-weight: 800; letter-spacing: 0.08em;
-      color: var(--bags); background: rgba(139,92,246,0.15);
-      border-radius: 6px; padding: 3px 8px;
-    }
-    .bags-label { font-size: 12px; color: var(--muted); font-weight: 500; }
-    .bags-bar-mid {
-      display: flex; align-items: center; gap: 10px;
-      flex: 1; font-size: 13px; color: var(--muted);
-    }
-    .bags-sep { color: var(--dim); }
-    .bags-bar-right { margin-left: auto; }
-    .bags-cta {
-      padding: 9px 18px; border-radius: 999px; border: none;
-      background: linear-gradient(135deg, var(--bags), var(--bags-dark));
-      color: #fff; font-size: 13px; font-weight: 700;
-      font-family: inherit; cursor: pointer;
-      box-shadow: 0 4px 16px var(--bags-glow);
-      transition: box-shadow 200ms, transform 200ms;
-      white-space: nowrap;
-    }
-    .bags-cta:hover {
-      box-shadow: 0 6px 24px rgba(139,92,246,0.45);
-      transform: translateY(-1px);
-    }
-    .bags-cta.pulse { animation: bagsPulse 2s ease-in-out infinite; }
-    @keyframes bagsPulse {
-      0%,100% { box-shadow: 0 4px 16px var(--bags-glow); }
-      50% { box-shadow: 0 6px 28px rgba(139,92,246,0.6); }
-    }
-
-    /* Swap modal */
-    .swap-overlay {
-      position: fixed; inset: 0; z-index: 100;
-      background: rgba(0,0,0,0.72); backdrop-filter: blur(6px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .swap-modal {
-      width: 100%; max-width: 420px;
-      background: #0f1210;
-      border: 1px solid rgba(139,92,246,0.35);
-      border-radius: 20px; padding: 28px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(139,92,246,0.08);
-    }
-    .swap-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 22px;
-    }
-    .swap-modal-header h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
-    .swap-close {
-      width: 32px; height: 32px; border-radius: 50%;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.05);
-      color: var(--muted); font-size: 20px; line-height: 1;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-family: inherit; transition: background 200ms, color 200ms;
-    }
-    .swap-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
-    .btn-wallet {
-      width: 100%; padding: 13px;
-      border-radius: 12px; border: 1px solid rgba(139,92,246,0.4);
-      background: rgba(139,92,246,0.1);
-      color: var(--bags); font-size: 14px; font-weight: 700;
-      font-family: inherit; cursor: pointer;
-      transition: background 200ms, border-color 200ms;
-    }
-    .btn-wallet:hover { background: rgba(139,92,246,0.2); }
-    .btn-wallet.connected {
-      color: var(--green); border-color: rgba(0,198,94,0.4);
-      background: rgba(0,198,94,0.07);
-    }
-    .swap-field { margin-top: 18px; }
-    .swap-field label {
-      display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
-    }
-    .swap-input-row {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 12px; padding: 4px 4px 4px 14px;
-      transition: border-color 200ms;
-    }
-    .swap-input-row:focus-within { border-color: rgba(139,92,246,0.4); }
-    .swap-input-row input {
-      flex: 1; background: transparent; border: none; outline: none;
-      color: var(--text); font-size: 18px; font-weight: 700;
-      font-family: inherit; padding: 8px 0; width: 0;
-    }
-    .swap-input-row input::placeholder { color: var(--dim); font-weight: 400; }
-    .btn-max {
-      padding: 6px 11px; border-radius: 8px; border: none;
-      background: rgba(139,92,246,0.15); color: var(--bags);
-      font-size: 11px; font-weight: 700; font-family: inherit; cursor: pointer;
-      transition: background 200ms;
-    }
-    .btn-max:hover { background: rgba(139,92,246,0.28); }
-    .token-chip {
-      padding: 7px 12px; border-radius: 8px;
-      background: rgba(255,255,255,0.07);
-      font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap;
-    }
-    .quote-box {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 12px; padding: 14px 16px;
-      font-size: 14px; color: var(--muted); min-height: 52px;
-      display: flex; align-items: center;
-    }
-    .quote-amount { font-size: 20px; font-weight: 800; color: var(--text); }
-    .quote-meta {
-      display: flex; gap: 16px; margin-top: 8px;
-      font-size: 12px; color: var(--dim);
-    }
-    .quote-meta strong { color: var(--muted); }
-    .btn-swap-exec {
-      width: 100%; padding: 15px; margin-top: 18px;
-      border-radius: 12px; border: none;
-      background: linear-gradient(135deg, var(--bags), var(--bags-dark));
-      color: #fff; font-size: 16px; font-weight: 800;
-      font-family: inherit; cursor: pointer;
-      box-shadow: 0 6px 20px var(--bags-glow);
-      transition: box-shadow 200ms, transform 200ms, opacity 200ms;
-    }
-    .btn-swap-exec:hover:not(:disabled) {
-      box-shadow: 0 10px 30px rgba(139,92,246,0.5);
-      transform: translateY(-1px);
-    }
-    .btn-swap-exec:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-    .swap-status-msg {
-      margin-top: 14px; padding: 11px 14px;
-      border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center;
-    }
-    .swap-status-msg.success {
-      background: rgba(0,198,94,0.09); border: 1px solid rgba(0,198,94,0.25);
-      color: var(--green);
-    }
-    .swap-status-msg.error {
-      background: rgba(255,92,92,0.09); border: 1px solid rgba(255,92,92,0.25);
-      color: #ff5c5c;
-    }
-    .swap-status-msg a { color: inherit; text-decoration: underline; }
 
     /* Market modal */
     .market-overlay {
@@ -534,11 +378,6 @@
     }
     .market-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
 
-    @media (max-width: 640px) {
-      .bags-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .bags-bar-right { margin-left: 0; width: 100%; }
-      .bags-cta { width: 100%; text-align: center; }
-    }
 
     /* ── Ticker ───────────────────────────────────────────────────────── */
     .ticker-wrap {
@@ -728,60 +567,7 @@
 
     <div id="resultsArea"></div>
 
-    <!-- Bags bar — shown after any search result -->
-    <div class="bags-bar" id="bagsBar" style="display:none">
-      <div class="bags-bar-left">
-        <span class="bags-logo">BAGS</span>
-        <span class="bags-label">Solana Launchpad</span>
-      </div>
-      <div class="bags-bar-mid">
-        <span id="bagsPoolCount">— tokens launched</span>
-      </div>
-      <div class="bags-bar-right">
-        <button class="bags-cta" id="bagsCta" onclick="openSwapModal()">Swap on Bags →</button>
-      </div>
-    </div>
   </main>
-
-  <!-- Swap modal -->
-  <div class="swap-overlay" id="swapOverlay" style="display:none" onclick="handleOverlayClick(event)">
-    <div class="swap-modal">
-      <div class="swap-modal-header">
-        <h3>Swap on <span style="color:var(--bags)">Bags</span></h3>
-        <button class="swap-close" onclick="closeSwapModal()">×</button>
-      </div>
-
-      <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">
-        Connect Wallet (Solflare / Phantom)
-      </button>
-
-      <div class="swap-field">
-        <label>You Pay</label>
-        <div class="swap-input-row">
-          <input type="number" id="swapAmount" placeholder="0.0" min="0" step="any"
-                 oninput="onAmountInput()" />
-          <button class="btn-max" onclick="setMaxSol()">Max</button>
-          <span class="token-chip">SOL</span>
-        </div>
-      </div>
-
-      <div class="swap-field">
-        <label>You Receive</label>
-        <div class="quote-box" id="quoteBox">Enter an amount to get a quote</div>
-        <div class="quote-meta" id="quoteMeta" style="display:none">
-          <span>Impact: <strong id="priceImpact">—</strong></span>
-          <span>Route: <strong id="routeVenue">—</strong></span>
-          <span>Fee: <strong>1%</strong></span>
-        </div>
-      </div>
-
-      <button class="btn-swap-exec" id="swapExecBtn" onclick="executeSwap()" disabled>
-        Swap
-      </button>
-
-      <div id="swapStatusEl" style="display:none"></div>
-    </div>
-  </div>
 
   <!-- Market detail modal -->
   <div class="market-overlay" id="marketOverlay" style="display:none" onclick="handleMarketOverlayClick(event)">
@@ -908,7 +694,6 @@
 
         html += `</div>`;
         results.innerHTML = html;
-        showBagsBar(headline);
       } catch (err) {
         results.innerHTML = `<div class="status error">Error: ${esc(err.message)}</div>`;
       } finally {
@@ -932,71 +717,6 @@
     // Auto-focus input
     input.focus();
 
-    // ── Bags integration ────────────────────────────────────────────────
-
-    const CRYPTO_KEYWORDS = [
-      'crypto','token','memecoin','solana','bitcoin','btc','ethereum','eth',
-      'defi','nft','blockchain','web3','altcoin','dex','sol','bonk','wif',
-      'jup','pump','meme','coin','dogecoin','doge','shib','pepe','rug',
-      'airdrop','staking','yield','liquidity','swap',
-    ];
-    const SOL_MINT  = "So11111111111111111111111111111111111111112";
-    const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-
-    let walletPublicKey = null;
-    let solBalance = null;
-    let currentQuoteId = null;
-    let quoteTimer = null;
-
-    function isCrypto(text) {
-      const l = text.toLowerCase();
-      return CRYPTO_KEYWORDS.some(k => l.includes(k));
-    }
-
-    // ── Live stats (SOL price + pool count) ─────────────────────────────
-    async function loadBagsStats() {
-      try {
-        const r = await fetch("/api/bags-quote");
-        const d = await r.json();
-        if (!d.ok) return;
-
-        const poolStr = d.poolCount != null ? `${d.poolCount.toLocaleString()} tokens launched` : null;
-
-        // Bags bar stats
-        const poolEl = document.getElementById("bagsPoolCount");
-        if (poolEl && poolStr) poolEl.textContent = poolStr;
-      } catch {}
-    }
-    loadBagsStats();
-    setInterval(loadBagsStats, 60000);
-
-    // ── Bags bar ─────────────────────────────────────────────────────────
-    function showBagsBar(headline) {
-      const bar = document.getElementById("bagsBar");
-      if (!bar) return;
-      bar.style.display = "flex";
-      const cta = document.getElementById("bagsCta");
-      cta.textContent = "Coming Soon";
-      cta.disabled = true;
-      cta.style.opacity = "0.6";
-      cta.style.cursor = "not-allowed";
-    }
-
-    // ── Swap modal open/close ────────────────────────────────────────────
-    function openSwapModal() {
-      document.getElementById("swapOverlay").style.display = "flex";
-      document.body.style.overflow = "hidden";
-    }
-    function closeSwapModal() {
-      document.getElementById("swapOverlay").style.display = "none";
-      document.body.style.overflow = "";
-    }
-    function handleOverlayClick(e) {
-      if (e.target === document.getElementById("swapOverlay")) closeSwapModal();
-    }
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSwapModal(); });
-
-    // ── Market modal ─────────────────────────────────────────────────────
     function openMarketModal(index) {
       const item = tickerData[index];
       if (!item) return;
@@ -1063,176 +783,6 @@
       if (e.target === document.getElementById("marketOverlay")) closeMarketModal();
     }
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMarketModal(); });
-
-    // ── Wallet connect ───────────────────────────────────────────────────
-    async function connectWallet() {
-      const btn = document.getElementById("walletBtn");
-      const provider = window.solflare || window.solana;
-      if (!provider) {
-        setSwapStatus("Please install Solflare or Phantom wallet extension", "error");
-        return;
-      }
-      try {
-        btn.textContent = "Connecting…";
-        btn.disabled = true;
-        const resp = await provider.connect();
-        walletPublicKey = resp.publicKey.toString();
-        btn.textContent = `✓ ${walletPublicKey.slice(0,4)}…${walletPublicKey.slice(-4)}`;
-        btn.classList.add("connected");
-        btn.disabled = false;
-
-        // Fetch SOL balance for "Max" button
-        try {
-          const rpc = await fetch("https://api.mainnet-beta.solana.com", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ jsonrpc:"2.0", id:1, method:"getBalance", params:[walletPublicKey] }),
-          });
-          const rpcData = await rpc.json();
-          if (rpcData.result?.value != null) solBalance = rpcData.result.value / 1e9;
-        } catch {}
-
-        // Enable swap button if we already have a quote
-        if (currentQuoteId) {
-          const execBtn = document.getElementById("swapExecBtn");
-          execBtn.disabled = false;
-          execBtn.textContent = "Swap";
-        }
-      } catch (err) {
-        btn.textContent = "Connect Wallet (Phantom / Solflare)";
-        btn.disabled = false;
-        setSwapStatus(err.message || "Wallet connection failed", "error");
-      }
-    }
-
-    function setMaxSol() {
-      if (solBalance == null) return;
-      const max = Math.max(0, solBalance - 0.01); // keep 0.01 for fees
-      document.getElementById("swapAmount").value = max.toFixed(4);
-      onAmountInput();
-    }
-
-    // ── Quote ────────────────────────────────────────────────────────────
-    function onAmountInput() {
-      clearTimeout(quoteTimer);
-      const amt = parseFloat(document.getElementById("swapAmount").value);
-      if (!amt || amt <= 0) {
-        document.getElementById("quoteBox").textContent = "Enter an amount to get a quote";
-        document.getElementById("quoteMeta").style.display = "none";
-        document.getElementById("swapExecBtn").disabled = true;
-        currentQuoteId = null;
-        return;
-      }
-      document.getElementById("quoteBox").textContent = "Getting quote…";
-      quoteTimer = setTimeout(() => fetchQuote(amt), 600);
-    }
-
-    async function fetchQuote(solAmount) {
-      const lamports = Math.round(solAmount * 1e9);
-      try {
-        const r = await fetch("/api/bags-quote", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ inputMint: SOL_MINT, outputMint: USDC_MINT, amount: lamports }),
-        });
-        const d = await r.json();
-        if (!d.ok) throw new Error(d.error || "Quote failed");
-
-        currentQuoteId = d.requestId;
-        const usdcAmt = (parseInt(d.outAmount) / 1e6).toFixed(2);
-
-        document.getElementById("quoteBox").innerHTML =
-          `<span class="quote-amount">${usdcAmt} USDC</span>`;
-
-        const impact = d.priceImpactPct && parseFloat(d.priceImpactPct) > 0
-          ? `${parseFloat(d.priceImpactPct).toFixed(4)}%`
-          : "<0.01%";
-        document.getElementById("priceImpact").textContent = impact;
-        document.getElementById("routeVenue").textContent = d.venue || "Bags";
-        document.getElementById("quoteMeta").style.display = "flex";
-
-        const execBtn = document.getElementById("swapExecBtn");
-        execBtn.disabled = !walletPublicKey;
-        execBtn.textContent = walletPublicKey ? "Swap" : "Connect wallet to swap";
-      } catch (err) {
-        document.getElementById("quoteBox").textContent = `Quote failed — ${err.message}`;
-        document.getElementById("quoteMeta").style.display = "none";
-        document.getElementById("swapExecBtn").disabled = true;
-        currentQuoteId = null;
-      }
-    }
-
-    // ── Execute swap ──────────────────────────────────────────────────────
-    async function executeSwap() {
-      if (!walletPublicKey) return;
-      const execBtn = document.getElementById("swapExecBtn");
-      execBtn.disabled = true;
-      execBtn.textContent = "Preparing…";
-      clearSwapStatus();
-
-      try {
-        const solAmount = parseFloat(document.getElementById("swapAmount").value);
-        if (!solAmount || solAmount <= 0) throw new Error("Enter a valid amount");
-
-        // Fresh quote
-        execBtn.textContent = "Getting fresh quote…";
-        const lamports = Math.round(solAmount * 1e9);
-        const qRes = await fetch("/api/bags-quote", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ inputMint: SOL_MINT, outputMint: USDC_MINT, amount: lamports }),
-        });
-        const qData = await qRes.json();
-        if (!qData.ok) throw new Error(qData.error || "Quote failed");
-
-        // Build serialized transaction
-        execBtn.textContent = "Building transaction…";
-        const sRes = await fetch("/api/bags-swap", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ requestId: qData.requestId, userPublicKey: walletPublicKey }),
-        });
-        const sData = await sRes.json();
-        if (!sData.ok) throw new Error(sData.error || "Swap build failed");
-
-        // Deserialize + sign
-        execBtn.textContent = "Awaiting signature…";
-        const provider = window.solflare || window.solana;
-        const txBytes = Uint8Array.from(atob(sData.serializedTransaction), c => c.charCodeAt(0));
-
-        let tx;
-        try {
-          tx = solanaWeb3.VersionedTransaction.deserialize(txBytes);
-        } catch {
-          tx = solanaWeb3.Transaction.from(txBytes);
-        }
-
-        const result = await provider.signAndSendTransaction(tx);
-        const sig = result.signature || result;
-
-        execBtn.disabled = false;
-        execBtn.textContent = "Swap";
-        setSwapStatus(
-          `Swapped! <a href="https://solscan.io/tx/${esc(String(sig))}" target="_blank" rel="noopener">View on Solscan →</a>`,
-          "success"
-        );
-      } catch (err) {
-        execBtn.disabled = false;
-        execBtn.textContent = "Swap";
-        setSwapStatus(err.message || "Swap failed", "error");
-      }
-    }
-
-    function setSwapStatus(msg, type) {
-      const el = document.getElementById("swapStatusEl");
-      el.className = `swap-status-msg ${type}`;
-      el.innerHTML = msg;
-      el.style.display = "";
-    }
-    function clearSwapStatus() {
-      const el = document.getElementById("swapStatusEl");
-      if (el) el.style.display = "none";
-    }
 
     // ── Ticker ───────────────────────────────────────────────────────────
 
@@ -1303,9 +853,6 @@
         const shareLink = `${window.location.origin}/api/share?${shareParams}`;
         const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
 
-        const cryptoCta = isCrypto(r.headline)
-          ? `<button class="bags-cta" style="font-size:12px;padding:7px 14px" disabled style="opacity:0.6;cursor:not-allowed;">Coming Soon</button>`
-          : "";
 
         const logoUrl = SOURCE_LOGOS[r.source] || "https://via.placeholder.com/20x20/00e38f/ffffff?text=?";
 
@@ -1347,7 +894,6 @@
                   <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
                 </a>
                 <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
-                ${cryptoCta}
               </div>
             </div>
           </div>`;
@@ -1545,3 +1091,4 @@
   </script>
 </body>
 </html>
+
