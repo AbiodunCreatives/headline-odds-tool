@@ -12,8 +12,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <!-- Solana web3.js for tx deserialization -->
-  <script src="https://unpkg.com/@solana/web3.js@1.87.6/lib/index.iife.min.js"></script>
   <style>
     :root {
       --bg: #080a09;
@@ -508,168 +506,7 @@
       .comparison-grid { grid-template-columns: 1fr; }
       .comparison-subtitle { min-height: 0; }
     }
-
-
     .nav-right { display: flex; align-items: center; gap: 14px; }
-
-    /* Market modal */
-    .market-overlay {
-      position: fixed; inset: 0; z-index: 1000;
-      background: rgba(8,10,9,0.8); backdrop-filter: blur(20px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .market-modal {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 24px; padding: 32px; max-width: 600px; width: 100%;
-      max-height: 80vh; overflow-y: auto;
-      position: relative;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
-    }
-    .market-close {
-      position: sticky; top: 0; float: right;
-      width: 32px; height: 32px; border-radius: 50%;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.05);
-      color: var(--muted); font-size: 20px; line-height: 1;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-family: inherit; transition: background 200ms, color 200ms;
-      z-index: 10; margin-bottom: -32px;
-    }
-    .market-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
-
-
-    /* Ticker */
-    .ticker-wrap {
-      position: relative; z-index: 9;
-      display: none; align-items: center;
-      height: 44px; overflow: hidden;
-      background: rgba(0,0,0,0.35);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .ticker-label {
-      flex-shrink: 0; height: 100%;
-      display: flex; align-items: center;
-      padding: 0 18px;
-      font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--green); background: rgba(0,227,143,0.08);
-      border-right: 1px solid rgba(0,227,143,0.15);
-      white-space: nowrap;
-    }
-    .ticker-track { flex: 1; overflow: hidden; }
-    .ticker-inner {
-      display: flex; width: max-content;
-      animation: tickerScroll 50s linear infinite;
-    }
-    .ticker-inner:hover { animation-play-state: paused; }
-    @keyframes tickerScroll {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    .ticker-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 0 32px; white-space: nowrap;
-      font-size: 14px; font-weight: 600; color: var(--muted);
-      border-right: 1px solid rgba(255,255,255,0.04);
-    }
-    .ticker-item .t-title { color: var(--text); max-width: 400px; overflow: hidden; text-overflow: ellipsis; }
-    .ticker-item .t-yes   { color: var(--green); font-weight: 800; }
-    .ticker-item .t-no    { color: #ff5c5c; font-weight: 800; }
-    .ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
-
-    /* Trending section */
-    .trending-section { margin-bottom: 8px; }
-    .trending-loading {
-      text-align: center; padding: 48px 0;
-      color: var(--muted); font-size: 14px;
-    }
-    .trending-refresh {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 999px;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
-      color: var(--muted); font-size: 12px; font-weight: 600;
-      font-family: inherit; cursor: pointer;
-      transition: color 200ms, border-color 200ms, background 200ms;
-    }
-    .trending-refresh:hover { color: var(--text); background: rgba(255,255,255,0.08); }
-    .trending-refresh.spinning svg { animation: spin 0.7s linear infinite; }
-    .trending-card {
-      padding: 18px 22px; border-radius: 16px;
-      background: var(--card); border: 1px solid var(--border);
-      margin-bottom: 12px;
-      transition: border-color 300ms, transform 300ms, box-shadow 300ms;
-    }
-    .trending-card:hover {
-      border-color: rgba(0,198,94,0.18);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
-    }
-    .trend-headline-row {
-      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;
-    }
-    .trend-source {
-      flex-shrink: 0; margin-top: 1px;
-      width: 20px; height: 20px;
-      background: rgba(0,198,94,0.08);
-      border: 1px solid rgba(0,198,94,0.18); border-radius: 4px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .trend-headline-text { font-size: 13px; color: var(--muted); line-height: 1.55; }
-    .trend-divider { height: 1px; background: var(--border); margin-bottom: 12px; }
-    .trend-match-label {
-      font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--dim); margin-bottom: 6px;
-    }
-    .trend-market-title { font-size: 15px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
-    .trend-odds-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .trend-odd {
-      flex: 1; display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 14px; border-radius: 10px;
-      text-decoration: none; color: var(--text);
-      transition: transform 200ms, border-color 200ms;
-    }
-    .trend-odd-yes { border: 1px solid rgba(0,198,94,0.3); background: rgba(0,198,94,0.06); }
-    .trend-odd-yes:hover { border-color: rgba(0,198,94,0.6); transform: translateX(2px); }
-    .trend-odd-no  { border: 1px solid rgba(255,92,92,0.25); background: rgba(255,92,92,0.06); }
-    .trend-odd-no:hover  { border-color: rgba(255,92,92,0.55); transform: translateX(2px); }
-    .trend-odd-label { font-size: 12px; font-weight: 600; }
-    .trend-odd-value { font-size: 15px; font-weight: 800; }
-    .trend-odd-yes .trend-odd-value { color: var(--green); }
-    .trend-odd-no  .trend-odd-value { color: #ff5c5c; }
-    .trend-meta { font-size: 11px; color: var(--dim); display: flex; gap: 14px; margin-bottom: 12px; }
-    .trend-meta strong { color: var(--muted); }
-    .trend-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    /* Swipe functionality */
-    .swipe-card {
-      position: relative;
-      overflow: hidden;
-      touch-action: pan-y;
-      cursor: grab;
-    }
-    .swipe-card:active { cursor: grabbing; }
-    .swipe-overlay {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 32px; font-weight: 800; color: white;
-      opacity: 0; transition: opacity 100ms;
-      pointer-events: none; z-index: 10;
-    }
-    .swipe-yes {
-      background: linear-gradient(135deg, rgba(0,198,94,0.9), rgba(0,227,143,0.9));
-      transform: translateX(-100%);
-    }
-    .swipe-no {
-      background: linear-gradient(135deg, rgba(255,92,92,0.9), rgba(255,120,120,0.9));
-      transform: translateX(100%);
-    }
-    .swipe-card.swipe-yes-active .swipe-yes { opacity: 1; transform: translateX(0); }
-    .swipe-card.swipe-no-active .swipe-no { opacity: 1; transform: translateX(0); }
-    .swipe-card.swipe-yes-active { transform: translateX(60px) rotate(5deg); }
-    .swipe-card.swipe-no-active { transform: translateX(-60px) rotate(-5deg); }
-
-    @media (max-width: 640px) {
-      .ticker-item .t-title { max-width: 200px; }
-    }
   </style>
 </head>
 <body>
@@ -686,14 +523,6 @@
     </div>
   </nav>
 
-  <!-- Live odds ticker -->
-  <div class="ticker-wrap" id="tickerWrap">
-    <div class="ticker-label">Kalshi Live</div>
-    <div class="ticker-track">
-      <div class="ticker-inner" id="tickerInner"></div>
-    </div>
-  </div>
-
   <main>
     <div class="hero-label"><span class="hero-dot"></span> Bayse x Kalshi Crossover</div>
     <h1>Search Bayse. Find the <span>Kalshi crossover</span>.</h1>
@@ -707,45 +536,18 @@
     </div>
     <p class="search-hint">Try: "Super Eagles", "Davido Grammy", "Naira", "Kenya election", "Afrobeats"</p>
 
-    <!-- Trending section (default view, hidden when search is active) -->
-    <section class="trending-section" id="trendingSection" style="display:none">
-      <div class="results-header">
-        <span class="results-title">Hot Kalshi Markets</span>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="results-count" id="trendCount"></span>
-          <button class="trending-refresh" id="refreshBtn" onclick="loadTrending(true)" title="Refresh">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
-          </button>
-        </div>
-      </div>
-      <div id="trendResults">
-        <div class="trending-loading"><div class="spinner"></div>Loading live Kalshi markets...</div>
-      </div>
-    </section>
-
     <div id="resultsArea"></div>
 
   </main>
 
-  <!-- Market detail modal -->
-  <div class="market-overlay" id="marketOverlay" style="display:none" onclick="handleMarketOverlayClick(event)">
-    <div class="market-modal">
-      <button class="market-close" onclick="closeMarketModal()">&times;</button>
-      <div id="marketDetailContent"></div>
-    </div>
-  </div>
-
   <footer>
-    <p>Built by <a href="https://headlineodds.fun">Headline Odds</a> - real-time prediction market odds on every headline.</p>
+    <p>Built by <a href="https://headlineodds.fun">Headline Odds</a> - search Bayse markets and compare them with live Kalshi pricing.</p>
   </footer>
 
   <script>
     const input = document.getElementById("headlineInput");
     const btn = document.getElementById("searchBtn");
     const results = document.getElementById("resultsArea");
-
-    let tickerData = []; // Store full market data for ticker items
 
     function formatPriceCents(value) {
       return value != null ? `${value}\u00a2` : "\u2014";
@@ -843,7 +645,6 @@
       btn.disabled = true;
       btn.textContent = "Searching...";
       results.innerHTML = `<div class="status"><div class="spinner"></div>Searching Bayse and matching to Kalshi...</div>`;
-      document.getElementById("trendingSection").style.display = "none";
 
       try {
         const res = await fetch("/api/match", {
@@ -869,10 +670,20 @@
           return;
         }
 
-        let html = `
+        /* let html = `
           <div class="results-header">
             <span class="results-title">Bayse x Kalshi Matches</span>
             <span class="results-count">${(data.bayseCount || 0).toLocaleString()} Bayse markets · ${(data.kalshiMarketCount || 0).toLocaleString()} Kalshi markets scanned</span>
+          </div>
+          <div class="results">`; */
+
+        let html = "";
+        const bayseCount = (data.bayseCount || 0).toLocaleString();
+        const kalshiCount = (data.kalshiMarketCount || 0).toLocaleString();
+        html = `
+          <div class="results-header">
+            <span class="results-title">Bayse x Kalshi Matches</span>
+            <span class="results-count">${bayseCount} Bayse markets &middot; ${kalshiCount} Kalshi markets scanned</span>
           </div>
           <div class="results">`;
 
@@ -980,398 +791,6 @@
 
     // Auto-focus input
     input.focus();
-
-    function openMarketModal(index) {
-      const item = tickerData[index];
-      if (!item) return;
-
-      const m = item.market;
-      const yesPrice = getReferenceYesPrice(m);
-      const noPrice = getReferenceNoPrice(m);
-      const yes = formatPriceCents(yesPrice);
-      const no = formatPriceCents(noPrice);
-      const volumeValue = m.volume_24h != null ? formatMarket24hVolume(m) : formatMarketVolume(m);
-      const volumeLabel = m.volume_24h != null ? "24h Vol" : "Volume";
-      const close = formatCloseDate(m.close_time);
-
-      const yesPct = yesPrice || 0;
-      const shareParams = new URLSearchParams({
-        title: m.title,
-        yes: yesPrice ?? "\u2014",
-        no: noPrice ?? "\u2014",
-        vol: volumeValue,
-        closes: close,
-        url: m.url,
-      });
-      const shareLink = `${window.location.origin}/api/share?${shareParams}`;
-      const tweetText = yesPct >= 70
-        ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
-        : yesPct >= 40
-        ? `This one's a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
-        : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
-      const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
-
-      const html = `
-        <div class="market-card" style="margin: 0; box-shadow: none; border: none; background: transparent;">
-          <div class="market-header" style="margin-bottom: 24px;">
-            <div class="market-title" style="font-size: 24px; line-height: 1.3;">${esc(m.title)}</div>
-          </div>
-          ${m.subtitle ? `<div class="market-subtitle" style="font-size: 16px; margin-bottom: 24px;">${esc(m.subtitle)}</div>` : ""}
-          <div class="odds-row" style="gap: 16px;">
-            <a class="odd odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
-              <span class="odd-label">Yes</span>
-              <span class="odd-value">${yes}</span>
-            </a>
-            <a class="odd odd-no" href="${esc(m.url)}" target="_blank" rel="noopener">
-              <span class="odd-label">No</span>
-              <span class="odd-value">${no}</span>
-            </a>
-          </div>
-          ${(m.volume || m.volume_24h || m.close_time) ? `
-          <div class="market-meta" style="margin-top: 20px; font-size: 14px;">
-            ${volumeValue !== "\u2014" ? `<span>${volumeLabel}: <strong>${volumeValue}</strong></span>` : ""}
-            ${m.close_time ? `<span>Closes: ${close}</span>` : ""}
-          </div>` : ""}
-          <div class="market-actions" style="margin-top: 24px; justify-content: center;">
-            <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to X
-              <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
-            </a>
-            <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
-          </div>
-        </div>`;
-
-      document.getElementById("marketDetailContent").innerHTML = html;
-      document.getElementById("marketOverlay").style.display = "flex";
-      document.body.style.overflow = "hidden";
-    }
-    function closeMarketModal() {
-      document.getElementById("marketOverlay").style.display = "none";
-      document.body.style.overflow = "";
-    }
-    function handleMarketOverlayClick(e) {
-      if (e.target === document.getElementById("marketOverlay")) closeMarketModal();
-    }
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMarketModal(); });
-
-    // Ticker
-
-    function populateTicker(results) {
-      const items = results
-        .filter(r => getReferenceYesPrice(r.market) != null || getReferenceNoPrice(r.market) != null)
-        .slice(0, 7);
-      if (!items.length) {
-        tickerData = [];
-        document.getElementById("tickerInner").innerHTML = "";
-        document.getElementById("tickerWrap").style.display = "none";
-        return;
-      }
-
-      tickerData = items; // Store for modal access
-
-      const html = items.map((r, index) => {
-        const label = r.market.title.length > 55
-          ? r.market.title.slice(0, 55) + "..."
-          : r.market.title;
-        const yes = formatPriceCents(getReferenceYesPrice(r.market));
-        const no = formatPriceCents(getReferenceNoPrice(r.market));
-        return `<div class="ticker-item" onclick="openMarketModal(${index})" style="cursor: pointer;">
-          <span class="t-title">${esc(label)}</span>
-          <span class="ticker-dot"></span>
-          <span class="t-yes">${yes} YES</span>
-          <span class="t-no">${no} NO</span>
-        </div>`;
-      }).join("");
-
-      // Duplicate for seamless infinite loop
-      document.getElementById("tickerInner").innerHTML = html + html;
-      document.getElementById("tickerWrap").style.display = "flex";
-    }
-
-    // Trending section
-
-    let trendOffset = 0;        // how many results we've loaded so far
-    let trendTotal  = 0;        // total available from API
-    let swipedCount = 0;        // cards swiped away
-    let isFetchingMore = false; // prevent duplicate fetches
-
-    function renderTrendingCards(results, append = false) {
-      const container = document.getElementById("trendResults");
-      const section   = document.getElementById("trendingSection");
-      const countEl   = document.getElementById("trendCount");
-
-      if (!results.length && !append) {
-        container.innerHTML = `<div class="empty"><div class="empty-icon">LIVE</div><div class="empty-text">No active Kalshi markets are bubbling up right now.</div></div>`;
-        section.style.display = "";
-        return;
-      }
-
-      const existingCount = container.querySelectorAll('.swipe-card').length;
-      countEl.textContent = `${trendTotal || results.length} live markets`;
-
-      let html = "";
-      const startIndex = append ? existingCount : 0;
-      for (let i = 0; i < results.length; i++) {
-        const index = startIndex + i;
-        const r = results[i];
-        const m    = r.market;
-        const yesPrice = getReferenceYesPrice(m);
-        const noPrice = getReferenceNoPrice(m);
-        const yes = formatPriceCents(yesPrice);
-        const no = formatPriceCents(noPrice);
-        const close = formatCloseDate(m.close_time);
-        const volumeValue = m.volume_24h != null ? formatMarket24hVolume(m) : formatMarketVolume(m);
-        const volumeLabel = m.volume_24h != null ? "24h Vol" : "Volume";
-        const yesPct = yesPrice || 0;
-
-        const tweetText = yesPct >= 70
-          ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
-          : yesPct >= 40
-          ? `This one\u2019s a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
-          : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
-
-        const shareParams = new URLSearchParams({
-          title: m.title,
-          yes: yesPrice ?? "\u2014",
-          no: noPrice ?? "\u2014",
-          vol: volumeValue !== "\u2014" ? volumeValue : "",
-          closes: close !== "\u2014" ? close : "",
-          url: m.url,
-        });
-        const shareLink = `${window.location.origin}/api/share?${shareParams}`;
-        const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
-
-        html += `
-          <div class="trending-card swipe-card" data-market-id="${index}">
-            <div class="swipe-overlay swipe-yes">
-              <div class="swipe-text">YES</div>
-            </div>
-            <div class="swipe-overlay swipe-no">
-              <div class="swipe-text">NO</div>
-            </div>
-            <div class="card-content">
-              <div class="trend-headline-row">
-                <span class="trend-source">
-                  <span style="font-size: 11px; font-weight: 800; color: var(--green);">#${index + 1}</span>
-                </span>
-                <span class="trend-headline-text">${esc(r.context || "Live Kalshi market")}</span>
-              </div>
-              <div class="trend-divider"></div>
-              <div class="trend-match-label">${esc(r.activity || "Live open market")}</div>
-              <div class="trend-market-title">${esc(m.title)}</div>
-              <div class="trend-odds-row">
-                <a class="trend-odd trend-odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
-                  <span class="trend-odd-label">Yes</span>
-                  <span class="trend-odd-value">${yes}</span>
-                </a>
-                <a class="trend-odd trend-odd-no" href="${esc(m.url)}" target="_blank" rel="noopener">
-                  <span class="trend-odd-label">No</span>
-                  <span class="trend-odd-value">${no}</span>
-                </a>
-              </div>
-              ${(volumeValue !== "\u2014" || close !== "\u2014") ? `
-              <div class="trend-meta">
-                ${volumeValue !== "\u2014" ? `<span>${volumeLabel}: <strong>${esc(volumeValue)}</strong></span>` : ""}
-                ${close !== "\u2014" ? `<span>Closes: ${esc(close)}</span>` : ""}
-              </div>` : ""}
-              <div class="trend-actions">
-                <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to
-                  <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
-                </a>
-                <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
-              </div>
-            </div>
-          </div>`;
-      }
-
-      if (append) {
-        container.insertAdjacentHTML('beforeend', html);
-      } else {
-        container.innerHTML = html;
-        swipedCount = 0;
-      }
-      section.style.display = "";
-
-      // Initialize swipe functionality for new cards
-      initSwipeCards();
-    }
-
-    async function loadTrending(force = false) {
-      const btn = document.getElementById("refreshBtn");
-      if (btn) btn.classList.add("spinning");
-
-      // Don't show trending section if user already has search results showing
-      const hasSearchResults = document.getElementById("resultsArea").innerHTML.includes("market-card")
-        || document.getElementById("resultsArea").innerHTML.includes("empty");
-      if (!hasSearchResults) {
-        document.getElementById("trendingSection").style.display = "";
-        document.getElementById("trendResults").innerHTML =
-          `<div class="trending-loading"><div class="spinner"></div>Loading live Kalshi markets...</div>`;
-      }
-
-      try {
-        const url = force ? "/api/trending?force=1&limit=20" : "/api/trending?limit=20";
-        const res = await fetch(url);
-        const d   = await res.json();
-        if (!d.ok) throw new Error(d.error || "Failed");
-
-        trendOffset = d.results.length;
-        trendTotal  = d.total || d.results.length;
-
-        populateTicker(d.results);
-        if (!hasSearchResults) renderTrendingCards(d.results);
-      } catch (err) {
-        if (!hasSearchResults) {
-          document.getElementById("trendResults").innerHTML =
-            `<div class="empty"><div class="empty-icon">!</div><div class="empty-text">Couldn't load live Kalshi markets - ${esc(err.message)}</div></div>`;
-          document.getElementById("trendingSection").style.display = "";
-        }
-      } finally {
-        if (btn) btn.classList.remove("spinning");
-      }
-    }
-
-    // Swipe functionality
-
-    function initSwipeCards() {
-      const cards = document.querySelectorAll('.swipe-card:not([data-swipe-init])');
-
-      cards.forEach(card => {
-        card.setAttribute('data-swipe-init', '1');
-        let startX = 0;
-        let currentX = 0;
-        let isDragging = false;
-        let startTime = 0;
-        
-        const handleStart = (e) => {
-          isDragging = true;
-          startTime = Date.now();
-          startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-          card.style.transition = 'none';
-          card.classList.remove('swipe-yes-active', 'swipe-no-active');
-        };
-        
-        const handleMove = (e) => {
-          if (!isDragging) return;
-          
-          const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-          currentX = clientX - startX;
-          
-          // Limit swipe distance
-          const maxSwipe = 120;
-          currentX = Math.max(-maxSwipe, Math.min(maxSwipe, currentX));
-          
-          // Apply transform
-          card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`;
-          
-          // Show overlay based on swipe direction
-          if (currentX > 20) {
-            card.classList.add('swipe-yes-active');
-            card.classList.remove('swipe-no-active');
-          } else if (currentX < -20) {
-            card.classList.add('swipe-no-active');
-            card.classList.remove('swipe-yes-active');
-          } else {
-            card.classList.remove('swipe-yes-active', 'swipe-no-active');
-          }
-        };
-        
-        const handleEnd = (e) => {
-          if (!isDragging) return;
-          
-          isDragging = false;
-          const duration = Date.now() - startTime;
-          const velocity = Math.abs(currentX) / duration;
-          
-          // Check if swipe was fast enough or far enough
-          const threshold = 40;
-          const fastThreshold = 0.3;
-          
-          if (Math.abs(currentX) > threshold || velocity > fastThreshold) {
-            if (currentX > 0) {
-              // Swiped right - YES bet
-              handleSwipeBet(card, 'yes');
-            } else {
-              // Swiped left - NO bet
-              handleSwipeBet(card, 'no');
-            }
-          } else {
-            // Reset position
-            card.style.transition = 'transform 150ms cubic-bezier(0.4, 0, 0.2, 1)';
-            card.style.transform = '';
-            card.classList.remove('swipe-yes-active', 'swipe-no-active');
-          }
-        };
-        
-        // Mouse events
-        card.addEventListener('mousedown', handleStart);
-        document.addEventListener('mousemove', handleMove);
-        document.addEventListener('mouseup', handleEnd);
-        
-        // Touch events
-        card.addEventListener('touchstart', handleStart, { passive: true });
-        document.addEventListener('touchmove', handleMove, { passive: true });
-        document.addEventListener('touchend', handleEnd, { passive: true });
-      });
-    }
-    
-    async function fetchMoreTrending() {
-      if (isFetchingMore || trendOffset >= trendTotal) return;
-      isFetchingMore = true;
-      try {
-        const res = await fetch(`/api/trending?offset=${trendOffset}&limit=10`);
-        const d = await res.json();
-        if (d.ok && d.results.length) {
-          trendOffset += d.results.length;
-          trendTotal = d.total || trendTotal;
-          renderTrendingCards(d.results, true);
-        }
-      } catch (e) {
-        console.warn("Failed to fetch more trending:", e);
-      } finally {
-        isFetchingMore = false;
-      }
-    }
-
-    function handleSwipeBet(card, direction) {
-      const marketId = card.dataset.marketId;
-
-      // Track swipe and fetch more when threshold reached
-      swipedCount++;
-      if (swipedCount % 10 === 0) fetchMoreTrending();
-
-      // Animate the card off screen
-      const exitX = direction === 'yes' ? window.innerWidth : -window.innerWidth;
-      card.style.transition = 'transform 200ms cubic-bezier(0.4, 0, 0.2, 1)';
-      card.style.transform = `translateX(${exitX}px) rotate(${direction === 'yes' ? 15 : -15}deg)`;
-      
-      // Show success message
-      setTimeout(() => {
-        const message = direction === 'yes' 
-          ? 'YES bet placed! (Coming Soon)' 
-          : 'NO bet placed! (Coming Soon)';
-        
-        // Create a temporary success message
-        const successMsg = document.createElement('div');
-        successMsg.style.cssText = `
-          position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-          background: ${direction === 'yes' ? 'var(--green)' : '#ff5c5c'};
-          color: white; padding: 12px 24px; border-radius: 8px;
-          font-weight: 600; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        `;
-        successMsg.textContent = message;
-        document.body.appendChild(successMsg);
-        
-        // Remove message and card after animation
-        setTimeout(() => {
-          successMsg.remove();
-          card.remove();
-        }, 2000);
-      }, 200);
-    }
-
-    // Load on start, auto-refresh every 60 seconds
-    loadTrending();
-    setInterval(() => loadTrending(), 60 * 1000);
   </script>
 </body>
 </html>
