@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" sizes="128x128" href="/icon128.png" />
   <link rel="apple-touch-icon" href="/icon128.png" />
   <title>Headline Odds - Market Matcher</title>
-  <meta name="description" content="Paste any headline. See what the prediction markets say. Get a reply draft with live Kalshi odds." />
+  <meta name="description" content="Search open Bayse markets, find the closest live Kalshi crossover, and share the current prices in one card." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -21,6 +21,10 @@
       --border: rgba(255,255,255,0.07);
       --green: #00e38f;
       --green-2: #00c65e;
+      --bayse: #4f7cff;
+      --bayse-2: #8db0ff;
+      --bayse-soft: rgba(79,124,255,0.12);
+      --bayse-border: rgba(79,124,255,0.3);
       --text: #eef2ef;
       --muted: #a9b5ae;
       --dim: #55625d;
@@ -283,6 +287,141 @@
     .market-actions {
       display: flex; gap: 10px; flex-wrap: wrap;
     }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .comparison-panel {
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .comparison-panel.bayse-panel {
+      background: linear-gradient(180deg, rgba(79,124,255,0.14), rgba(11,18,38,0.82));
+      border-color: var(--bayse-border);
+      box-shadow: inset 0 1px 0 rgba(141,176,255,0.08);
+    }
+    .comparison-panel.kalshi-panel {
+      background: linear-gradient(180deg, rgba(0,227,143,0.09), rgba(8,10,9,0.82));
+      border-color: rgba(0,227,143,0.18);
+    }
+    .comparison-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .source-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .source-chip-bayse {
+      color: var(--bayse-2);
+      background: rgba(79,124,255,0.14);
+      border: 1px solid rgba(141,176,255,0.2);
+    }
+    .source-chip-kalshi {
+      color: var(--green);
+      background: rgba(0,227,143,0.1);
+      border: 1px solid rgba(0,227,143,0.2);
+    }
+    .source-mini {
+      font-size: 11px;
+      color: var(--dim);
+    }
+    .comparison-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .comparison-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+      min-height: 38px;
+      margin-bottom: 14px;
+    }
+    .comparison-odds {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .comparison-odd {
+      flex: 1;
+      min-width: 0;
+      display: block;
+      border-radius: 16px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      text-decoration: none;
+    }
+    .comparison-odd strong {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .comparison-odd span {
+      display: block;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .comparison-odd-bayse {
+      border-color: rgba(141,176,255,0.18);
+      background: rgba(79,124,255,0.12);
+    }
+    .comparison-odd-bayse span {
+      color: var(--bayse-2);
+    }
+    .comparison-odd-yes {
+      border-color: rgba(0,198,94,0.28);
+      background: rgba(0,198,94,0.1);
+    }
+    .comparison-odd-yes span {
+      color: var(--green);
+    }
+    .comparison-odd-no {
+      border-color: rgba(255,92,92,0.28);
+      background: rgba(255,92,92,0.08);
+    }
+    .comparison-odd-no span {
+      color: #ff7b7b;
+    }
+    .comparison-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+      font-size: 11px;
+      color: var(--dim);
+      line-height: 1.5;
+    }
+    .comparison-meta strong {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .match-badge-bayse {
+      color: var(--bayse-2);
+      background: rgba(79,124,255,0.14);
+      border-color: rgba(141,176,255,0.24);
+    }
     .btn-copy {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 9px 18px; border-radius: 999px;
@@ -305,6 +444,24 @@
       background: #000; flex-shrink: 0;
     }
     .btn-copy .x-logo svg { width: 10px; height: 10px; fill: #fff; }
+    .btn-copy-bayse {
+      color: var(--bayse-2);
+      background: rgba(79,124,255,0.12);
+      border-color: rgba(79,124,255,0.28);
+    }
+    .btn-copy-bayse:hover {
+      background: rgba(79,124,255,0.2);
+      border-color: rgba(141,176,255,0.44);
+    }
+    .btn-view-bayse {
+      border-color: rgba(79,124,255,0.24);
+      color: var(--bayse-2);
+      background: rgba(79,124,255,0.08);
+    }
+    .btn-view-bayse:hover {
+      background: rgba(79,124,255,0.14);
+      color: #dce7ff;
+    }
     .btn-view {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 9px 18px; border-radius: 999px;
@@ -348,6 +505,8 @@
       .search-box { flex-direction: column; }
       .search-btn { width: 100%; text-align: center; }
       .odds-row { flex-direction: column; }
+      .comparison-grid { grid-template-columns: 1fr; }
+      .comparison-subtitle { min-height: 0; }
     }
 
 
@@ -529,29 +688,29 @@
 
   <!-- Live odds ticker -->
   <div class="ticker-wrap" id="tickerWrap">
-    <div class="ticker-label">Live Odds</div>
+    <div class="ticker-label">Kalshi Live</div>
     <div class="ticker-track">
       <div class="ticker-inner" id="tickerInner"></div>
     </div>
   </div>
 
   <main>
-    <div class="hero-label"><span class="hero-dot"></span> Live Kalshi Data</div>
-    <h1>What do the <span>markets</span> say?</h1>
-    <p class="hero-sub">Paste any headline, tweet, or news story. We'll match it against live Kalshi prediction markets and draft a reply with real odds.</p>
+    <div class="hero-label"><span class="hero-dot"></span> Bayse x Kalshi Crossover</div>
+    <h1>Search Bayse. Find the <span>Kalshi crossover</span>.</h1>
+    <p class="hero-sub">Search open Bayse markets tied to African topics, then see the closest live Kalshi market beside it with current pricing on both platforms.</p>
 
     <div class="search-box">
       <input type="text" class="search-input" id="headlineInput"
-        placeholder="Paste a headline - e.g. &quot;Fed signals rate cut&quot;"
+        placeholder="Search Bayse keywords - e.g. &quot;Super Eagles AFCON&quot;"
         autocomplete="off" />
-      <button class="search-btn" id="searchBtn">Find Markets</button>
+      <button class="search-btn" id="searchBtn">Search Crossover</button>
     </div>
-    <p class="search-hint">Try: "Elon Musk", "Bitcoin hits $200k", "Trump executive order", "AI regulation"</p>
+    <p class="search-hint">Try: "Super Eagles", "Davido Grammy", "Naira", "Kenya election", "Afrobeats"</p>
 
     <!-- Trending section (default view, hidden when search is active) -->
     <section class="trending-section" id="trendingSection" style="display:none">
       <div class="results-header">
-        <span class="results-title">Trending Markets</span>
+        <span class="results-title">Hot Kalshi Markets</span>
         <div style="display:flex;align-items:center;gap:10px">
           <span class="results-count" id="trendCount"></span>
           <button class="trending-refresh" id="refreshBtn" onclick="loadTrending(true)" title="Refresh">
@@ -632,13 +791,58 @@
       return formatContractCount(market.volume_24h);
     }
 
+    function formatBayseActivity(market) {
+      if (market.total_volume != null) return `${formatCompactNumber(market.total_volume)} volume`;
+      if (market.liquidity != null) return `${formatCompactNumber(market.liquidity)} liquidity`;
+      if (market.total_orders != null) return `${formatCompactNumber(market.total_orders, 0)} orders`;
+      return "Open Bayse market";
+    }
+
+    function buildBayseShare(match) {
+      const bayse = match.bayse;
+      const kalshi = match.kalshi;
+      const kalshiYes = getReferenceYesPrice(kalshi);
+      const kalshiNo = getReferenceNoPrice(kalshi);
+      const kalshiVolume = kalshi.volume_24h != null ? formatMarket24hVolume(kalshi) : formatMarketVolume(kalshi);
+      const kalshiMeta = kalshiVolume !== "\u2014"
+        ? `${kalshi.volume_24h != null ? "24h vol" : "Volume"} ${kalshiVolume}`
+        : "Live Kalshi price";
+      const bayseMeta = formatBayseActivity(bayse);
+
+      const shareParams = new URLSearchParams({
+        theme: "bayse",
+        title: bayse.title,
+        bayseTitle: bayse.market_title || bayse.title,
+        bayseLabel1: bayse.outcome1_label || "Outcome 1",
+        baysePrice1: bayse.outcome1_display ?? "\u2014",
+        bayseLabel2: bayse.outcome2_label || "Outcome 2",
+        baysePrice2: bayse.outcome2_display ?? "\u2014",
+        bayseMeta,
+        kalshiTitle: kalshi.title,
+        kalshiYes: kalshiYes ?? "\u2014",
+        kalshiNo: kalshiNo ?? "\u2014",
+        kalshiMeta,
+        match: match.similarity ?? "",
+        url: kalshi.url,
+        secondaryUrl: bayse.url || "",
+      });
+
+      const shareLink = `${window.location.origin}/api/share?${shareParams}`;
+      const bayseLine = `${bayse.outcome1_label} ${formatPriceCents(bayse.outcome1_display)} / ${bayse.outcome2_label} ${formatPriceCents(bayse.outcome2_display)}`;
+      const kalshiLine = `Yes ${formatPriceCents(kalshiYes)} / No ${formatPriceCents(kalshiNo)}`;
+      const tweetText = `${bayse.title}\n\nBayse: ${bayseLine}\nKalshi: ${kalshiLine}\n\nLive Bayse x Kalshi crossover via @headlineodds`;
+      const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
+
+      return { shareLink, xUrl };
+    }
+
     async function search() {
       const headline = input.value.trim();
-      if (headline.length < 5) return;
+      if (headline.length < 2) return;
 
       btn.disabled = true;
       btn.textContent = "Searching...";
-      results.innerHTML = `<div class="status"><div class="spinner"></div>Scanning Kalshi markets...</div>`;
+      results.innerHTML = `<div class="status"><div class="spinner"></div>Searching Bayse and matching to Kalshi...</div>`;
       document.getElementById("trendingSection").style.display = "none";
 
       try {
@@ -649,70 +853,105 @@
         });
         const data = await res.json();
 
-        if (!data.ok || !data.results || data.results.length === 0) {
+        if (!data.ok) {
+          throw new Error(data.error || "Search failed");
+        }
+
+        if (!data.results || data.results.length === 0) {
+          const emptyText = data.bayseCount
+            ? `Bayse found ${data.bayseCount} open market${data.bayseCount === 1 ? "" : "s"}, but none had a strong Kalshi crossover yet.<br>Try a broader African topic or a more specific keyword.`
+            : `No open Bayse markets matched that keyword.<br>Try a person, team, country, artist, or election topic.`;
           results.innerHTML = `
             <div class="empty">
               <div class="empty-icon">?</div>
-              <div class="empty-text">No matching markets found for this headline.<br>Try different keywords or a broader topic.</div>
+              <div class="empty-text">${emptyText}</div>
             </div>`;
           return;
         }
 
         let html = `
           <div class="results-header">
-            <span class="results-title">Matched Markets</span>
-            <span class="results-count">${data.results.length} of ${(data.marketCount || 0).toLocaleString()} scanned</span>
+            <span class="results-title">Bayse x Kalshi Matches</span>
+            <span class="results-count">${(data.bayseCount || 0).toLocaleString()} Bayse markets · ${(data.kalshiMarketCount || 0).toLocaleString()} Kalshi markets scanned</span>
           </div>
           <div class="results">`;
 
-        for (const m of data.results) {
-          const yesPrice = getReferenceYesPrice(m);
-          const noPrice = getReferenceNoPrice(m);
-          const yes = formatPriceCents(yesPrice);
-          const no = formatPriceCents(noPrice);
-          const vol = formatMarketVolume(m);
-          const close = formatCloseDate(m.close_time);
-          const yesPct = yesPrice || 0;
-          const shareParams = new URLSearchParams({
-            title: m.title,
-            yes: yesPrice ?? "\u2014",
-            no: noPrice ?? "\u2014",
-            vol: vol,
-            closes: close,
-            url: m.url,
-          });
-          const shareLink = `${window.location.origin}/api/share?${shareParams}`;
-          const tweetText = yesPct >= 70
-            ? `The market is ${yesPct}% confident on this \u2192 ${m.title}\n\nWhat do you think?\n\nvia @headlineodds`
-            : yesPct >= 40
-            ? `This one's a toss-up \u2014 market says ${yesPct}% yes on: ${m.title}\n\nWhere do you stand?\n\nvia @headlineodds`
-            : `Market only gives this ${yesPct}% odds \u2192 ${m.title}\n\nDo you agree?\n\nvia @headlineodds`;
-          const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
+        for (const pair of data.results) {
+          const bayse = pair.bayse;
+          const kalshi = pair.kalshi;
+          const bayseLeft = formatPriceCents(bayse.outcome1_display);
+          const bayseRight = formatPriceCents(bayse.outcome2_display);
+          const bayseClose = formatCloseDate(bayse.close_time);
+          const bayseMeta = formatBayseActivity(bayse);
+          const kalshiYes = formatPriceCents(getReferenceYesPrice(kalshi));
+          const kalshiNo = formatPriceCents(getReferenceNoPrice(kalshi));
+          const kalshiVolume = kalshi.volume_24h != null ? formatMarket24hVolume(kalshi) : formatMarketVolume(kalshi);
+          const kalshiVolumeLabel = kalshi.volume_24h != null ? "24h Vol" : "Volume";
+          const kalshiClose = formatCloseDate(kalshi.close_time);
+          const baysePanelSubtitle = bayse.market_title && bayse.market_title !== bayse.title
+            ? bayse.market_title
+            : (bayse.description || "Open Bayse market");
+          const { xUrl } = buildBayseShare(pair);
 
           html += `
             <div class="market-card">
               <div class="market-header">
-                <div class="market-title">${esc(m.title)}</div>
-                ${m.similarity ? `<span class="match-badge">${m.similarity}% match</span>` : ""}
+                <div>
+                  <div class="market-title">${esc(bayse.title)}</div>
+                  ${bayse.subtitle ? `<div class="market-subtitle">${esc(bayse.subtitle)}</div>` : ""}
+                </div>
+                ${pair.similarity ? `<span class="match-badge match-badge-bayse">${pair.similarity}% crossover</span>` : ""}
               </div>
-              ${m.subtitle ? `<div class="market-subtitle">${esc(m.subtitle)}</div>` : ""}
-              <div class="odds-row">
-                <a class="odd odd-yes" href="${esc(m.url)}" target="_blank" rel="noopener">
-                  <span class="odd-label">Yes</span>
-                  <span class="odd-value">${yes}</span>
-                </a>
-                <a class="odd odd-no" href="${esc(m.url)}" target="_blank" rel="noopener">
-                  <span class="odd-label">No</span>
-                  <span class="odd-value">${no}</span>
-                </a>
-              </div>
-              <div class="market-meta">
-                <span>Volume: <strong>${vol}</strong></span>
-                <span>Closes: ${close}</span>
+              <div class="comparison-grid">
+                <div class="comparison-panel bayse-panel">
+                  <div class="comparison-top">
+                    <span class="source-chip source-chip-bayse">Bayse</span>
+                    <span class="source-mini">${esc(bayse.category || "Open market")}</span>
+                  </div>
+                  <div class="comparison-title">${esc(bayse.market_title || bayse.title)}</div>
+                  <div class="comparison-subtitle">${esc(baysePanelSubtitle)}</div>
+                  <div class="comparison-odds">
+                    <div class="comparison-odd comparison-odd-bayse">
+                      <strong>${esc(bayse.outcome1_label || "Outcome 1")}</strong>
+                      <span>${bayseLeft}</span>
+                    </div>
+                    <div class="comparison-odd comparison-odd-bayse">
+                      <strong>${esc(bayse.outcome2_label || "Outcome 2")}</strong>
+                      <span>${bayseRight}</span>
+                    </div>
+                  </div>
+                  <div class="comparison-meta">
+                    <span>Signal: <strong>${esc(bayseMeta)}</strong></span>
+                    ${bayseClose !== "\u2014" ? `<span>Closes: <strong>${esc(bayseClose)}</strong></span>` : ""}
+                  </div>
+                </div>
+                <div class="comparison-panel kalshi-panel">
+                  <div class="comparison-top">
+                    <span class="source-chip source-chip-kalshi">Matched Kalshi</span>
+                    <span class="source-mini">${pair.similarity}% fit</span>
+                  </div>
+                  <div class="comparison-title">${esc(kalshi.title)}</div>
+                  <div class="comparison-subtitle">${esc(kalshi.subtitle || kalshi.event_title || "Live Kalshi market")}</div>
+                  <div class="comparison-odds">
+                    <a class="comparison-odd comparison-odd-yes" href="${esc(kalshi.url)}" target="_blank" rel="noopener">
+                      <strong>Yes</strong>
+                      <span>${kalshiYes}</span>
+                    </a>
+                    <a class="comparison-odd comparison-odd-no" href="${esc(kalshi.url)}" target="_blank" rel="noopener">
+                      <strong>No</strong>
+                      <span>${kalshiNo}</span>
+                    </a>
+                  </div>
+                  <div class="comparison-meta">
+                    ${kalshiVolume !== "\u2014" ? `<span>${kalshiVolumeLabel}: <strong>${esc(kalshiVolume)}</strong></span>` : ""}
+                    ${kalshiClose !== "\u2014" ? `<span>Closes: <strong>${esc(kalshiClose)}</strong></span>` : ""}
+                  </div>
+                </div>
               </div>
               <div class="market-actions">
-                <a class="btn-copy" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span></a>
-                <a class="btn-view" href="${esc(m.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
+                <a class="btn-copy btn-copy-bayse" href="${esc(xUrl)}" target="_blank" rel="noopener">Share to <span class="x-logo"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span></a>
+                <a class="btn-view btn-view-bayse" href="${esc(bayse.url)}" target="_blank" rel="noopener">Open Bayse</a>
+                <a class="btn-view" href="${esc(kalshi.url)}" target="_blank" rel="noopener">View on Kalshi \u2192</a>
               </div>
             </div>`;
         }
@@ -723,7 +962,7 @@
         results.innerHTML = `<div class="status error">Error: ${esc(err.message)}</div>`;
       } finally {
         btn.disabled = false;
-        btn.textContent = "Find Markets";
+        btn.textContent = "Search Crossover";
       }
     }
 

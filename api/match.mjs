@@ -1,14 +1,18 @@
-// Vercel serverless function — matches a headline against live Kalshi markets
-// Uses Cloudflare Workers AI (bge-small-en-v1.5) for semantic embedding matching
+// Vercel serverless function - search open Bayse markets and find the closest live Kalshi crossover
+// Uses Cloudflare Workers AI (bge-small-en-v1.5) for semantic market matching
 
+import { searchOpenBayseMarkets } from "./bayse.mjs";
 import { fetchOpenMarkets } from "./kalshi.mjs";
 
 const EMBED_API = "https://headline-embed.abiodunfaboyode007.workers.dev/";
-const MARKET_CACHE_TTL = 60 * 1000;
+const KALSHI_CACHE_TTL = 60 * 1000;
 const EMBED_CACHE_TTL = 30 * 60 * 1000;
+const MIN_QUERY_LENGTH = 2;
+const MIN_MATCH_SCORE = 0.33;
+const MAX_RESULTS = 8;
 
-let marketCache = { data: [], ts: 0 };
-let embedCache = { key: "", vectors: [], ts: 0 };
+let kalshiCache = { data: [], ts: 0 };
+let kalshiEmbedCache = { key: "", vectors: [], ts: 0 };
 
 function cosineSim(a, b) {
   let dot = 0;
@@ -24,6 +28,7 @@ function cosineSim(a, b) {
 
 async function getEmbeddings(texts) {
   const allEmbeddings = [];
+
   for (let i = 0; i < texts.length; i += 100) {
     const batch = texts.slice(i, i + 100);
     const res = await fetch(EMBED_API, {
@@ -31,47 +36,132 @@ async function getEmbeddings(texts) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ texts: batch }),
     });
+
     if (!res.ok) {
       const body = await res.text().catch(() => "<no body>");
       console.error("Embed API error", res.status, body);
       throw new Error(`Embed API ${res.status}`);
     }
+
     const json = await res.json();
     if (json.error) {
       console.error("Embed API returned error field", json.error);
       throw new Error(json.error);
     }
+
     allEmbeddings.push(...json.embeddings);
   }
+
   return allEmbeddings;
 }
 
-async function getAllMarkets() {
-  const now = Date.now();
-  if (marketCache.data.length && now - marketCache.ts < MARKET_CACHE_TTL) {
-    return marketCache.data;
-  }
-
-  const allMarkets = await fetchOpenMarkets({ fetchImpl: fetch, pageLimit: 4, pageSize: 200 });
-
-  marketCache = { data: allMarkets, ts: Date.now() };
-  return allMarkets;
+function buildKalshiEmbeddingText(market) {
+  return [market.title, market.subtitle, market.event_title, market.category]
+    .filter(Boolean)
+    .join(" - ");
 }
 
-async function getMarketEmbeddings(markets) {
-  const texts = markets.map(m =>
-    [m.title, m.subtitle, m.event_title].filter(Boolean).join(" - ")
-  );
+function buildBayseEmbeddingText(market) {
+  return market.search_text || [
+    market.title,
+    market.market_title,
+    market.description,
+    market.rules,
+    market.category,
+    market.subcategory,
+  ].filter(Boolean).join(" - ");
+}
+
+async function getAllKalshiMarkets() {
+  const now = Date.now();
+  if (kalshiCache.data.length && now - kalshiCache.ts < KALSHI_CACHE_TTL) {
+    return kalshiCache.data;
+  }
+
+  const data = await fetchOpenMarkets({ fetchImpl: fetch, pageLimit: 4, pageSize: 200 });
+  kalshiCache = { data, ts: Date.now() };
+  return data;
+}
+
+async function getKalshiEmbeddings(markets) {
+  const texts = markets.map(buildKalshiEmbeddingText);
   const key = texts.join("\n");
   const now = Date.now();
 
-  if (embedCache.key === key && embedCache.vectors.length === texts.length && now - embedCache.ts < EMBED_CACHE_TTL) {
-    return embedCache.vectors;
+  if (
+    kalshiEmbedCache.key === key &&
+    kalshiEmbedCache.vectors.length === texts.length &&
+    now - kalshiEmbedCache.ts < EMBED_CACHE_TTL
+  ) {
+    return kalshiEmbedCache.vectors;
   }
 
   const vectors = await getEmbeddings(texts);
-  embedCache = { key, vectors, ts: Date.now() };
+  kalshiEmbedCache = { key, vectors, ts: Date.now() };
   return vectors;
+}
+
+function pickBestKalshiMatch(bayseVector, kalshiMarkets, kalshiVectors, usedTickers) {
+  let bestIndex = -1;
+  let bestScore = -Infinity;
+
+  for (let i = 0; i < kalshiMarkets.length; i++) {
+    const kalshi = kalshiMarkets[i];
+    if (!kalshi?.ticker || usedTickers.has(kalshi.ticker)) continue;
+
+    const score = cosineSim(bayseVector, kalshiVectors[i]);
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = i;
+    }
+  }
+
+  if (bestIndex === -1 || bestScore < MIN_MATCH_SCORE) return null;
+  return { market: kalshiMarkets[bestIndex], score: bestScore };
+}
+
+async function matchBayseToKalshi(query) {
+  const [bayseMarkets, kalshiMarkets] = await Promise.all([
+    searchOpenBayseMarkets({ keyword: query, fetchImpl: fetch, pageSize: 12 }),
+    getAllKalshiMarkets(),
+  ]);
+
+  if (!bayseMarkets.length || !kalshiMarkets.length) {
+    return {
+      bayseCount: bayseMarkets.length,
+      kalshiMarketCount: kalshiMarkets.length,
+      results: [],
+    };
+  }
+
+  const [bayseVectors, kalshiVectors] = await Promise.all([
+    getEmbeddings(bayseMarkets.map(buildBayseEmbeddingText)),
+    getKalshiEmbeddings(kalshiMarkets),
+  ]);
+
+  const usedTickers = new Set();
+  const pairs = [];
+
+  for (let i = 0; i < bayseMarkets.length; i++) {
+    const best = pickBestKalshiMatch(bayseVectors[i], kalshiMarkets, kalshiVectors, usedTickers);
+    if (!best) continue;
+
+    usedTickers.add(best.market.ticker);
+    pairs.push({
+      bayse: bayseMarkets[i],
+      kalshi: best.market,
+      similarity: Math.round(best.score * 100),
+      score: best.score,
+    });
+  }
+
+  pairs.sort((a, b) => b.score - a.score);
+
+  return {
+    bayseCount: bayseMarkets.length,
+    kalshiMarketCount: kalshiMarkets.length,
+    results: pairs.slice(0, MAX_RESULTS).map(({ score, ...rest }) => rest),
+  };
 }
 
 export default async function handler(req, res) {
@@ -82,32 +172,15 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
-  const { headline } = req.body || {};
-  if (!headline || typeof headline !== "string" || headline.trim().length < 5) {
-    return res.status(400).json({ error: "Headline too short" });
+  const query = String(req.body?.headline || "").trim();
+  if (query.length < MIN_QUERY_LENGTH) {
+    return res.status(400).json({ error: "Keyword too short" });
   }
 
   try {
-    const markets = await getAllMarkets();
-    if (markets.length === 0) {
-      return res.json({ ok: true, results: [], marketCount: 0 });
-    }
-
-    const [headlineEmbed] = await getEmbeddings([headline.trim()]);
-    const marketEmbeds = await getMarketEmbeddings(markets);
-
-    const results = markets
-      .map((m, i) => ({ ...m, score: cosineSim(headlineEmbed, marketEmbeds[i]) }))
-      .filter(m => m.score > 0.35 && m.yes_display !== null && m.no_display !== null)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8)
-      .map(({ score, category, event_title, ...rest }) => ({
-        ...rest,
-        similarity: Math.round(score * 100),
-      }));
-
-    return res.json({ ok: true, results, marketCount: markets.length });
+    const data = await matchBayseToKalshi(query);
+    return res.json({ ok: true, query, ...data });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ ok: false, error: err.message });
   }
 }
