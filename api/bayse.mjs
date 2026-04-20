@@ -33,10 +33,17 @@ function probabilityToCents(value) {
   return Math.max(0, Math.min(100, Math.round(probability * 100)));
 }
 
-function buildBayseUrl(event) {
+function buildBayseUrl(event, market = null, side = "") {
   const slug = cleanText(event?.slug);
-  if (!slug) return BAYSE_WEB_URL;
-  return `${BAYSE_WEB_URL}?market=${encodeURIComponent(slug)}`;
+  const marketId = cleanText(market?.id);
+  const params = new URLSearchParams();
+
+  if (slug) params.set("market", slug);
+  if (marketId) params.set("marketId", marketId);
+  if (side) params.set("side", side);
+
+  const query = params.toString();
+  return query ? `${BAYSE_WEB_URL}?${query}` : BAYSE_WEB_URL;
 }
 
 function buildSubtitle(eventTitle, marketTitle, description) {
@@ -44,6 +51,10 @@ function buildSubtitle(eventTitle, marketTitle, description) {
   if (marketTitle && marketTitle !== eventTitle) parts.push(marketTitle);
   if (description) parts.push(description);
   return parts.join(" - ");
+}
+
+function pickEventCloseTime(event) {
+  return firstText(event.closingDate, event.resolutionDate) || null;
 }
 
 export function normalizeBayseMarket(event = {}, market = {}) {
@@ -81,7 +92,11 @@ export function normalizeBayseMarket(event = {}, market = {}) {
     outcome1_display: outcome1Price,
     outcome2_display: outcome2Price,
     rules: cleanText(market.rules),
-    url: buildBayseUrl(event),
+    image_url: firstText(market.imageUrl, event.imageUrl),
+    image_128_url: firstText(market.image128Url, event.image128Url),
+    url: buildBayseUrl(event, market),
+    yes_url: buildBayseUrl(event, market, "yes"),
+    no_url: buildBayseUrl(event, market, "no"),
   };
 
   normalized.search_text = [
@@ -97,22 +112,63 @@ export function normalizeBayseMarket(event = {}, market = {}) {
   return normalized;
 }
 
-export async function searchOpenBayseMarkets({
-  keyword,
+export function normalizeBayseEvent(event = {}) {
+  const normalizedMarkets = (event.markets || [])
+    .map(market => normalizeBayseMarket(event, market))
+    .filter(market => market.title && (!market.status || market.status === "open"));
+
+  const normalized = {
+    id: cleanText(event.id),
+    slug: cleanText(event.slug),
+    title: firstText(event.title),
+    description: cleanText(event.description),
+    category: cleanText(event.category),
+    subcategory: cleanText(event.subcategory),
+    engine: cleanText(event.engine),
+    status: cleanText(event.status),
+    type: cleanText(event.type),
+    image_url: firstText(event.imageUrl),
+    image_128_url: firstText(event.image128Url, event.imageUrl),
+    additional_context: cleanText(event.additionalContext),
+    close_time: pickEventCloseTime(event),
+    closing_date: firstText(event.closingDate) || null,
+    resolution_date: firstText(event.resolutionDate) || null,
+    created_at: firstText(event.createdAt) || null,
+    liquidity: parseFiniteNumber(event.liquidity),
+    total_volume: parseFiniteNumber(event.totalVolume),
+    total_orders: parseFiniteNumber(event.totalOrders),
+    supported_currencies: Array.isArray(event.supportedCurrencies) ? event.supportedCurrencies : [],
+    url: buildBayseUrl(event),
+    markets: normalizedMarkets,
+  };
+
+  normalized.search_text = [
+    normalized.title,
+    normalized.description,
+    normalized.category,
+    normalized.subcategory,
+    normalized.engine,
+    ...normalized.markets.map(market => market.search_text),
+  ].filter(Boolean).join(" - ");
+
+  return normalized;
+}
+
+export async function fetchOpenBayseEvents({
+  keyword = "",
   fetchImpl = fetch,
   pageSize = 12,
-  currency = "USD",
+  currency = "NGN",
 } = {}) {
   const term = cleanText(keyword);
-  if (!term) return [];
-
   const params = new URLSearchParams({
     status: "open",
-    keyword: term,
     currency,
     page: "1",
     size: String(pageSize),
   });
+
+  if (term) params.set("keyword", term);
 
   const response = await fetchImpl(`${BAYSE_API}/v1/pm/events?${params}`);
   if (!response.ok) {
@@ -122,16 +178,23 @@ export async function searchOpenBayseMarkets({
   }
 
   const json = await response.json();
-  const markets = [];
+  return (json.events || [])
+    .map(event => normalizeBayseEvent(event))
+    .filter(event => event.title && event.markets.length && (!event.status || event.status === "open"));
+}
 
-  for (const event of json.events || []) {
-    for (const market of event.markets || []) {
-      const normalized = normalizeBayseMarket(event, market);
-      if (!normalized.title) continue;
-      if (normalized.status && normalized.status !== "open") continue;
-      markets.push(normalized);
-    }
-  }
+export async function searchOpenBayseMarkets({
+  keyword,
+  fetchImpl = fetch,
+  pageSize = 12,
+  currency = "NGN",
+} = {}) {
+  const events = await fetchOpenBayseEvents({
+    keyword,
+    fetchImpl,
+    pageSize,
+    currency,
+  });
 
-  return markets;
+  return events.flatMap(event => event.markets);
 }

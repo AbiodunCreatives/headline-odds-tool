@@ -1,14 +1,8 @@
-// Serves a lightweight HTML page with OG meta tags for shared market cards.
+// Serves a lightweight HTML page with OG meta tags for Bayse-style shared market cards.
 
 function getParam(source, key, fallback = "") {
   const value = source[key];
   return value == null || value === "" ? fallback : String(value);
-}
-
-function formatCentsText(value) {
-  const raw = String(value ?? "").trim();
-  if (!raw || raw === "-" || raw === "\u2014") return "\u2014";
-  return /^[0-9.]+$/.test(raw) ? `${raw}\u00a2` : raw;
 }
 
 function esc(str) {
@@ -21,6 +15,38 @@ function esc(str) {
 
 function toJsString(value) {
   return JSON.stringify(String(value ?? ""));
+}
+
+function parseRowsParam(raw) {
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map(row => ({
+        title: getParam(row, "title"),
+        yesLabel: getParam(row, "yesLabel", "Yes"),
+        yesPrice: getParam(row, "yesPrice", "\u2014"),
+        noLabel: getParam(row, "noLabel", "No"),
+        noPrice: getParam(row, "noPrice", "\u2014"),
+      }))
+      .filter(row => row.yesPrice || row.noPrice);
+  } catch {
+    return [];
+  }
+}
+
+function buildRowsMarkup(rows) {
+  return rows.map(row => `
+    <div class="row">
+      <div class="row-copy">
+        ${row.title ? `<div class="row-title">${esc(row.title)}</div>` : ""}
+      </div>
+      <div class="price price-yes">${esc(row.yesLabel)} ${esc(row.yesPrice)}</div>
+      <div class="price price-no">${esc(row.noLabel)} ${esc(row.noPrice)}</div>
+    </div>`).join("");
 }
 
 export default function handler(req, res) {
@@ -51,61 +77,65 @@ export default function handler(req, res) {
   let autoRedirect = false;
 
   if (theme === "bayse") {
-    const bayseTitle = getParam(q, "bayseTitle", "Open Bayse market");
-    const bayseSubtitle = getParam(q, "bayseSubtitle", "Live Bayse market");
-    const bayseLabel1 = getParam(q, "bayseLabel1", "Outcome 1");
-    const baysePrice1 = formatCentsText(getParam(q, "baysePrice1", "\u2014"));
-    const bayseLabel2 = getParam(q, "bayseLabel2", "Outcome 2");
-    const baysePrice2 = formatCentsText(getParam(q, "baysePrice2", "\u2014"));
-    const bayseMeta = getParam(q, "bayseMeta", "Open on Bayse");
-    const bayseClose = getParam(q, "bayseClose");
-    const bayseCategory = getParam(q, "bayseCategory", "Open market");
+    const subtitle = getParam(q, "bayseSubtitle", "Live Bayse market");
+    const category = getParam(q, "bayseCategory", "Open market");
+    const meta = getParam(q, "bayseMeta", "Open Bayse market");
+    const close = getParam(q, "bayseClose", "Open market");
+    const image = getParam(q, "image");
+    const rows = parseRowsParam(getParam(q, "rows"));
+    const preview = rows[0] || { yesLabel: "Yes", yesPrice: "\u2014", noLabel: "No", noPrice: "\u2014" };
 
-    description = `${title} - ${bayseLabel1} ${baysePrice1} / ${bayseLabel2} ${baysePrice2} on Bayse`;
+    description = `${title} - ${preview.yesLabel} ${preview.yesPrice} / ${preview.noLabel} ${preview.noPrice} on Bayse`;
 
     body = `
-  <div class="wrap bayse-theme">
-    <div class="hero-kicker">
-      <span>Bayse Market</span>
-      ${bayseCategory ? `<span class="hero-tag">${esc(bayseCategory)}</span>` : ""}
+  <div class="bayse-page">
+    <div class="bayse-topbar">
+      <div class="bayse-brand">
+        <span class="bayse-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M8 8.5A3.5 3.5 0 1 1 8 15.5H11.5"></path>
+            <path d="M16 15.5A3.5 3.5 0 1 1 16 8.5H12.5"></path>
+          </svg>
+        </span>
+        <span>bayse</span>
+      </div>
+      <div class="bayse-actions">
+        <a class="nav-ghost" href="https://headlineodds.fun/scanner" target="_blank" rel="noopener">Scanner</a>
+        <a class="nav-primary" href="${esc(primaryUrl)}" target="_blank" rel="noopener">Open Bayse</a>
+      </div>
     </div>
-    <h1>${esc(title)}</h1>
-    <p class="lead">Live Bayse pricing captured from an open market.</p>
 
-    <section class="panel bayse">
-      <div class="panel-top">
-        <strong>Bayse</strong>
-        <span>${esc(bayseMeta)}</span>
-      </div>
-      <h2>${esc(bayseTitle)}</h2>
-      <p class="panel-subtitle">${esc(bayseSubtitle)}</p>
-
-      <div class="odds-row">
-        <div class="odd bayse-odd">
-          <label>${esc(bayseLabel1)}</label>
-          <span>${esc(baysePrice1)}</span>
+    <div class="bayse-card">
+      <div class="card-head">
+        <div class="card-main">
+          ${image ? `<span class="card-image"><img src="${esc(image)}" alt="${esc(title)}" /></span>` : `<span class="card-fallback">${esc((title || "Bayse").split(/\s+/).slice(0, 2).map(word => word[0] || "").join("").toUpperCase())}</span>`}
+          <div class="card-copy">
+            <div class="card-title">${esc(title)}</div>
+            <div class="card-subtitle">${esc(subtitle)}</div>
+          </div>
         </div>
-        <div class="odd bayse-odd">
-          <label>${esc(bayseLabel2)}</label>
-          <span>${esc(baysePrice2)}</span>
-        </div>
+        <span class="card-tag">${esc(category)}</span>
       </div>
 
-      ${(bayseClose || bayseCategory) ? `
-      <div class="panel-meta">
-        ${bayseCategory ? `<span>Category: <strong>${esc(bayseCategory)}</strong></span>` : ""}
-        ${bayseClose ? `<span>Closes: <strong>${esc(bayseClose)}</strong></span>` : ""}
-      </div>` : ""}
-    </section>
+      <div class="rows">
+        ${buildRowsMarkup(rows.length ? rows : [preview])}
+      </div>
 
-    <div class="actions">
-      <a class="btn btn-bayse" href="${esc(primaryUrl)}" target="_blank" rel="noopener">Open Bayse</a>
-      <a class="btn btn-ghost" href="https://headlineodds.fun/scanner" target="_blank" rel="noopener">Try the Scanner</a>
+      <div class="card-foot">
+        <div class="foot-meta">
+          <span>${esc(meta)}</span>
+          <span>${esc(close)}</span>
+        </div>
+        <div class="foot-actions">
+          <a class="foot-btn foot-share" href="https://x.com/intent/tweet?url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Share to X</a>
+          <a class="foot-btn" href="${esc(primaryUrl)}" target="_blank" rel="noopener">Trade on Bayse</a>
+        </div>
+      </div>
     </div>
   </div>`;
   } else {
-    const yes = formatCentsText(getParam(q, "yes", "\u2014"));
-    const no = formatCentsText(getParam(q, "no", "\u2014"));
+    const yes = getParam(q, "yes", "\u2014");
+    const no = getParam(q, "no", "\u2014");
     const vol = getParam(q, "vol");
     const closes = getParam(q, "closes");
 
@@ -113,10 +143,10 @@ export default function handler(req, res) {
     autoRedirect = true;
 
     body = `
-  <div class="wrap">
+  <div class="legacy-wrap">
     <h1>${esc(title)}</h1>
     <p>Market says ${esc(yes)} yes / ${esc(no)} no.</p>
-    ${vol || closes ? `<p class="subtle">${vol ? `Volume ${esc(vol)}` : ""}${vol && closes ? " - " : ""}${closes ? `Closes ${esc(closes)}` : ""}</p>` : ""}
+    ${vol || closes ? `<p class="legacy-subtle">${vol ? `Volume ${esc(vol)}` : ""}${vol && closes ? " - " : ""}${closes ? `Closes ${esc(closes)}` : ""}</p>` : ""}
     <p><a href="${esc(primaryUrl)}">Click here</a> if not redirected.</p>
   </div>`;
   }
@@ -143,18 +173,30 @@ export default function handler(req, res) {
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(description)}" />
   <meta name="twitter:image" content="${esc(ogImage)}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #080a09;
-      --card: rgba(255,255,255,0.035);
-      --border: rgba(255,255,255,0.08);
-      --text: #eef2ef;
-      --muted: #a9b5ae;
-      --green: #00e38f;
-      --bayse: #4f7cff;
-      --bayse-soft: rgba(79,124,255,0.14);
+      color-scheme: light;
+      --bg: #f5f8ff;
+      --panel: #ffffff;
+      --line: #dbe6ff;
+      --text: #183b83;
+      --text-soft: #5872a8;
+      --muted: #88a0cf;
+      --bayse: #1f6cf0;
+      --bayse-soft: #eef4ff;
+      --yes-bg: #f2f7ff;
+      --yes-line: #bdd5ff;
+      --no-bg: #fff7f7;
+      --no-line: #ffd0d0;
+      --no-text: #ff5d5d;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
@@ -163,56 +205,10 @@ export default function handler(req, res) {
       display: flex;
       align-items: center;
       justify-content: center;
-      background:
-        radial-gradient(circle at top right, rgba(79,124,255,0.16), transparent 36%),
-        radial-gradient(circle at bottom left, rgba(0,227,143,0.08), transparent 34%),
-        var(--bg);
+      padding: 28px;
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
       color: var(--text);
-      font-family: system-ui, sans-serif;
-      padding: 24px;
-    }
-
-    .wrap {
-      width: min(920px, 100%);
-      text-align: center;
-      padding: 40px;
-      border-radius: 28px;
-      border: 1px solid var(--border);
-      background: rgba(8,10,9,0.84);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 24px 80px rgba(0,0,0,0.36);
-    }
-
-    .wrap.bayse-theme {
-      text-align: left;
-      background:
-        linear-gradient(180deg, rgba(79,124,255,0.08), transparent 44%),
-        rgba(8,10,9,0.86);
-    }
-
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(30px, 4vw, 48px);
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-    }
-
-    h2 {
-      margin: 0 0 12px;
-      font-size: 20px;
-      line-height: 1.35;
-      letter-spacing: -0.02em;
-    }
-
-    p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    .subtle {
-      margin-top: 10px;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
     }
 
     a {
@@ -220,167 +216,282 @@ export default function handler(req, res) {
       text-decoration: none;
     }
 
-    .hero-kicker {
+    .legacy-wrap {
+      width: min(760px, 100%);
+      padding: 32px;
+      border-radius: 24px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .legacy-wrap h1 {
+      margin: 0 0 12px;
+    }
+
+    .legacy-subtle {
+      margin: 12px 0;
+      color: var(--text-soft);
+    }
+
+    .bayse-page {
+      width: min(980px, 100%);
+      display: grid;
+      gap: 22px;
+    }
+
+    .bayse-topbar {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
+      justify-content: space-between;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
-    .hero-kicker > span {
+    .bayse-brand {
       display: inline-flex;
       align-items: center;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--bayse-soft);
-      border: 1px solid rgba(79,124,255,0.22);
-      color: #8db0ff;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .hero-tag {
-      background: rgba(255,255,255,0.04) !important;
-      border-color: rgba(255,255,255,0.12) !important;
-      color: var(--muted) !important;
-    }
-
-    .lead {
-      max-width: 720px;
-      margin-bottom: 28px;
-    }
-
-    .panel {
-      border-radius: 22px;
-      padding: 22px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      margin-bottom: 24px;
-    }
-
-    .panel.bayse {
-      background: linear-gradient(180deg, rgba(79,124,255,0.16), rgba(12,18,38,0.92));
-      border-color: rgba(79,124,255,0.26);
-    }
-
-    .panel-top {
-      display: flex;
-      justify-content: space-between;
       gap: 12px;
-      align-items: center;
-      margin-bottom: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .panel-top strong {
-      font-size: 13px;
-      color: #8db0ff;
-    }
-
-    .panel-subtitle {
-      margin-bottom: 16px;
-    }
-
-    .odds-row {
-      display: flex;
-      gap: 12px;
-    }
-
-    .odd {
-      flex: 1;
-      border-radius: 16px;
-      padding: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-    }
-
-    .odd label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .odd span {
-      display: block;
+      color: var(--bayse);
       font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.04em;
     }
 
-    .bayse-odd {
-      background: rgba(79,124,255,0.14);
-      border-color: rgba(79,124,255,0.22);
-    }
-
-    .bayse-odd span {
-      color: #e3ebff;
-    }
-
-    .panel-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 18px;
-      margin-top: 16px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .panel-meta strong {
-      color: var(--text);
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
+    .bayse-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      background: var(--bayse);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 48px;
-      padding: 0 18px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      font-size: 14px;
-      font-weight: 700;
-      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      box-shadow: 0 12px 22px rgba(31, 108, 240, 0.22);
     }
 
-    .btn:hover {
+    .bayse-mark svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .bayse-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-ghost,
+    .nav-primary,
+    .foot-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: transform 160ms ease;
+    }
+
+    .nav-ghost,
+    .foot-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .nav-primary {
+      background: var(--bayse);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(31, 108, 240, 0.2);
+    }
+
+    .nav-ghost:hover,
+    .nav-primary:hover,
+    .foot-btn:hover {
       transform: translateY(-1px);
     }
 
-    .btn-bayse {
-      background: var(--bayse-soft);
-      border-color: rgba(79,124,255,0.28);
-      color: #dce7ff;
+    .bayse-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 40px rgba(31, 108, 240, 0.08);
     }
 
-    .btn-ghost {
-      background: rgba(255,255,255,0.04);
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .card-image,
+    .card-fallback {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid #e7eeff;
+      background: #f0f5ff;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-fallback {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bayse);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .card-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.2;
+    }
+
+    .card-subtitle {
+      margin-top: 4px;
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .card-tag {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--bayse-soft);
+      color: var(--bayse);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .rows {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid #eef3ff;
+    }
+
+    .row:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .row-title {
+      color: var(--text-soft);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .price {
+      min-width: 150px;
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .price-yes {
+      background: var(--yes-bg);
+      border-color: var(--yes-line);
+      color: var(--bayse);
+    }
+
+    .price-no {
+      background: var(--no-bg);
+      border-color: var(--no-line);
+      color: var(--no-text);
+    }
+
+    .card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #eef3ff;
+    }
+
+    .foot-meta {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
       color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .foot-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .foot-share {
+      color: var(--bayse);
+      background: var(--bayse-soft);
     }
 
     @media (max-width: 760px) {
-      .wrap,
-      .wrap.bayse-theme {
-        padding: 28px 20px;
+      .row {
+        grid-template-columns: 1fr;
       }
 
-      .odds-row {
+      .price {
+        width: 100%;
+      }
+
+      .card-head,
+      .card-foot {
+        align-items: flex-start;
         flex-direction: column;
       }
     }
