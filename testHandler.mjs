@@ -1,4 +1,4 @@
-import handler from './api/match.js';
+import handler from "./api/match.mjs";
 
 class FakeRes {
   constructor() {

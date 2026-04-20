@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Headline Odds Market Matcher — paste a headline, find matching Kalshi markets",
+  "description": "Headline Odds Bayse scanner - search open Bayse markets and share live prices",
   "scripts": {
     "dev": "npx http-server . -p 3000"
   },
