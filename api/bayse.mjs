@@ -1,5 +1,6 @@
 export const BAYSE_API = "https://relay.bayse.markets";
-export const BAYSE_WEB_URL = "https://www.bayse.markets/install";
+export const BAYSE_WEB_URL = "https://www.bayse.markets";
+export const BAYSE_TRADE_URL = `${BAYSE_WEB_URL}/trade`;
 
 function parseFiniteNumber(value) {
   if (value == null || value === "") return null;
@@ -34,16 +35,23 @@ function probabilityToCents(value) {
 }
 
 function buildBayseUrl(event, market = null, side = "") {
-  const slug = cleanText(event?.slug);
+  const eventId = cleanText(event?.id);
   const marketId = cleanText(market?.id);
   const params = new URLSearchParams();
 
-  if (slug) params.set("market", slug);
   if (marketId) params.set("marketId", marketId);
-  if (side) params.set("side", side);
+  if (side) {
+    params.set("tradeType", "BUY");
+    params.set("outcome", side.toUpperCase());
+  }
 
   const query = params.toString();
-  return query ? `${BAYSE_WEB_URL}?${query}` : BAYSE_WEB_URL;
+  if (!eventId) {
+    return query ? `${BAYSE_TRADE_URL}?${query}` : BAYSE_TRADE_URL;
+  }
+
+  const base = `${BAYSE_WEB_URL}/market/${eventId}`;
+  return query ? `${base}?${query}` : base;
 }
 
 function buildSubtitle(eventTitle, marketTitle, description) {
@@ -159,6 +167,7 @@ export async function fetchOpenBayseEvents({
   fetchImpl = fetch,
   pageSize = 12,
   currency = "NGN",
+  trending = false,
 } = {}) {
   const term = cleanText(keyword);
   const params = new URLSearchParams({
@@ -168,6 +177,7 @@ export async function fetchOpenBayseEvents({
     size: String(pageSize),
   });
 
+  if (trending) params.set("trending", "true");
   if (term) params.set("keyword", term);
 
   const response = await fetchImpl(`${BAYSE_API}/v1/pm/events?${params}`);

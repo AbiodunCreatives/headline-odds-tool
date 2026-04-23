@@ -681,7 +681,7 @@
 <body>
   <div class="shell">
     <nav class="nav">
-      <a class="brand" href="https://www.bayse.markets/install" target="_blank" rel="noopener">
+      <a class="brand" href="https://www.bayse.markets/trade" target="_blank" rel="noopener">
         <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M8 8.5A3.5 3.5 0 1 1 8 15.5H11.5"></path>
@@ -693,7 +693,7 @@
 
       <div class="nav-actions">
         <a class="nav-link" href="https://headlineodds.fun">Headline Odds</a>
-        <a class="nav-primary" href="https://www.bayse.markets/install" target="_blank" rel="noopener">Open Bayse</a>
+        <a class="nav-primary" href="https://www.bayse.markets/trade" target="_blank" rel="noopener">Open Bayse</a>
       </div>
     </nav>
 
@@ -738,7 +738,7 @@
   </div>
 
   <script>
-    const INSTALL_URL = "https://www.bayse.markets/install";
+    const INSTALL_URL = "https://www.bayse.markets/trade";
     const input = document.getElementById("headlineInput");
     const searchBtn = document.getElementById("searchBtn");
     const refreshBtn = document.getElementById("refreshBtn");
@@ -980,6 +980,102 @@
       if (data.kind === "search") {
         sectionKicker.textContent = "Search results";
         sectionTitle.textContent = data.query ? `Results for “${data.query}”` : "Bayse results";
+        sectionMeta.textContent = `${count} open event${data.bayseCount === 1 ? "" : "s"} found`;
+      } else {
+        sectionKicker.textContent = "Trending now";
+        sectionTitle.textContent = "Trending on Bayse";
+        sectionMeta.textContent = `${count} open event${data.bayseCount === 1 ? "" : "s"} scanned`;
+      }
+    }
+
+    function formatEventMeta(event) {
+      const parts = [];
+      const trades = formatTrades(event.total_orders);
+      const liquidity = formatLiquidity(event.liquidity);
+      if (trades) parts.push(trades);
+      if (liquidity) parts.push(`${liquidity} Liquidity`);
+      return parts.join(" - ") || "Open Bayse market";
+    }
+
+    function buildShareRows(event) {
+      return (event.markets || []).slice(0, 5).map(market => ({
+        title: getMarketRowTitle(event, market),
+        yesLabel: market.outcome1_label || "Yes",
+        yesPrice: formatNairaPrice(market.outcome1_display),
+        yesUrl: market.yes_url || market.url || event.url || INSTALL_URL,
+        noLabel: market.outcome2_label || "No",
+        noPrice: formatNairaPrice(market.outcome2_display),
+        noUrl: market.no_url || market.url || event.url || INSTALL_URL,
+      }));
+    }
+
+    function renderEventCard(event) {
+      const shareUrl = buildBayseShare(event);
+      const stats = [
+        formatTrades(event.total_orders),
+        formatLiquidity(event.liquidity),
+      ].filter(Boolean);
+
+      const rowsMarkup = (event.markets || []).map(market => {
+        const rowTitle = getMarketRowTitle(event, market);
+        const yesPrice = formatNairaPrice(market.outcome1_display);
+        const noPrice = formatNairaPrice(market.outcome2_display);
+        const yesReturn = formatRowReturn(market.outcome1_display);
+        const noReturn = formatRowReturn(market.outcome2_display);
+
+        return `
+          <div class="market-row">
+            <div class="row-copy">
+              ${rowTitle ? `<div class="row-title">${esc(rowTitle)}</div>` : ""}
+              <div class="row-meta">
+                ${yesReturn ? `<span>${esc(market.outcome1_label || "Yes")} return: ${esc(yesReturn)}</span>` : ""}
+                ${noReturn ? `<span>${esc(market.outcome2_label || "No")} return: ${esc(noReturn)}</span>` : ""}
+              </div>
+            </div>
+            <a class="trade-btn trade-yes" href="${esc(market.yes_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
+              Buy ${esc(market.outcome1_label || "Yes")} - ${esc(yesPrice)}
+            </a>
+            <a class="trade-btn trade-no" href="${esc(market.no_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
+              Buy ${esc(market.outcome2_label || "No")} - ${esc(noPrice)}
+            </a>
+          </div>`;
+      }).join("");
+
+      return `
+        <article class="market-card">
+          <div class="market-top">
+            <div class="market-main">
+              ${getImageMarkup(event)}
+              <div class="market-copy">
+                <div class="market-title">${esc(event.title)}</div>
+                ${event.description ? `<div class="market-subtitle">${esc(event.description)}</div>` : ""}
+              </div>
+            </div>
+            <span class="market-tag">${esc(event.category || "Bayse")}</span>
+          </div>
+
+          <div class="market-rows">${rowsMarkup}</div>
+
+          <div class="market-foot">
+            <div class="market-stats">
+              ${stats[0] ? `<span class="stat"><svg viewBox="0 0 24 24"><path d="M4 20V10"></path><path d="M10 20V4"></path><path d="M16 20v-7"></path><path d="M22 20V8"></path></svg>${esc(stats[0])}</span>` : ""}
+              ${stats[1] ? `<span class="stat"><svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5.5a4.5 4.5 0 0 0-4.5-3.5h-1A4.5 4.5 0 0 0 7 6.5c0 2.5 2 3.5 5 4.5s5 2 5 4.5A4.5 4.5 0 0 1 12.5 20h-1A4.5 4.5 0 0 1 7 16.5"></path></svg>${esc(stats[1])}</span>` : ""}
+              <span class="stat"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="9"></circle></svg>${esc(formatEndsLabel(event))}</span>
+            </div>
+
+            <div class="market-actions">
+              <a class="share-btn" href="${esc(shareUrl)}" target="_blank" rel="noopener">Share to X</a>
+              <a class="open-btn" href="${esc(event.url || INSTALL_URL)}" target="_blank" rel="noopener">Open event</a>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function updateSection(data) {
+      const count = (data.bayseCount || 0).toLocaleString();
+      if (data.kind === "search") {
+        sectionKicker.textContent = "Search results";
+        sectionTitle.textContent = data.query ? `Results for "${data.query}"` : "Bayse results";
         sectionMeta.textContent = `${count} open event${data.bayseCount === 1 ? "" : "s"} found`;
       } else {
         sectionKicker.textContent = "Trending now";

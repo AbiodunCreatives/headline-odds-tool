@@ -29,8 +29,10 @@ function parseRowsParam(raw) {
         title: getParam(row, "title"),
         yesLabel: getParam(row, "yesLabel", "Yes"),
         yesPrice: getParam(row, "yesPrice", "\u2014"),
+        yesUrl: getParam(row, "yesUrl"),
         noLabel: getParam(row, "noLabel", "No"),
         noPrice: getParam(row, "noPrice", "\u2014"),
+        noUrl: getParam(row, "noUrl"),
       }))
       .filter(row => row.yesPrice || row.noPrice);
   } catch {
@@ -44,8 +46,12 @@ function buildRowsMarkup(rows) {
       <div class="row-copy">
         ${row.title ? `<div class="row-title">${esc(row.title)}</div>` : ""}
       </div>
-      <div class="price price-yes">${esc(row.yesLabel)} ${esc(row.yesPrice)}</div>
-      <div class="price price-no">${esc(row.noLabel)} ${esc(row.noPrice)}</div>
+      ${row.yesUrl
+        ? `<a class="price price-yes" href="${esc(row.yesUrl)}" target="_blank" rel="noopener">${esc(row.yesLabel)} ${esc(row.yesPrice)}</a>`
+        : `<div class="price price-yes">${esc(row.yesLabel)} ${esc(row.yesPrice)}</div>`}
+      ${row.noUrl
+        ? `<a class="price price-no" href="${esc(row.noUrl)}" target="_blank" rel="noopener">${esc(row.noLabel)} ${esc(row.noPrice)}</a>`
+        : `<div class="price price-no">${esc(row.noLabel)} ${esc(row.noPrice)}</div>`}
     </div>`).join("");
 }
 
@@ -56,7 +62,7 @@ export default function handler(req, res) {
   const primaryUrl = getParam(
     q,
     "url",
-    theme === "bayse" ? "https://www.bayse.markets/install" : "https://headlineodds.fun"
+    theme === "bayse" ? "https://www.bayse.markets/trade" : "https://headlineodds.fun"
   );
 
   const proto = req.headers["x-forwarded-proto"] || "https";

@@ -49,19 +49,26 @@ function dedupeEvents(events) {
   return unique;
 }
 
-async function getBayseEvents({ keyword = "", pageSize = SEARCH_PAGE_SIZE } = {}) {
+async function getBayseEvents({
+  keyword = "",
+  pageSize = SEARCH_PAGE_SIZE,
+  trending = false,
+} = {}) {
   const events = await fetchOpenBayseEvents({
     keyword,
     fetchImpl: fetch,
     pageSize,
+    trending,
   });
 
-  const uniqueEvents = dedupeEvents(events)
-    .sort((a, b) => getEventScore(b) - getEventScore(a));
+  const uniqueEvents = dedupeEvents(events);
+  const rankedEvents = trending
+    ? uniqueEvents
+    : uniqueEvents.sort((a, b) => getEventScore(b) - getEventScore(a));
 
   return {
-    bayseCount: uniqueEvents.length,
-    results: uniqueEvents.slice(0, MAX_RESULTS),
+    bayseCount: rankedEvents.length,
+    results: rankedEvents.slice(0, MAX_RESULTS),
   };
 }
 
@@ -74,7 +81,10 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      const data = await getBayseEvents({ pageSize: TRENDING_PAGE_SIZE });
+      const data = await getBayseEvents({
+        pageSize: TRENDING_PAGE_SIZE,
+        trending: true,
+      });
       return res.json({ ok: true, kind: "trending", ...data });
     } catch (err) {
       return res.status(500).json({ ok: false, error: err.message });
