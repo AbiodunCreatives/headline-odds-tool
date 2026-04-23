@@ -28,10 +28,11 @@ function firstText(...values) {
   return "";
 }
 
-function probabilityToCents(value) {
-  const probability = parseFiniteNumber(value);
-  if (probability == null) return null;
-  return Math.max(0, Math.min(100, Math.round(probability * 100)));
+function normalizeDisplayPrice(value) {
+  const price = parseFiniteNumber(value);
+  if (price == null) return null;
+  if (price <= 1) return Math.max(0, Math.min(100, Math.round(price * 100)));
+  return Math.max(0, Math.min(100, Math.round(price)));
 }
 
 function buildBayseUrl(event, market = null, side = "") {
@@ -71,8 +72,12 @@ export function normalizeBayseMarket(event = {}, market = {}) {
   const description = cleanText(event.description);
   const title = eventTitle || marketTitle;
 
-  const outcome1Price = probabilityToCents(firstNumber(market.yesBuyPrice, market.outcome1Price));
-  const outcome2Price = probabilityToCents(firstNumber(market.noBuyPrice, market.outcome2Price));
+  const outcome1Price = normalizeDisplayPrice(
+    firstNumber(market.outcome1Price, market.yesBuyPrice, market.yesPriceForEstimate)
+  );
+  const outcome2Price = normalizeDisplayPrice(
+    firstNumber(market.outcome2Price, market.noBuyPrice, market.noPriceForEstimate)
+  );
 
   const normalized = {
     id: `${event.id || "event"}:${market.id || "market"}`,
@@ -173,8 +178,7 @@ export async function fetchOpenBayseEvents({
   const params = new URLSearchParams({
     status: "open",
     currency,
-    page: "1",
-    size: String(pageSize),
+    limit: String(pageSize),
   });
 
   if (trending) params.set("trending", "true");

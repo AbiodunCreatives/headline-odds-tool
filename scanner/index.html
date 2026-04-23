@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="/icon48.png" />
   <link rel="icon" type="image/png" sizes="128x128" href="/icon128.png" />
   <link rel="apple-touch-icon" href="/icon128.png" />
-  <title>Headline Odds - Bayse Scanner</title>
+  <title>Headline Odds - Bayse Arena</title>
   <meta name="description" content="Browse trending Bayse markets, search live open events, and share Bayse-style market cards." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -69,7 +69,6 @@
     .nav {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 16px;
       min-height: 76px;
       margin-bottom: 14px;
@@ -78,69 +77,45 @@
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--bayse);
-      letter-spacing: -0.02em;
+      gap: 14px;
+      color: var(--text);
+      letter-spacing: -0.03em;
     }
 
     .brand-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
-      background: var(--bayse);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 18px rgba(31, 108, 240, 0.24);
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid rgba(24, 59, 131, 0.08);
+      box-shadow: 0 14px 30px rgba(12, 23, 52, 0.12);
+      background: #111;
     }
 
-    .brand-mark svg {
-      width: 18px;
-      height: 18px;
-      fill: none;
-      stroke: #fff;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 2;
+    .brand-mark img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
     }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+    .brand-copy {
+      display: grid;
+      gap: 2px;
     }
 
-    .nav-link,
-    .nav-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 42px;
-      padding: 0 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
-      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+    .brand-kicker {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
-    .nav-link {
-      background: #f5f8ff;
-      border: 1px solid #edf2ff;
-      color: var(--bayse);
-    }
-
-    .nav-primary {
-      background: var(--bayse);
-      color: #fff;
-      box-shadow: 0 12px 22px rgba(31, 108, 240, 0.2);
-    }
-
-    .nav-link:hover,
-    .nav-primary:hover {
-      transform: translateY(-1px);
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
     }
 
     .hero {
@@ -421,23 +396,14 @@
     .row-copy {
       min-width: 0;
       display: grid;
-      gap: 6px;
+      gap: 4px;
     }
 
     .row-title {
       font-size: 15px;
       font-weight: 700;
-      color: var(--text-soft);
+      color: var(--text);
       line-height: 1.45;
-    }
-
-    .row-meta {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
     }
 
     .trade-btn {
@@ -616,6 +582,83 @@
       margin-top: 10px;
     }
 
+    .market-expand {
+      margin-top: 10px;
+      border-top: 1px solid #eef3ff;
+    }
+
+    .market-expand summary {
+      list-style: none;
+    }
+
+    .market-expand summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .market-expand-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 14px;
+      color: var(--bayse);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .market-expand-toggle:hover {
+      color: #1357c4;
+    }
+
+    .market-expand-label-open {
+      display: none;
+    }
+
+    .market-expand[open] .market-expand-label-closed {
+      display: none;
+    }
+
+    .market-expand[open] .market-expand-label-open {
+      display: inline;
+    }
+
+    .market-expand-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--bayse);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 180ms ease;
+    }
+
+    .market-expand-icon svg {
+      width: 10px;
+      height: 10px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .market-expand[open] .market-expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .market-expand-body {
+      display: grid;
+      gap: 10px;
+      padding-top: 10px;
+    }
+
     @keyframes shimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
@@ -651,12 +694,6 @@
         padding: 0 14px 56px;
       }
 
-      .nav {
-        align-items: flex-start;
-        flex-direction: column;
-        padding-top: 16px;
-      }
-
       .search-row {
         grid-template-columns: 1fr;
       }
@@ -681,19 +718,14 @@
 <body>
   <div class="shell">
     <nav class="nav">
-      <a class="brand" href="https://www.bayse.markets/trade" target="_blank" rel="noopener">
+      <div class="brand">
         <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M8 8.5A3.5 3.5 0 1 1 8 15.5H11.5"></path>
-            <path d="M16 15.5A3.5 3.5 0 1 1 16 8.5H12.5"></path>
-          </svg>
+          <img src="/scanner/assets/headline-odds-mark.jpg" alt="" />
         </span>
-        <span>bayse scanner</span>
-      </a>
-
-      <div class="nav-actions">
-        <a class="nav-link" href="https://headlineodds.fun">Headline Odds</a>
-        <a class="nav-primary" href="https://www.bayse.markets/trade" target="_blank" rel="noopener">Open Bayse</a>
+        <span class="brand-copy">
+          <span class="brand-kicker">Headline Odds</span>
+          <span class="brand-title">Bayse Arena</span>
+        </span>
       </div>
     </nav>
 
@@ -739,6 +771,7 @@
 
   <script>
     const INSTALL_URL = "https://www.bayse.markets/trade";
+    const EXPANDED_MARKET_LIMIT = 3;
     const input = document.getElementById("headlineInput");
     const searchBtn = document.getElementById("searchBtn");
     const refreshBtn = document.getElementById("refreshBtn");
@@ -753,6 +786,11 @@
       return div.innerHTML;
     }
 
+    function toNumber(value, fallback = null) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
     function formatNumber(value, fractionDigits = 1) {
       if (value == null || !Number.isFinite(Number(value))) return null;
       const amount = Number(value);
@@ -763,8 +801,9 @@
     }
 
     function formatNairaPrice(value) {
-      if (value == null || !Number.isFinite(Number(value))) return "\u2014";
-      return `N${Math.round(Number(value))}`;
+      const amount = toNumber(value);
+      if (amount == null) return "--";
+      return `N${Math.round(amount)}`;
     }
 
     function formatTrades(value) {
@@ -807,9 +846,84 @@
     }
 
     function getMarketRowTitle(event, market) {
+      const marketTitle = market.market_title || market.title || "";
       if ((event.markets || []).length <= 1) return "";
-      if (!market.market_title || market.market_title === event.title) return "";
-      return market.market_title;
+      if (!marketTitle || marketTitle === event.title) return "";
+      return marketTitle;
+    }
+
+    function getMarketOddsValue(market) {
+      const outcome1 = toNumber(market.outcome1_display, -1);
+      if (outcome1 >= 0) return outcome1;
+
+      const outcome2 = toNumber(market.outcome2_display, -1);
+      return outcome2 >= 0 ? 100 - outcome2 : -1;
+    }
+
+    function sortMarketsByOdds(markets = []) {
+      return [...markets].sort((left, right) => {
+        const oddsDiff = getMarketOddsValue(right) - getMarketOddsValue(left);
+        if (oddsDiff) return oddsDiff;
+
+        const ordersDiff = toNumber(right.total_orders, 0) - toNumber(left.total_orders, 0);
+        if (ordersDiff) return ordersDiff;
+
+        return String(left.market_title || left.title || "").localeCompare(String(right.market_title || right.title || ""));
+      });
+    }
+
+    function getOrderedMarkets(event) {
+      const markets = Array.isArray(event.markets) ? event.markets : [];
+      return markets.length > EXPANDED_MARKET_LIMIT ? sortMarketsByOdds(markets) : [...markets];
+    }
+
+    function getExpandableMarketLabel(event, count) {
+      const noun = event.category === "POLITICS"
+        ? (count === 1 ? "candidate" : "candidates")
+        : (count === 1 ? "option" : "options");
+      return `${count} more ${noun}`;
+    }
+
+    function renderMarketRows(event, markets) {
+      return markets.map(market => {
+        const rowTitle = getMarketRowTitle(event, market);
+        const yesPrice = formatNairaPrice(market.outcome1_display);
+        const noPrice = formatNairaPrice(market.outcome2_display);
+
+        return `
+          <div class="market-row">
+            <div class="row-copy">
+              ${rowTitle ? `<div class="row-title">${esc(rowTitle)}</div>` : ""}
+            </div>
+            <a class="trade-btn trade-yes" href="${esc(market.yes_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
+              Buy ${esc(market.outcome1_label || "Yes")} - ${esc(yesPrice)}
+            </a>
+            <a class="trade-btn trade-no" href="${esc(market.no_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
+              Buy ${esc(market.outcome2_label || "No")} - ${esc(noPrice)}
+            </a>
+          </div>`;
+      }).join("");
+    }
+
+    function renderExpandedMarkets(event, markets) {
+      if (!markets.length) return "";
+
+      const label = esc(getExpandableMarketLabel(event, markets.length));
+      return `
+        <details class="market-expand">
+          <summary class="market-expand-toggle">
+            <span>
+              <span class="market-expand-label-closed">Show ${label}</span>
+              <span class="market-expand-label-open">Hide ${label}</span>
+            </span>
+            <span class="market-expand-icon" aria-hidden="true">
+              <svg viewBox="0 0 12 12">
+                <path d="M2 4.5 6 8l4-3.5"></path>
+              </svg>
+            </span>
+          </summary>
+          <div class="market-expand-body">${renderMarketRows(event, markets)}</div>
+        </details>`;
     }
 
     function getImageMarkup(event) {
@@ -998,7 +1112,7 @@
     }
 
     function buildShareRows(event) {
-      return (event.markets || []).slice(0, 5).map(market => ({
+      return getOrderedMarkets(event).slice(0, 5).map(market => ({
         title: getMarketRowTitle(event, market),
         yesLabel: market.outcome1_label || "Yes",
         yesPrice: formatNairaPrice(market.outcome1_display),
@@ -1015,31 +1129,9 @@
         formatTrades(event.total_orders),
         formatLiquidity(event.liquidity),
       ].filter(Boolean);
-
-      const rowsMarkup = (event.markets || []).map(market => {
-        const rowTitle = getMarketRowTitle(event, market);
-        const yesPrice = formatNairaPrice(market.outcome1_display);
-        const noPrice = formatNairaPrice(market.outcome2_display);
-        const yesReturn = formatRowReturn(market.outcome1_display);
-        const noReturn = formatRowReturn(market.outcome2_display);
-
-        return `
-          <div class="market-row">
-            <div class="row-copy">
-              ${rowTitle ? `<div class="row-title">${esc(rowTitle)}</div>` : ""}
-              <div class="row-meta">
-                ${yesReturn ? `<span>${esc(market.outcome1_label || "Yes")} return: ${esc(yesReturn)}</span>` : ""}
-                ${noReturn ? `<span>${esc(market.outcome2_label || "No")} return: ${esc(noReturn)}</span>` : ""}
-              </div>
-            </div>
-            <a class="trade-btn trade-yes" href="${esc(market.yes_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
-              Buy ${esc(market.outcome1_label || "Yes")} - ${esc(yesPrice)}
-            </a>
-            <a class="trade-btn trade-no" href="${esc(market.no_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
-              Buy ${esc(market.outcome2_label || "No")} - ${esc(noPrice)}
-            </a>
-          </div>`;
-      }).join("");
+      const orderedMarkets = getOrderedMarkets(event);
+      const primaryMarkets = orderedMarkets.slice(0, EXPANDED_MARKET_LIMIT);
+      const extraMarkets = orderedMarkets.slice(EXPANDED_MARKET_LIMIT);
 
       return `
         <article class="market-card">
@@ -1048,13 +1140,13 @@
               ${getImageMarkup(event)}
               <div class="market-copy">
                 <div class="market-title">${esc(event.title)}</div>
-                ${event.description ? `<div class="market-subtitle">${esc(event.description)}</div>` : ""}
               </div>
             </div>
             <span class="market-tag">${esc(event.category || "Bayse")}</span>
           </div>
 
-          <div class="market-rows">${rowsMarkup}</div>
+          <div class="market-rows">${renderMarketRows(event, primaryMarkets)}</div>
+          ${renderExpandedMarkets(event, extraMarkets)}
 
           <div class="market-foot">
             <div class="market-stats">
@@ -1073,15 +1165,18 @@
 
     function updateSection(data) {
       const count = (data.bayseCount || 0).toLocaleString();
+      const plural = data.bayseCount === 1 ? "" : "s";
+
       if (data.kind === "search") {
         sectionKicker.textContent = "Search results";
         sectionTitle.textContent = data.query ? `Results for "${data.query}"` : "Bayse results";
-        sectionMeta.textContent = `${count} open event${data.bayseCount === 1 ? "" : "s"} found`;
-      } else {
-        sectionKicker.textContent = "Trending now";
-        sectionTitle.textContent = "Trending on Bayse";
-        sectionMeta.textContent = `${count} open event${data.bayseCount === 1 ? "" : "s"} scanned`;
+        sectionMeta.textContent = `${count} open event${plural} found`;
+        return;
       }
+
+      sectionKicker.textContent = "Trending now";
+      sectionTitle.textContent = "Trending on Bayse";
+      sectionMeta.textContent = `${count} open event${plural} scanned`;
     }
 
     async function loadTrending() {
