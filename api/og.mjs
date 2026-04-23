@@ -1,5 +1,34 @@
 import { ImageResponse } from "@vercel/og";
 
+export const config = {
+  runtime: "edge",
+};
+
+function getHeader(req, key) {
+  const headers = req?.headers;
+  if (!headers) return "";
+
+  if (typeof headers.get === "function") {
+    return headers.get(key) || "";
+  }
+
+  const direct = headers[key] ?? headers[key.toLowerCase()];
+  if (Array.isArray(direct)) return direct[0] || "";
+  return direct ? String(direct) : "";
+}
+
+function getRequestUrl(req) {
+  const rawUrl = typeof req?.url === "string" && req.url ? req.url : "/api/og";
+
+  try {
+    return new URL(rawUrl);
+  } catch {
+    const proto = getHeader(req, "x-forwarded-proto") || "https";
+    const host = getHeader(req, "x-forwarded-host") || getHeader(req, "host") || "headlineodds.fun";
+    return new URL(rawUrl, `${proto}://${host}`);
+  }
+}
+
 function getParam(searchParams, keys, fallback = "") {
   const candidates = Array.isArray(keys) ? keys : [keys];
 
@@ -505,7 +534,7 @@ function buildBayseCard(searchParams) {
 }
 
 export default function handler(req) {
-  const { searchParams } = new URL(req.url);
+  const { searchParams } = getRequestUrl(req);
   const theme = getTheme(searchParams);
   const card = theme === "bayse"
     ? buildBayseCard(searchParams)
