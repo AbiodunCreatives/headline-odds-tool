@@ -217,7 +217,7 @@ export default function handler(req, res) {
     }
 
     body.bayse-theme {
-      background: linear-gradient(180deg, #070908 0%, #020403 100%);
+      background: linear-gradient(180deg, #050814 0%, #02040b 100%);
       color: #ffffff;
     }
 
@@ -255,7 +255,7 @@ export default function handler(req, res) {
       width: min(1040px, 100%);
       min-height: 520px;
       border-radius: 30px;
-      background: linear-gradient(180deg, rgba(8, 11, 10, 0.94) 0%, rgba(3, 5, 4, 0.98) 100%);
+      background: linear-gradient(180deg, rgba(7, 10, 24, 0.94) 0%, rgba(3, 5, 12, 0.98) 100%);
       border: 1px solid rgba(76, 110, 190, 0.45);
       box-shadow: 0 28px 100px rgba(0, 0, 0, 0.48);
       position: relative;
@@ -298,7 +298,7 @@ export default function handler(req, res) {
       align-items: center;
       gap: 12px;
       margin-bottom: 28px;
-      color: rgba(241, 247, 243, 0.78);
+      color: rgba(241, 247, 255, 0.78);
       font-size: 22px;
       font-weight: 600;
     }
@@ -307,7 +307,7 @@ export default function handler(req, res) {
       width: 32px;
       height: 32px;
       border-radius: 999px;
-      background: #080b0a;
+      background: #070b17;
       border: 1px solid rgba(82, 119, 199, 0.68);
       display: inline-flex;
       align-items: center;
@@ -322,7 +322,7 @@ export default function handler(req, res) {
     }
 
     .ho-o {
-      color: #f3f7f4;
+      color: #f5f9ff;
     }
 
     .bayse-focus {
@@ -340,7 +340,7 @@ export default function handler(req, res) {
 
     .bayse-title {
       max-width: 780px;
-      color: #f2f7f3;
+      color: #f2f7ff;
       font-size: clamp(38px, 4vw, 56px);
       font-weight: 700;
       letter-spacing: -0.05em;
@@ -375,7 +375,7 @@ export default function handler(req, res) {
     }
 
     .bayse-pill-no {
-      background: rgba(26, 29, 28, 0.88);
+      background: rgba(18, 22, 35, 0.88);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -393,7 +393,7 @@ export default function handler(req, res) {
     }
 
     .bayse-pill-no .bayse-pill-label {
-      color: rgba(193, 199, 196, 0.86);
+      color: rgba(204, 214, 232, 0.86);
     }
 
     .bayse-pill-value {
@@ -404,14 +404,14 @@ export default function handler(req, res) {
     }
 
     .bayse-pill-no .bayse-pill-value {
-      color: #f2f7f3;
+      color: #f2f7ff;
     }
 
     .bayse-meta {
       display: flex;
       align-items: center;
       gap: 34px;
-      color: rgba(210, 220, 214, 0.7);
+      color: rgba(208, 218, 238, 0.7);
       font-size: 18px;
       font-weight: 500;
       flex-wrap: wrap;
@@ -433,7 +433,7 @@ export default function handler(req, res) {
     }
 
     .bayse-footer-title {
-      color: #f3f7f4;
+      color: #f5f9ff;
       font-size: 16px;
       font-weight: 700;
     }
@@ -470,7 +470,7 @@ export default function handler(req, res) {
     .bayse-action-ghost {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(105, 137, 204, 0.28);
-      color: rgba(241, 247, 243, 0.86);
+      color: rgba(241, 247, 255, 0.86);
     }
 
     .bayse-action-primary {
