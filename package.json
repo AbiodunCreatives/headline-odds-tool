@@ -8,7 +8,8 @@
     "dev": "npx http-server . -p 3000"
   },
   "dependencies": {
-    "@vercel/og": "^0.6.0"
+    "@vercel/og": "^0.11.1",
+    "react": "^19.2.5"
   },
   "devDependencies": {
     "vercel": "^50.28.0"

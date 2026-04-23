@@ -1,3 +1,18 @@
 {
-  "version": 2
+  "version": 2,
+  "functions": {
+    "api/og.mjs": {
+      "includeFiles": "node_modules/@vercel/og/dist/**/*"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/s",
+      "destination": "/api/share"
+    },
+    {
+      "source": "/o",
+      "destination": "/api/og"
+    }
+  ]
 }

@@ -944,20 +944,18 @@
       const params = new URLSearchParams({
         th: "b",
         t: event.title || primaryRow.title || "Bayse market",
-        m: formatEventMeta(event),
-        c: formatEndsLabel(event),
         yp: primaryRow.yesPrice,
         np: primaryRow.noPrice,
       });
 
-      if (primaryRow.title) params.set("f", primaryRow.title);
+      if (primaryRow.title && primaryRow.title !== event.title) params.set("f", primaryRow.title);
       if (primaryRow.yesLabel && primaryRow.yesLabel !== "Yes") params.set("yl", primaryRow.yesLabel);
       if (primaryRow.noLabel && primaryRow.noLabel !== "No") params.set("nl", primaryRow.noLabel);
       if (event.id) params.set("e", event.id);
       else if (event.url) params.set("u", event.url);
       else params.set("u", INSTALL_URL);
 
-      const shareLink = `${window.location.origin}/api/share?${params}`;
+      const shareLink = `${window.location.origin}/s?${params}`;
       const leadOdds = primaryMarket ? formatOddsPercent(primaryMarket.outcome1_display) : null;
       const subject = primaryRow.title
         ? `${primaryRow.title} ${leadOdds || primaryRow.yesPrice}`
