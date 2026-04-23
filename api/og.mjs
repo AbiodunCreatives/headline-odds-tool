@@ -1,5 +1,7 @@
 import { unstable_createNodejsStream } from "@vercel/og";
 
+const REACT_ELEMENT_TYPE = Symbol.for("react.element");
+
 function getHeader(req, key) {
   const headers = req?.headers;
   if (!headers) return "";
@@ -61,6 +63,43 @@ function parseRowsParam(raw) {
   } catch {
     return [];
   }
+}
+
+function toReactElement(node) {
+  if (node == null || node === false) return null;
+  if (typeof node === "string" || typeof node === "number") return node;
+
+  if (Array.isArray(node)) {
+    return node
+      .map(toReactElement)
+      .filter(child => child != null && child !== false);
+  }
+
+  const { type, props = {} } = node;
+  const rawChildren = Array.isArray(props.children)
+    ? props.children
+    : props.children == null
+      ? []
+      : [props.children];
+  const children = rawChildren
+    .map(toReactElement)
+    .filter(child => child != null && child !== false);
+  const nextProps = { ...props };
+
+  if (children.length === 0) {
+    delete nextProps.children;
+  } else {
+    nextProps.children = children.length === 1 ? children[0] : children;
+  }
+
+  return {
+    $$typeof: REACT_ELEMENT_TYPE,
+    type,
+    key: null,
+    ref: null,
+    props: nextProps,
+    _owner: null,
+  };
 }
 
 function getFallbackInitials(title) {
@@ -535,7 +574,8 @@ export default async function handler(req, res) {
   const card = theme === "bayse"
     ? buildBayseCard(searchParams)
     : buildLegacyCard(searchParams);
-  const stream = await unstable_createNodejsStream(card, { width: 1200, height: 630 });
+  const element = toReactElement(card);
+  const stream = await unstable_createNodejsStream(element, { width: 1200, height: 630 });
 
   if (!res) {
     return new Response(stream, {
