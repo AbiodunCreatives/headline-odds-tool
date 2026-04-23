@@ -128,7 +128,7 @@ export default function handler(req, res) {
 
       <div class="bayse-footer">
         <div class="bayse-footer-title">${esc(title)}</div>
-        <div class="bayse-footer-meta">headlineodds.fun/scanner &mdash; Powered by Bayse</div>
+        <div class="bayse-footer-meta">headlineodds.fun/scanner &mdash; Powered by Bayse Markets</div>
       </div>
     </div>
 
@@ -256,7 +256,7 @@ export default function handler(req, res) {
       min-height: 520px;
       border-radius: 30px;
       background: linear-gradient(180deg, rgba(8, 11, 10, 0.94) 0%, rgba(3, 5, 4, 0.98) 100%);
-      border: 1px solid rgba(69, 104, 83, 0.45);
+      border: 1px solid rgba(76, 110, 190, 0.45);
       box-shadow: 0 28px 100px rgba(0, 0, 0, 0.48);
       position: relative;
       overflow: hidden;
@@ -272,13 +272,13 @@ export default function handler(req, res) {
     }
 
     .bayse-grid {
-      background-image: linear-gradient(rgba(42, 65, 54, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(42, 65, 54, 0.28) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(52, 77, 136, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(52, 77, 136, 0.28) 1px, transparent 1px);
       background-size: 34px 34px;
       opacity: 0.24;
     }
 
     .bayse-glow {
-      background: radial-gradient(circle at 50% 14%, rgba(9, 170, 93, 0.22) 0%, rgba(0, 0, 0, 0) 48%);
+      background: radial-gradient(circle at 50% 14%, rgba(31, 108, 240, 0.22) 0%, rgba(0, 0, 0, 0) 48%);
     }
 
     .bayse-inner {
@@ -308,7 +308,7 @@ export default function handler(req, res) {
       height: 32px;
       border-radius: 999px;
       background: #080b0a;
-      border: 1px solid rgba(67, 108, 84, 0.68);
+      border: 1px solid rgba(82, 119, 199, 0.68);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -318,7 +318,7 @@ export default function handler(req, res) {
     }
 
     .ho-h {
-      color: #11c46b;
+      color: #1f6cf0;
     }
 
     .ho-o {
@@ -329,9 +329,9 @@ export default function handler(req, res) {
       margin-bottom: 18px;
       padding: 8px 16px;
       border-radius: 999px;
-      background: rgba(17, 196, 107, 0.08);
-      border: 1px solid rgba(17, 196, 107, 0.18);
-      color: #73e4a8;
+      background: rgba(31, 108, 240, 0.08);
+      border: 1px solid rgba(31, 108, 240, 0.18);
+      color: #8fb7ff;
       font-size: 14px;
       font-weight: 700;
       text-transform: uppercase;
@@ -369,9 +369,9 @@ export default function handler(req, res) {
     }
 
     .bayse-pill-yes {
-      background: rgba(7, 45, 31, 0.88);
-      border: 1px solid rgba(17, 196, 107, 0.32);
-      box-shadow: 0 0 0 1px rgba(17, 196, 107, 0.14) inset;
+      background: rgba(10, 35, 82, 0.88);
+      border: 1px solid rgba(31, 108, 240, 0.32);
+      box-shadow: 0 0 0 1px rgba(31, 108, 240, 0.14) inset;
     }
 
     .bayse-pill-no {
@@ -383,11 +383,11 @@ export default function handler(req, res) {
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: #11c46b;
+      background: #1f6cf0;
     }
 
     .bayse-pill-label {
-      color: rgba(212, 255, 229, 0.9);
+      color: rgba(214, 229, 255, 0.9);
       font-size: 21px;
       font-weight: 600;
     }
@@ -397,7 +397,7 @@ export default function handler(req, res) {
     }
 
     .bayse-pill-value {
-      color: #11c46b;
+      color: #1f6cf0;
       font-size: 34px;
       font-weight: 800;
       letter-spacing: -0.04em;
@@ -427,8 +427,8 @@ export default function handler(req, res) {
       justify-content: space-between;
       gap: 12px;
       padding: 0 26px;
-      background: linear-gradient(90deg, rgba(10, 78, 51, 0.58) 0%, rgba(8, 28, 20, 0.46) 52%, rgba(6, 8, 7, 0.82) 100%);
-      border-top: 1px solid rgba(71, 122, 96, 0.35);
+      background: linear-gradient(90deg, rgba(12, 53, 132, 0.58) 0%, rgba(9, 26, 64, 0.46) 52%, rgba(6, 8, 7, 0.82) 100%);
+      border-top: 1px solid rgba(79, 121, 206, 0.35);
       flex-wrap: wrap;
     }
 
@@ -439,7 +439,7 @@ export default function handler(req, res) {
     }
 
     .bayse-footer-meta {
-      color: rgba(120, 230, 165, 0.86);
+      color: rgba(155, 194, 255, 0.86);
       font-size: 14px;
       font-weight: 500;
     }
@@ -469,14 +469,14 @@ export default function handler(req, res) {
 
     .bayse-action-ghost {
       background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(105, 143, 122, 0.28);
+      border: 1px solid rgba(105, 137, 204, 0.28);
       color: rgba(241, 247, 243, 0.86);
     }
 
     .bayse-action-primary {
-      background: rgba(17, 196, 107, 0.16);
-      border: 1px solid rgba(17, 196, 107, 0.3);
-      color: #86efb3;
+      background: rgba(31, 108, 240, 0.16);
+      border: 1px solid rgba(31, 108, 240, 0.3);
+      color: #a7c7ff;
     }
 
     @media (max-width: 760px) {

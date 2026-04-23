@@ -166,7 +166,7 @@ function buildBayseCard(searchParams) {
             style: {
               position: "absolute",
               inset: "0",
-              background: "radial-gradient(circle at 50% 16%, rgba(0, 181, 104, 0.26) 0%, rgba(0, 0, 0, 0) 42%)",
+              background: "radial-gradient(circle at 50% 16%, rgba(31, 108, 240, 0.26) 0%, rgba(0, 0, 0, 0) 42%)",
             },
           },
         },
@@ -180,7 +180,7 @@ function buildBayseCard(searchParams) {
               height: "450px",
               borderRadius: "30px",
               background: "linear-gradient(180deg, rgba(8, 11, 10, 0.94) 0%, rgba(3, 5, 4, 0.98) 100%)",
-              border: "1px solid rgba(69, 104, 83, 0.45)",
+              border: "1px solid rgba(76, 110, 190, 0.45)",
               boxShadow: "0 28px 100px rgba(0, 0, 0, 0.48)",
               position: "relative",
               overflow: "hidden",
@@ -192,7 +192,7 @@ function buildBayseCard(searchParams) {
                   style: {
                     position: "absolute",
                     inset: "0",
-                    backgroundImage: "linear-gradient(rgba(42, 65, 54, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(42, 65, 54, 0.28) 1px, transparent 1px)",
+                    backgroundImage: "linear-gradient(rgba(52, 77, 136, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(52, 77, 136, 0.28) 1px, transparent 1px)",
                     backgroundSize: "34px 34px",
                     opacity: "0.24",
                   },
@@ -204,7 +204,7 @@ function buildBayseCard(searchParams) {
                   style: {
                     position: "absolute",
                     inset: "0",
-                    background: "radial-gradient(circle at 50% 12%, rgba(9, 170, 93, 0.22) 0%, rgba(0, 0, 0, 0) 48%)",
+                    background: "radial-gradient(circle at 50% 12%, rgba(31, 108, 240, 0.22) 0%, rgba(0, 0, 0, 0) 48%)",
                   },
                 },
               },
@@ -243,7 +243,7 @@ function buildBayseCard(searchParams) {
                                 height: "32px",
                                 borderRadius: "999px",
                                 background: "#080b0a",
-                                border: "1px solid rgba(67, 108, 84, 0.68)",
+                                border: "1px solid rgba(82, 119, 199, 0.68)",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -253,7 +253,7 @@ function buildBayseCard(searchParams) {
                                   type: "span",
                                   props: {
                                     style: {
-                                      color: "#11c46b",
+                                      color: "#1f6cf0",
                                       fontSize: "16px",
                                       fontWeight: "800",
                                       letterSpacing: "-0.08em",
@@ -291,9 +291,9 @@ function buildBayseCard(searchParams) {
                               marginBottom: "18px",
                               padding: "8px 16px",
                               borderRadius: "999px",
-                              background: "rgba(17, 196, 107, 0.08)",
-                              border: "1px solid rgba(17, 196, 107, 0.18)",
-                              color: "#73e4a8",
+                              background: "rgba(31, 108, 240, 0.08)",
+                              border: "1px solid rgba(31, 108, 240, 0.18)",
+                              color: "#8fb7ff",
                               fontSize: "16px",
                               fontWeight: "700",
                               textTransform: "uppercase",
@@ -337,9 +337,9 @@ function buildBayseCard(searchParams) {
                                 minHeight: "72px",
                                 padding: "0 24px",
                                 borderRadius: "999px",
-                                background: "rgba(7, 45, 31, 0.88)",
-                                border: "1px solid rgba(17, 196, 107, 0.32)",
-                                boxShadow: "0 0 0 1px rgba(17, 196, 107, 0.14) inset",
+                                background: "rgba(10, 35, 82, 0.88)",
+                                border: "1px solid rgba(31, 108, 240, 0.32)",
+                                boxShadow: "0 0 0 1px rgba(31, 108, 240, 0.14) inset",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -353,7 +353,7 @@ function buildBayseCard(searchParams) {
                                       width: "10px",
                                       height: "10px",
                                       borderRadius: "999px",
-                                      background: "#11c46b",
+                                      background: "#1f6cf0",
                                     },
                                   },
                                 },
@@ -361,7 +361,7 @@ function buildBayseCard(searchParams) {
                                   type: "span",
                                   props: {
                                     style: {
-                                      color: "rgba(212, 255, 229, 0.9)",
+                                      color: "rgba(214, 229, 255, 0.9)",
                                       fontSize: "22px",
                                       fontWeight: "600",
                                     },
@@ -372,7 +372,7 @@ function buildBayseCard(searchParams) {
                                   type: "span",
                                   props: {
                                     style: {
-                                      color: "#11c46b",
+                                      color: "#1f6cf0",
                                       fontSize: "34px",
                                       fontWeight: "800",
                                       letterSpacing: "-0.04em",
@@ -456,8 +456,8 @@ function buildBayseCard(searchParams) {
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: "0 26px",
-                    background: "linear-gradient(90deg, rgba(10, 78, 51, 0.58) 0%, rgba(8, 28, 20, 0.46) 52%, rgba(6, 8, 7, 0.82) 100%)",
-                    borderTop: "1px solid rgba(71, 122, 96, 0.35)",
+                    background: "linear-gradient(90deg, rgba(12, 53, 132, 0.58) 0%, rgba(9, 26, 64, 0.46) 52%, rgba(6, 8, 7, 0.82) 100%)",
+                    borderTop: "1px solid rgba(79, 121, 206, 0.35)",
                   },
                   children: [
                     {
@@ -475,11 +475,11 @@ function buildBayseCard(searchParams) {
                       type: "div",
                       props: {
                         style: {
-                          color: "rgba(120, 230, 165, 0.86)",
+                          color: "rgba(155, 194, 255, 0.86)",
                           fontSize: "14px",
                           fontWeight: "500",
                         },
-                        children: "headlineodds.fun/scanner  —  Powered by Bayse",
+                        children: "headlineodds.fun/scanner  \u2014  Powered by Bayse Markets",
                       },
                     },
                   ],
