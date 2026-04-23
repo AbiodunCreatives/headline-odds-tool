@@ -1,4 +1,4 @@
-import { ImageResponse } from "@vercel/og";
+import { unstable_createNodejsStream } from "@vercel/og";
 
 function getHeader(req, key) {
   const headers = req?.headers;
@@ -535,15 +535,19 @@ export default async function handler(req, res) {
   const card = theme === "bayse"
     ? buildBayseCard(searchParams)
     : buildLegacyCard(searchParams);
-
-  const image = new ImageResponse(card, { width: 1200, height: 630 });
+  const stream = await unstable_createNodejsStream(card, { width: 1200, height: 630 });
 
   if (!res) {
-    return image;
+    return new Response(stream, {
+      headers: {
+        "content-type": "image/png",
+        "cache-control": "public, max-age=300, s-maxage=300",
+      },
+    });
   }
 
-  const arrayBuffer = await image.arrayBuffer();
   res.setHeader("Content-Type", "image/png");
   res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300");
-  return res.status(200).send(Buffer.from(arrayBuffer));
+  stream.pipe(res);
+  return;
 }
