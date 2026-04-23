@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="/icon48.png" />
   <link rel="icon" type="image/png" sizes="128x128" href="/icon128.png" />
   <link rel="apple-touch-icon" href="/icon128.png" />
-  <title>Headline Odds - Bayse Arena</title>
+  <title>Headline Odds - Bayse Market Scanner</title>
   <meta name="description" content="Browse trending Bayse markets, search live open events, and share Bayse-style market cards." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -83,39 +83,25 @@
     }
 
     .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
+      width: 50px;
+      height: 50px;
+      border-radius: 0;
       overflow: hidden;
       flex-shrink: 0;
-      border: 1px solid rgba(24, 59, 131, 0.08);
-      box-shadow: 0 14px 30px rgba(12, 23, 52, 0.12);
-      background: #111;
+      background: transparent;
     }
 
     .brand-mark img {
       width: 100%;
       height: 100%;
       display: block;
-      object-fit: cover;
+      object-fit: contain;
     }
 
-    .brand-copy {
-      display: grid;
-      gap: 2px;
-    }
-
-    .brand-kicker {
-      color: var(--muted);
-      font-size: 11px;
+    .brand-label {
+      font-size: 22px;
       font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .brand-title {
-      font-size: 18px;
-      font-weight: 800;
+      line-height: 1.1;
     }
 
     .hero {
@@ -124,39 +110,10 @@
       margin-bottom: 26px;
     }
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: var(--bayse-soft);
-      color: var(--bayse);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .eyebrow-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--bayse);
-    }
-
     h1 {
       font-size: clamp(32px, 5vw, 52px);
       line-height: 1.02;
       letter-spacing: -0.05em;
-      max-width: 760px;
-    }
-
-    .hero-sub {
-      color: var(--text-soft);
-      font-size: 16px;
-      line-height: 1.7;
       max-width: 760px;
     }
 
@@ -287,11 +244,11 @@
     }
 
     .market-card {
-      padding: 14px;
-      border-radius: 18px;
+      padding: 16px 18px;
+      border-radius: 14px;
       background: var(--panel);
       border: 1px solid var(--line);
-      box-shadow: var(--shadow);
+      box-shadow: 0 14px 28px rgba(31, 108, 240, 0.06);
     }
 
     .market-top {
@@ -343,28 +300,22 @@
     }
 
     .market-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.35;
-    }
-
-    .market-subtitle {
-      margin-top: 4px;
-      color: var(--text-soft);
-      font-size: 13px;
-      line-height: 1.55;
+      line-height: 1.3;
     }
 
     .market-tag {
       flex-shrink: 0;
       display: inline-flex;
       align-items: center;
-      padding: 8px 12px;
+      padding: 7px 11px;
       border-radius: 999px;
-      background: var(--bayse-soft);
+      background: #f7faff;
+      border: 1px solid #e5edff;
       color: var(--bayse);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -372,14 +323,12 @@
 
     .market-rows {
       display: grid;
-      gap: 10px;
+      gap: 0;
     }
 
     .market-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 12px;
-      align-items: center;
       padding: 12px 0;
       border-top: 1px solid #eef3ff;
     }
@@ -396,7 +345,7 @@
     .row-copy {
       min-width: 0;
       display: grid;
-      gap: 4px;
+      gap: 6px;
     }
 
     .row-title {
@@ -406,9 +355,16 @@
       line-height: 1.45;
     }
 
+    .row-trades {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
     .trade-btn {
-      min-width: 156px;
-      min-height: 40px;
+      width: 100%;
+      min-height: 42px;
       padding: 0 16px;
       border-radius: 0;
       border: 1px solid transparent;
@@ -416,7 +372,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
     }
@@ -680,12 +636,8 @@
     }
 
     @media (max-width: 860px) {
-      .market-row {
-        grid-template-columns: 1fr;
-      }
-
-      .trade-btn {
-        width: 100%;
+      .row-trades {
+        gap: 12px;
       }
     }
 
@@ -709,8 +661,33 @@
         font-size: 28px;
       }
 
+      .brand-label {
+        font-size: 19px;
+      }
+
       .skeleton-row {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .market-card {
+        padding: 14px;
+      }
+
+      .market-top {
+        gap: 12px;
+      }
+
+      .row-trades {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .trade-btn {
+        min-height: 40px;
+        padding: 0 12px;
+        font-size: 13px;
       }
     }
   </style>
@@ -722,17 +699,12 @@
         <span class="brand-mark" aria-hidden="true">
           <img src="/scanner/assets/headline-odds-mark.jpg" alt="" />
         </span>
-        <span class="brand-copy">
-          <span class="brand-kicker">Headline Odds</span>
-          <span class="brand-title">Bayse Arena</span>
-        </span>
+        <span class="brand-label">Bayse Market Scanner</span>
       </div>
     </nav>
 
     <section class="hero">
-      <div class="eyebrow"><span class="eyebrow-dot"></span> Live Bayse markets</div>
       <h1>Browse trending Bayse events and jump straight into the exact market.</h1>
-      <p class="hero-sub">Search live open markets, open the Yes or No side directly on Bayse, and share Bayse-style market cards to X without leaving the scanner.</p>
 
       <div class="search-shell">
         <div class="search-row">
@@ -804,6 +776,12 @@
       const amount = toNumber(value);
       if (amount == null) return "--";
       return `N${Math.round(amount)}`;
+    }
+
+    function formatOddsPercent(value) {
+      const amount = toNumber(value);
+      if (amount == null) return null;
+      return `${Math.round(amount)}%`;
     }
 
     function formatTrades(value) {
@@ -892,15 +870,15 @@
 
         return `
           <div class="market-row">
-            <div class="row-copy">
-              ${rowTitle ? `<div class="row-title">${esc(rowTitle)}</div>` : ""}
+            ${rowTitle ? `<div class="row-copy"><div class="row-title">${esc(rowTitle)}</div></div>` : ""}
+            <div class="row-trades">
+              <a class="trade-btn trade-yes" href="${esc(market.yes_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
+                Buy ${esc(market.outcome1_label || "Yes")} - ${esc(yesPrice)}
+              </a>
+              <a class="trade-btn trade-no" href="${esc(market.no_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
+                Buy ${esc(market.outcome2_label || "No")} - ${esc(noPrice)}
+              </a>
             </div>
-            <a class="trade-btn trade-yes" href="${esc(market.yes_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
-              Buy ${esc(market.outcome1_label || "Yes")} - ${esc(yesPrice)}
-            </a>
-            <a class="trade-btn trade-no" href="${esc(market.no_url || market.url || event.url || INSTALL_URL)}" target="_blank" rel="noopener">
-              Buy ${esc(market.outcome2_label || "No")} - ${esc(noPrice)}
-            </a>
           </div>`;
       }).join("");
     }
@@ -954,6 +932,8 @@
 
     function buildBayseShare(event) {
       const rows = buildShareRows(event);
+      const orderedMarkets = getOrderedMarkets(event);
+      const primaryMarket = orderedMarkets[0] || null;
       const primaryRow = rows[0] || {
         title: "",
         yesLabel: "Yes",
@@ -965,21 +945,22 @@
       const params = new URLSearchParams({
         theme: "bayse",
         title: event.title,
-        bayseSubtitle: event.description || event.category || "Live Bayse market",
+        bayseSubtitle: event.category || "Bayse market",
+        bayseFocus: primaryRow.title || "",
         bayseCategory: event.category || "Open market",
         bayseClose: formatEndsLabel(event),
         bayseMeta: formatEventMeta(event),
         url: event.url || INSTALL_URL,
         image: event.image_128_url || event.image_url || "",
-        rows: JSON.stringify(rows),
+        rows: JSON.stringify(rows.length ? [primaryRow] : rows),
       });
 
       const shareLink = `${window.location.origin}/api/share?${params}`;
-      const previewLines = rows
-        .slice(0, 3)
-        .map(row => `${row.title ? `${row.title}: ` : ""}${row.yesLabel} ${row.yesPrice} / ${row.noLabel} ${row.noPrice}`)
-        .join("\n");
-      const tweetText = `${event.title}\n\n${previewLines || `${primaryRow.yesLabel} ${primaryRow.yesPrice} / ${primaryRow.noLabel} ${primaryRow.noPrice}`}\n\nLive on Bayse via @headlineodds`;
+      const leadOdds = primaryMarket ? formatOddsPercent(primaryMarket.outcome1_display) : null;
+      const subject = primaryRow.title
+        ? `${primaryRow.title} ${leadOdds || primaryRow.yesPrice}`
+        : `${primaryRow.yesLabel} ${leadOdds || primaryRow.yesPrice}`;
+      const tweetText = `Market gives ${subject} odds -> ${event.title}\n\nDo you agree?\n\nvia @headlineodds`;
       return `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareLink)}`;
     }
 

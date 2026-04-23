@@ -130,94 +130,19 @@ function buildLegacyCard(searchParams) {
 
 function buildBayseCard(searchParams) {
   const title = getParam(searchParams, "title", "Bayse market");
-  const subtitle = getParam(searchParams, "bayseSubtitle", "Live Bayse market");
-  const category = getParam(searchParams, "bayseCategory", "Open market");
+  const focus = getParam(searchParams, "bayseFocus");
   const meta = getParam(searchParams, "bayseMeta", "Open Bayse market");
   const close = getParam(searchParams, "bayseClose", "Open market");
-  const image = getParam(searchParams, "image");
   const rows = parseRowsParam(getParam(searchParams, "rows"));
-  const displayRows = rows.length
-    ? rows
-    : [{
-        title: "",
-        yesLabel: getParam(searchParams, "bayseLabel1", "Yes"),
-        yesPrice: getParam(searchParams, "baysePrice1", "\u2014"),
-        noLabel: getParam(searchParams, "bayseLabel2", "No"),
-        noPrice: getParam(searchParams, "baysePrice2", "\u2014"),
-      }];
-
-  const rowNodes = displayRows.map((row, index) => ({
-    type: "div",
-    props: {
-      style: {
-        display: "flex",
-        alignItems: "center",
-        gap: "16px",
-        padding: "14px 0",
-        borderTop: index === 0 ? "none" : "1px solid #eef3ff",
-      },
-      children: [
-        {
-          type: "div",
-          props: {
-            style: {
-              flex: 1,
-              minWidth: 0,
-              display: "flex",
-              alignItems: "center",
-              color: "#4c6da9",
-              fontSize: "24px",
-              fontWeight: "700",
-              lineHeight: "1.4",
-            },
-            children: row.title || "",
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              minWidth: "206px",
-              minHeight: "58px",
-              borderRadius: "0px",
-              background: "#f2f7ff",
-              border: "1px solid #bdd5ff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#1f6cf0",
-              fontSize: "22px",
-              fontWeight: "700",
-              textAlign: "center",
-              padding: "0 18px",
-            },
-            children: `${row.yesLabel} ${row.yesPrice}`,
-          },
-        },
-        {
-          type: "div",
-          props: {
-            style: {
-              minWidth: "206px",
-              minHeight: "58px",
-              borderRadius: "0px",
-              background: "#fff7f7",
-              border: "1px solid #ffd0d0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#ff5d5d",
-              fontSize: "22px",
-              fontWeight: "700",
-              textAlign: "center",
-              padding: "0 18px",
-            },
-            children: `${row.noLabel} ${row.noPrice}`,
-          },
-        },
-      ],
-    },
-  }));
+  const preview = rows[0] || {
+    title: "",
+    yesLabel: getParam(searchParams, "bayseLabel1", "Yes"),
+    yesPrice: getParam(searchParams, "baysePrice1", "\u2014"),
+    noLabel: getParam(searchParams, "bayseLabel2", "No"),
+    noPrice: getParam(searchParams, "baysePrice2", "\u2014"),
+  };
+  const detail = focus || preview.title || "";
+  const footerMeta = [meta, close].filter(Boolean).join("     ");
 
   return {
     type: "div",
@@ -226,134 +151,75 @@ function buildBayseCard(searchParams) {
         width: "1200px",
         height: "630px",
         display: "flex",
-        flexDirection: "column",
-        background: "#f5f8ff",
-        color: "#183b83",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(180deg, #060908 0%, #030504 100%)",
+        color: "#ffffff",
         fontFamily: "\"Plus Jakarta Sans\", sans-serif",
-        padding: "34px 40px",
+        position: "relative",
+        overflow: "hidden",
       },
       children: [
         {
           type: "div",
           props: {
             style: {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "20px",
+              position: "absolute",
+              inset: "0",
+              background: "radial-gradient(circle at 50% 16%, rgba(0, 181, 104, 0.26) 0%, rgba(0, 0, 0, 0) 42%)",
             },
-            children: [
-              {
-                type: "div",
-                props: {
-                  style: {
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    color: "#1f6cf0",
-                    fontSize: "34px",
-                    fontWeight: "800",
-                    letterSpacing: "-0.04em",
-                  },
-                  children: [
-                    {
-                      type: "div",
-                      props: {
-                        style: {
-                          width: "36px",
-                          height: "36px",
-                          borderRadius: "12px",
-                          background: "#1f6cf0",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#ffffff",
-                          fontSize: "16px",
-                          fontWeight: "800",
-                        },
-                        children: "b",
-                      },
-                    },
-                    "bayse",
-                  ],
-                },
-              },
-              {
-                type: "div",
-                props: {
-                  style: {
-                    display: "flex",
-                    gap: "12px",
-                  },
-                  children: [
-                    {
-                      type: "div",
-                      props: {
-                        style: {
-                          minWidth: "96px",
-                          minHeight: "46px",
-                          padding: "0 18px",
-                          borderRadius: "12px",
-                          background: "#f5f8ff",
-                          border: "1px solid #edf2ff",
-                          color: "#1f6cf0",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "18px",
-                          fontWeight: "700",
-                        },
-                        children: "Log In",
-                      },
-                    },
-                    {
-                      type: "div",
-                      props: {
-                        style: {
-                          minWidth: "110px",
-                          minHeight: "46px",
-                          padding: "0 18px",
-                          borderRadius: "12px",
-                          background: "#1f6cf0",
-                          color: "#ffffff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "18px",
-                          fontWeight: "700",
-                        },
-                        children: "Sign Up",
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
           },
         },
         {
           type: "div",
           props: {
             style: {
-              flex: 1,
               display: "flex",
               flexDirection: "column",
-              borderRadius: "18px",
-              background: "#ffffff",
-              border: "1px solid #dbe6ff",
-              padding: "18px",
-              boxShadow: "0 18px 40px rgba(31,108,240,0.08)",
+              width: "1020px",
+              height: "450px",
+              borderRadius: "30px",
+              background: "linear-gradient(180deg, rgba(8, 11, 10, 0.94) 0%, rgba(3, 5, 4, 0.98) 100%)",
+              border: "1px solid rgba(69, 104, 83, 0.45)",
+              boxShadow: "0 28px 100px rgba(0, 0, 0, 0.48)",
+              position: "relative",
+              overflow: "hidden",
             },
             children: [
               {
                 type: "div",
                 props: {
                   style: {
+                    position: "absolute",
+                    inset: "0",
+                    backgroundImage: "linear-gradient(rgba(42, 65, 54, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(42, 65, 54, 0.28) 1px, transparent 1px)",
+                    backgroundSize: "34px 34px",
+                    opacity: "0.24",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "absolute",
+                    inset: "0",
+                    background: "radial-gradient(circle at 50% 12%, rgba(9, 170, 93, 0.22) 0%, rgba(0, 0, 0, 0) 48%)",
+                  },
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    position: "relative",
+                    zIndex: "1",
+                    flex: "1",
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "16px",
-                    marginBottom: "16px",
+                    justifyContent: "center",
+                    padding: "44px 70px 22px",
                   },
                   children: [
                     {
@@ -362,78 +228,198 @@ function buildBayseCard(searchParams) {
                         style: {
                           display: "flex",
                           alignItems: "center",
-                          gap: "14px",
-                          flex: 1,
-                          minWidth: 0,
+                          gap: "12px",
+                          marginBottom: detail ? "24px" : "34px",
+                          color: "rgba(241, 247, 243, 0.78)",
+                          fontSize: "22px",
+                          fontWeight: "600",
                         },
                         children: [
-                          image
-                            ? {
-                                type: "img",
-                                props: {
-                                  src: image,
-                                  width: "46",
-                                  height: "46",
-                                  style: {
-                                    width: "46px",
-                                    height: "46px",
-                                    borderRadius: "999px",
-                                    border: "1px solid #e7eeff",
-                                  },
-                                },
-                              }
-                            : {
-                                type: "div",
-                                props: {
-                                  style: {
-                                    width: "46px",
-                                    height: "46px",
-                                    borderRadius: "999px",
-                                    background: "#f0f5ff",
-                                    border: "1px solid #e7eeff",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "#1f6cf0",
-                                    fontSize: "14px",
-                                    fontWeight: "800",
-                                    textTransform: "uppercase",
-                                  },
-                                  children: getFallbackInitials(title),
-                                },
-                              },
                           {
                             type: "div",
                             props: {
                               style: {
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "999px",
+                                background: "#080b0a",
+                                border: "1px solid rgba(67, 108, 84, 0.68)",
                                 display: "flex",
-                                flexDirection: "column",
-                                gap: "6px",
-                                flex: 1,
+                                alignItems: "center",
+                                justifyContent: "center",
+                              },
+                              children: [
+                                {
+                                  type: "span",
+                                  props: {
+                                    style: {
+                                      color: "#11c46b",
+                                      fontSize: "16px",
+                                      fontWeight: "800",
+                                      letterSpacing: "-0.08em",
+                                    },
+                                    children: "H",
+                                  },
+                                },
+                                {
+                                  type: "span",
+                                  props: {
+                                    style: {
+                                      color: "#f3f7f4",
+                                      fontSize: "16px",
+                                      fontWeight: "800",
+                                      letterSpacing: "-0.08em",
+                                    },
+                                    children: "O",
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                          "Headline Odds",
+                        ],
+                      },
+                    },
+                    detail
+                      ? {
+                          type: "div",
+                          props: {
+                            style: {
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginBottom: "18px",
+                              padding: "8px 16px",
+                              borderRadius: "999px",
+                              background: "rgba(17, 196, 107, 0.08)",
+                              border: "1px solid rgba(17, 196, 107, 0.18)",
+                              color: "#73e4a8",
+                              fontSize: "16px",
+                              fontWeight: "700",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.06em",
+                            },
+                            children: detail,
+                          },
+                        }
+                      : null,
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          maxWidth: "780px",
+                          textAlign: "center",
+                          color: "#f2f7f3",
+                          fontSize: title.length > 72 ? "44px" : title.length > 44 ? "52px" : "58px",
+                          fontWeight: "700",
+                          letterSpacing: "-0.05em",
+                          lineHeight: "1.12",
+                          marginBottom: "28px",
+                        },
+                        children: title,
+                      },
+                    },
+                    {
+                      type: "div",
+                      props: {
+                        style: {
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "16px",
+                          marginBottom: "22px",
+                        },
+                        children: [
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                minWidth: "178px",
+                                minHeight: "72px",
+                                padding: "0 24px",
+                                borderRadius: "999px",
+                                background: "rgba(7, 45, 31, 0.88)",
+                                border: "1px solid rgba(17, 196, 107, 0.32)",
+                                boxShadow: "0 0 0 1px rgba(17, 196, 107, 0.14) inset",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "12px",
                               },
                               children: [
                                 {
                                   type: "div",
                                   props: {
                                     style: {
-                                      color: "#183b83",
-                                      fontSize: title.length > 70 ? "30px" : "34px",
-                                      fontWeight: "800",
-                                      letterSpacing: "-0.04em",
-                                      lineHeight: "1.18",
+                                      width: "10px",
+                                      height: "10px",
+                                      borderRadius: "999px",
+                                      background: "#11c46b",
                                     },
-                                    children: title,
                                   },
                                 },
                                 {
-                                  type: "div",
+                                  type: "span",
                                   props: {
                                     style: {
-                                      color: "#4c6da9",
-                                      fontSize: "18px",
-                                      lineHeight: "1.5",
+                                      color: "rgba(212, 255, 229, 0.9)",
+                                      fontSize: "22px",
+                                      fontWeight: "600",
                                     },
-                                    children: subtitle,
+                                    children: preview.yesLabel,
+                                  },
+                                },
+                                {
+                                  type: "span",
+                                  props: {
+                                    style: {
+                                      color: "#11c46b",
+                                      fontSize: "34px",
+                                      fontWeight: "800",
+                                      letterSpacing: "-0.04em",
+                                    },
+                                    children: preview.yesPrice,
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                          {
+                            type: "div",
+                            props: {
+                              style: {
+                                minWidth: "178px",
+                                minHeight: "72px",
+                                padding: "0 24px",
+                                borderRadius: "999px",
+                                background: "rgba(26, 29, 28, 0.88)",
+                                border: "1px solid rgba(255, 255, 255, 0.1)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "12px",
+                              },
+                              children: [
+                                {
+                                  type: "span",
+                                  props: {
+                                    style: {
+                                      color: "rgba(193, 199, 196, 0.86)",
+                                      fontSize: "22px",
+                                      fontWeight: "600",
+                                    },
+                                    children: preview.noLabel,
+                                  },
+                                },
+                                {
+                                  type: "span",
+                                  props: {
+                                    style: {
+                                      color: "#f2f7f3",
+                                      fontSize: "34px",
+                                      fontWeight: "800",
+                                      letterSpacing: "-0.04em",
+                                    },
+                                    children: preview.noPrice,
                                   },
                                 },
                               ],
@@ -446,18 +432,14 @@ function buildBayseCard(searchParams) {
                       type: "div",
                       props: {
                         style: {
-                          display: "inline-flex",
+                          display: "flex",
                           alignItems: "center",
-                          padding: "8px 14px",
-                          borderRadius: "999px",
-                          background: "#eef4ff",
-                          color: "#1f6cf0",
-                          fontSize: "16px",
-                          fontWeight: "800",
-                          letterSpacing: "0.05em",
-                          textTransform: "uppercase",
+                          gap: "34px",
+                          color: "rgba(210, 220, 214, 0.7)",
+                          fontSize: "18px",
+                          fontWeight: "500",
                         },
-                        children: category,
+                        children: [meta, close],
                       },
                     },
                   ],
@@ -467,88 +449,37 @@ function buildBayseCard(searchParams) {
                 type: "div",
                 props: {
                   style: {
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                  },
-                  children: rowNodes,
-                },
-              },
-              {
-                type: "div",
-                props: {
-                  style: {
+                    position: "relative",
+                    zIndex: "1",
+                    minHeight: "58px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    gap: "16px",
-                    marginTop: "14px",
-                    paddingTop: "16px",
-                    borderTop: "1px solid #eef3ff",
+                    padding: "0 26px",
+                    background: "linear-gradient(90deg, rgba(10, 78, 51, 0.58) 0%, rgba(8, 28, 20, 0.46) 52%, rgba(6, 8, 7, 0.82) 100%)",
+                    borderTop: "1px solid rgba(71, 122, 96, 0.35)",
                   },
                   children: [
                     {
                       type: "div",
                       props: {
                         style: {
-                          display: "flex",
-                          gap: "18px",
-                          color: "#88a0cf",
-                          fontSize: "18px",
-                          fontWeight: "600",
+                          color: "#f3f7f4",
+                          fontSize: "16px",
+                          fontWeight: "700",
                         },
-                        children: [meta, close],
+                        children: title,
                       },
                     },
                     {
                       type: "div",
                       props: {
                         style: {
-                          display: "flex",
-                          gap: "12px",
+                          color: "rgba(120, 230, 165, 0.86)",
+                          fontSize: "14px",
+                          fontWeight: "500",
                         },
-                        children: [
-                          {
-                            type: "div",
-                            props: {
-                              style: {
-                                minWidth: "146px",
-                                minHeight: "42px",
-                                padding: "0 16px",
-                                borderRadius: "999px",
-                                background: "#eef4ff",
-                                border: "1px solid #dbe6ff",
-                                color: "#1f6cf0",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: "16px",
-                                fontWeight: "700",
-                              },
-                              children: "Share to X",
-                            },
-                          },
-                          {
-                            type: "div",
-                            props: {
-                              style: {
-                                minWidth: "152px",
-                                minHeight: "42px",
-                                padding: "0 16px",
-                                borderRadius: "999px",
-                                background: "#ffffff",
-                                border: "1px solid #dbe6ff",
-                                color: "#183b83",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontSize: "16px",
-                                fontWeight: "700",
-                              },
-                              children: "Trade on Bayse",
-                            },
-                          },
-                        ],
+                        children: "headlineodds.fun/scanner  —  Powered by Bayse",
                       },
                     },
                   ],

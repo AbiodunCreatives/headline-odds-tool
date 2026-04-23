@@ -1,183 +1,25 @@
-// Serves a lightweight HTML page with OG meta tags for Bayse-style shared market cards.
-
-function getParam(source, key, fallback = "") {
-  const value = source[key];
-  return value == null || value === "" ? fallback : String(value);
-}
-
-function esc(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function toJsString(value) {
-  return JSON.stringify(String(value ?? ""));
-}
-
-function parseRowsParam(raw) {
-  if (!raw) return [];
-
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-
-    return parsed
-      .map(row => ({
-        title: getParam(row, "title"),
-        yesLabel: getParam(row, "yesLabel", "Yes"),
-        yesPrice: getParam(row, "yesPrice", "\u2014"),
-        yesUrl: getParam(row, "yesUrl"),
-        noLabel: getParam(row, "noLabel", "No"),
-        noPrice: getParam(row, "noPrice", "\u2014"),
-        noUrl: getParam(row, "noUrl"),
-      }))
-      .filter(row => row.yesPrice || row.noPrice);
-  } catch {
-    return [];
-  }
-}
-
-function buildRowsMarkup(rows) {
-  return rows.map(row => `
-    <div class="row">
-      <div class="row-copy">
-        ${row.title ? `<div class="row-title">${esc(row.title)}</div>` : ""}
-      </div>
-      ${row.yesUrl
-        ? `<a class="price price-yes" href="${esc(row.yesUrl)}" target="_blank" rel="noopener">${esc(row.yesLabel)} ${esc(row.yesPrice)}</a>`
-        : `<div class="price price-yes">${esc(row.yesLabel)} ${esc(row.yesPrice)}</div>`}
-      ${row.noUrl
-        ? `<a class="price price-no" href="${esc(row.noUrl)}" target="_blank" rel="noopener">${esc(row.noLabel)} ${esc(row.noPrice)}</a>`
-        : `<div class="price price-no">${esc(row.noLabel)} ${esc(row.noPrice)}</div>`}
-    </div>`).join("");
-}
-
-export default function handler(req, res) {
-  const q = req.query || {};
-  const theme = getParam(q, "theme", "default");
-  const title = getParam(q, "title", "Prediction Market");
-  const primaryUrl = getParam(
-    q,
-    "url",
-    theme === "bayse" ? "https://www.bayse.markets/trade" : "https://headlineodds.fun"
-  );
-
-  const proto = req.headers["x-forwarded-proto"] || "https";
-  const host = req.headers["x-forwarded-host"] || req.headers.host;
-  const baseUrl = `${proto}://${host}`;
-
-  const ogParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(q)) {
-    if (value == null || value === "") continue;
-    ogParams.set(key, String(value));
-  }
-
-  const ogImage = `${baseUrl}/api/og?${ogParams}`;
-  const shareUrl = `${baseUrl}${req.url}`;
-
-  let description = "";
-  let body = "";
-  let autoRedirect = false;
-
-  if (theme === "bayse") {
-    const focus = getParam(q, "bayseFocus");
-    const category = getParam(q, "bayseCategory", "Open market");
-    const meta = getParam(q, "bayseMeta", "Open Bayse market");
-    const close = getParam(q, "bayseClose", "Open market");
-    const rows = parseRowsParam(getParam(q, "rows"));
-    const preview = rows[0] || { yesLabel: "Yes", yesPrice: "\u2014", noLabel: "No", noPrice: "\u2014" };
-
-    description = `${title} - ${preview.yesLabel} ${preview.yesPrice} / ${preview.noLabel} ${preview.noPrice} on Bayse`;
-
-    body = `
-  <div class="bayse-page">
-    <div class="bayse-card">
-      <div class="bayse-grid" aria-hidden="true"></div>
-      <div class="bayse-glow" aria-hidden="true"></div>
-
-      <div class="bayse-inner">
-        <div class="bayse-brand">
-          <span class="ho-mark" aria-hidden="true"><span class="ho-h">H</span><span class="ho-o">O</span></span>
-          <span>Headline Odds</span>
-        </div>
-
-        ${focus ? `<div class="bayse-focus">${esc(focus)}</div>` : ""}
-
-        <div class="bayse-title">${esc(title)}</div>
-
-        <div class="bayse-prices">
-          <div class="bayse-pill bayse-pill-yes">
-            <span class="bayse-pill-dot" aria-hidden="true"></span>
-            <span class="bayse-pill-label">${esc(preview.yesLabel)}</span>
-            <span class="bayse-pill-value">${esc(preview.yesPrice)}</span>
-          </div>
-          <div class="bayse-pill bayse-pill-no">
-            <span class="bayse-pill-label">${esc(preview.noLabel)}</span>
-            <span class="bayse-pill-value">${esc(preview.noPrice)}</span>
-          </div>
-        </div>
-
-        <div class="bayse-meta">
-          <span>${esc(meta)}</span>
-          <span>${esc(close)}</span>
-        </div>
-      </div>
-
-      <div class="bayse-footer">
-        <div class="bayse-footer-title">${esc(title)}</div>
-        <div class="bayse-footer-meta">headlineodds.fun/scanner &mdash; Powered by Bayse</div>
-      </div>
-    </div>
-
-    <div class="bayse-actions">
-      <a class="bayse-action bayse-action-ghost" href="https://headlineodds.fun/scanner" target="_blank" rel="noopener">Open scanner</a>
-      <a class="bayse-action bayse-action-primary" href="${esc(primaryUrl)}" target="_blank" rel="noopener">Open Bayse</a>
-      <a class="bayse-action bayse-action-ghost" href="https://x.com/intent/tweet?url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener">Share to X</a>
-    </div>
-  </div>`;
-  } else {
-    const yes = getParam(q, "yes", "\u2014");
-    const no = getParam(q, "no", "\u2014");
-    const vol = getParam(q, "vol");
-    const closes = getParam(q, "closes");
-
-    description = `Market says ${yes} yes / ${no} no - ${title}`;
-    autoRedirect = true;
-
-    body = `
-  <div class="legacy-wrap">
-    <h1>${esc(title)}</h1>
-    <p>Market says ${esc(yes)} yes / ${esc(no)} no.</p>
-    ${vol || closes ? `<p class="legacy-subtle">${vol ? `Volume ${esc(vol)}` : ""}${vol && closes ? " - " : ""}${closes ? `Closes ${esc(closes)}` : ""}</p>` : ""}
-    <p><a href="${esc(primaryUrl)}">Click here</a> if not redirected.</p>
-  </div>`;
-  }
-
-  const html = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${esc(title)} - Headline Odds</title>
-  <meta name="description" content="${esc(description)}" />
+  <title>Will Trump buy Greenland? - Headline Odds</title>
+  <meta name="description" content="Will Trump buy Greenland? - Yes 2c / No 97c on Bayse" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="${esc(shareUrl)}" />
-  <meta property="og:title" content="${esc(title)}" />
-  <meta property="og:description" content="${esc(description)}" />
-  <meta property="og:image" content="${esc(ogImage)}" />
+  <meta property="og:url" content="https://headlineodds.fun/api/share?theme=bayse" />
+  <meta property="og:title" content="Will Trump buy Greenland?" />
+  <meta property="og:description" content="Will Trump buy Greenland? - Yes 2c / No 97c on Bayse" />
+  <meta property="og:image" content="https://headlineodds.fun/api/og?theme=bayse&amp;title=Will+Trump+buy+Greenland%3F&amp;bayseSubtitle=POLITICS&amp;bayseCategory=POLITICS&amp;bayseMeta=Vol%3A+%2454%2C724&amp;bayseClose=Closes%3A+May+1%2C+2026&amp;rows=%5B%7B%22title%22%3A%22%22%2C%22yesLabel%22%3A%22Yes%22%2C%22yesPrice%22%3A%222c%22%2C%22yesUrl%22%3A%22https%3A%2F%2Fwww.bayse.markets%22%2C%22noLabel%22%3A%22No%22%2C%22noPrice%22%3A%2297c%22%2C%22noUrl%22%3A%22https%3A%2F%2Fwww.bayse.markets%22%7D%5D&amp;url=https%3A%2F%2Fwww.bayse.markets%2Ftrade" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:site_name" content="Headline Odds" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@headlineodds" />
-  <meta name="twitter:title" content="${esc(title)}" />
-  <meta name="twitter:description" content="${esc(description)}" />
-  <meta name="twitter:image" content="${esc(ogImage)}" />
+  <meta name="twitter:title" content="Will Trump buy Greenland?" />
+  <meta name="twitter:description" content="Will Trump buy Greenland? - Yes 2c / No 97c on Bayse" />
+  <meta name="twitter:image" content="https://headlineodds.fun/api/og?theme=bayse&amp;title=Will+Trump+buy+Greenland%3F&amp;bayseSubtitle=POLITICS&amp;bayseCategory=POLITICS&amp;bayseMeta=Vol%3A+%2454%2C724&amp;bayseClose=Closes%3A+May+1%2C+2026&amp;rows=%5B%7B%22title%22%3A%22%22%2C%22yesLabel%22%3A%22Yes%22%2C%22yesPrice%22%3A%222c%22%2C%22yesUrl%22%3A%22https%3A%2F%2Fwww.bayse.markets%22%2C%22noLabel%22%3A%22No%22%2C%22noPrice%22%3A%2297c%22%2C%22noUrl%22%3A%22https%3A%2F%2Fwww.bayse.markets%22%7D%5D&amp;url=https%3A%2F%2Fwww.bayse.markets%2Ftrade" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -505,18 +347,54 @@ export default function handler(req, res) {
       }
     }
   </style>
-  ${autoRedirect ? `<script>
-    if (!/bot|crawl|spider|twitter|facebook|telegram|slack|discord/i.test(navigator.userAgent)) {
-      setTimeout(function() { window.location.href = ${toJsString(primaryUrl)}; }, 1500);
-    }
-  </script>` : ""}
+  
 </head>
-<body${theme === "bayse" ? ` class="bayse-theme"` : ""}>
-${body}
-</body>
-</html>`;
+<body class="bayse-theme">
 
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300");
-  return res.status(200).send(html);
-}
+  <div class="bayse-page">
+    <div class="bayse-card">
+      <div class="bayse-grid" aria-hidden="true"></div>
+      <div class="bayse-glow" aria-hidden="true"></div>
+
+      <div class="bayse-inner">
+        <div class="bayse-brand">
+          <span class="ho-mark" aria-hidden="true"><span class="ho-h">H</span><span class="ho-o">O</span></span>
+          <span>Headline Odds</span>
+        </div>
+
+        
+
+        <div class="bayse-title">Will Trump buy Greenland?</div>
+
+        <div class="bayse-prices">
+          <div class="bayse-pill bayse-pill-yes">
+            <span class="bayse-pill-dot" aria-hidden="true"></span>
+            <span class="bayse-pill-label">Yes</span>
+            <span class="bayse-pill-value">2c</span>
+          </div>
+          <div class="bayse-pill bayse-pill-no">
+            <span class="bayse-pill-label">No</span>
+            <span class="bayse-pill-value">97c</span>
+          </div>
+        </div>
+
+        <div class="bayse-meta">
+          <span>Vol: $54,724</span>
+          <span>Closes: May 1, 2026</span>
+        </div>
+      </div>
+
+      <div class="bayse-footer">
+        <div class="bayse-footer-title">Will Trump buy Greenland?</div>
+        <div class="bayse-footer-meta">headlineodds.fun/scanner &mdash; Powered by Bayse</div>
+      </div>
+    </div>
+
+    <div class="bayse-actions">
+      <a class="bayse-action bayse-action-ghost" href="https://headlineodds.fun/scanner" target="_blank" rel="noopener">Open scanner</a>
+      <a class="bayse-action bayse-action-primary" href="https://www.bayse.markets/trade" target="_blank" rel="noopener">Open Bayse</a>
+      <a class="bayse-action bayse-action-ghost" href="https://x.com/intent/tweet?url=https%3A%2F%2Fheadlineodds.fun%2Fapi%2Fshare%3Ftheme%3Dbayse" target="_blank" rel="noopener">Share to X</a>
+    </div>
+  </div>
+</body>
+</html>
