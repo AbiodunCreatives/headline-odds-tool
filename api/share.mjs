@@ -92,7 +92,7 @@ export default function handler(req, res) {
     ogParams.set(key, String(value));
   }
 
-  const ogImage = `${baseUrl}/api/og?${ogParams}`;
+  const ogImage = `${baseUrl}/og-image.png?v=20260423`;
   const shareUrl = `${baseUrl}${req.url}`;
 
   let description = "";
