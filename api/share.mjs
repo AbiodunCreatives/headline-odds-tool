@@ -1,8 +1,24 @@
 // Serves a lightweight HTML page with OG meta tags for Bayse-style shared market cards.
 
-function getParam(source, key, fallback = "") {
-  const value = source[key];
-  return value == null || value === "" ? fallback : String(value);
+function getParam(source, keys, fallback = "") {
+  const candidates = Array.isArray(keys) ? keys : [keys];
+
+  for (const key of candidates) {
+    const value = source[key];
+    const first = Array.isArray(value) ? value[0] : value;
+    if (first != null && first !== "") return String(first);
+  }
+
+  return fallback;
+}
+
+function getTheme(source) {
+  const raw = getParam(source, ["th", "theme"], "default");
+  return raw === "b" ? "bayse" : raw;
+}
+
+function getBaysePrimaryUrl(eventId) {
+  return eventId ? `https://www.bayse.markets/market/${encodeURIComponent(eventId)}` : "https://www.bayse.markets/trade";
 }
 
 function esc(str) {
@@ -57,12 +73,13 @@ function buildRowsMarkup(rows) {
 
 export default function handler(req, res) {
   const q = req.query || {};
-  const theme = getParam(q, "theme", "default");
-  const title = getParam(q, "title", "Prediction Market");
+  const theme = getTheme(q);
+  const title = getParam(q, ["t", "title"], "Prediction Market");
+  const eventId = getParam(q, ["e", "eventId"]);
   const primaryUrl = getParam(
     q,
-    "url",
-    theme === "bayse" ? "https://www.bayse.markets/trade" : "https://headlineodds.fun"
+    ["u", "url"],
+    theme === "bayse" ? getBaysePrimaryUrl(eventId) : "https://headlineodds.fun"
   );
 
   const proto = req.headers["x-forwarded-proto"] || "https";
@@ -83,12 +100,16 @@ export default function handler(req, res) {
   let autoRedirect = false;
 
   if (theme === "bayse") {
-    const focus = getParam(q, "bayseFocus");
-    const category = getParam(q, "bayseCategory", "Open market");
-    const meta = getParam(q, "bayseMeta", "Open Bayse market");
-    const close = getParam(q, "bayseClose", "Open market");
-    const rows = parseRowsParam(getParam(q, "rows"));
-    const preview = rows[0] || { yesLabel: "Yes", yesPrice: "\u2014", noLabel: "No", noPrice: "\u2014" };
+    const focus = getParam(q, ["f", "bayseFocus"]);
+    const meta = getParam(q, ["m", "bayseMeta"], "Open Bayse market");
+    const close = getParam(q, ["c", "bayseClose"], "Open market");
+    const rows = parseRowsParam(getParam(q, ["r", "rows"]));
+    const preview = rows[0] || {
+      yesLabel: getParam(q, ["yl", "bayseLabel1"], "Yes"),
+      yesPrice: getParam(q, ["yp", "baysePrice1"], "\u2014"),
+      noLabel: getParam(q, ["nl", "bayseLabel2"], "No"),
+      noPrice: getParam(q, ["np", "baysePrice2"], "\u2014"),
+    };
 
     description = `${title} - ${preview.yesLabel} ${preview.yesPrice} / ${preview.noLabel} ${preview.noPrice} on Bayse`;
 
@@ -318,7 +339,7 @@ export default function handler(req, res) {
     }
 
     .ho-h {
-      color: #1f6cf0;
+      color: #11c46b;
     }
 
     .ho-o {

@@ -1,8 +1,19 @@
 import { ImageResponse } from "@vercel/og";
 
-function getParam(searchParams, key, fallback = "") {
-  const value = searchParams.get(key);
-  return value == null || value === "" ? fallback : value;
+function getParam(searchParams, keys, fallback = "") {
+  const candidates = Array.isArray(keys) ? keys : [keys];
+
+  for (const key of candidates) {
+    const value = searchParams.get(key);
+    if (value != null && value !== "") return value;
+  }
+
+  return fallback;
+}
+
+function getTheme(searchParams) {
+  const raw = getParam(searchParams, ["th", "theme"], "default");
+  return raw === "b" ? "bayse" : raw;
 }
 
 function parseRowsParam(raw) {
@@ -129,17 +140,17 @@ function buildLegacyCard(searchParams) {
 }
 
 function buildBayseCard(searchParams) {
-  const title = getParam(searchParams, "title", "Bayse market");
-  const focus = getParam(searchParams, "bayseFocus");
-  const meta = getParam(searchParams, "bayseMeta", "Open Bayse market");
-  const close = getParam(searchParams, "bayseClose", "Open market");
-  const rows = parseRowsParam(getParam(searchParams, "rows"));
+  const title = getParam(searchParams, ["t", "title"], "Bayse market");
+  const focus = getParam(searchParams, ["f", "bayseFocus"]);
+  const meta = getParam(searchParams, ["m", "bayseMeta"], "Open Bayse market");
+  const close = getParam(searchParams, ["c", "bayseClose"], "Open market");
+  const rows = parseRowsParam(getParam(searchParams, ["r", "rows"]));
   const preview = rows[0] || {
     title: "",
-    yesLabel: getParam(searchParams, "bayseLabel1", "Yes"),
-    yesPrice: getParam(searchParams, "baysePrice1", "\u2014"),
-    noLabel: getParam(searchParams, "bayseLabel2", "No"),
-    noPrice: getParam(searchParams, "baysePrice2", "\u2014"),
+    yesLabel: getParam(searchParams, ["yl", "bayseLabel1"], "Yes"),
+    yesPrice: getParam(searchParams, ["yp", "baysePrice1"], "\u2014"),
+    noLabel: getParam(searchParams, ["nl", "bayseLabel2"], "No"),
+    noPrice: getParam(searchParams, ["np", "baysePrice2"], "\u2014"),
   };
   const detail = focus || preview.title || "";
   const footerMeta = [meta, close].filter(Boolean).join("     ");
@@ -253,7 +264,7 @@ function buildBayseCard(searchParams) {
                                   type: "span",
                                   props: {
                                     style: {
-                                      color: "#1f6cf0",
+                                      color: "#11c46b",
                                       fontSize: "16px",
                                       fontWeight: "800",
                                       letterSpacing: "-0.08em",
@@ -495,7 +506,7 @@ function buildBayseCard(searchParams) {
 
 export default function handler(req) {
   const { searchParams } = new URL(req.url);
-  const theme = getParam(searchParams, "theme", "default");
+  const theme = getTheme(searchParams);
   const card = theme === "bayse"
     ? buildBayseCard(searchParams)
     : buildLegacyCard(searchParams);

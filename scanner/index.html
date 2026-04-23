@@ -931,10 +931,9 @@
     }
 
     function buildBayseShare(event) {
-      const rows = buildShareRows(event);
       const orderedMarkets = getOrderedMarkets(event);
       const primaryMarket = orderedMarkets[0] || null;
-      const primaryRow = rows[0] || {
+      const primaryRow = buildShareRows(event)[0] || {
         title: "",
         yesLabel: "Yes",
         yesPrice: "\u2014",
@@ -943,17 +942,20 @@
       };
 
       const params = new URLSearchParams({
-        theme: "bayse",
-        title: event.title,
-        bayseSubtitle: event.category || "Bayse market",
-        bayseFocus: primaryRow.title || "",
-        bayseCategory: event.category || "Open market",
-        bayseClose: formatEndsLabel(event),
-        bayseMeta: formatEventMeta(event),
-        url: event.url || INSTALL_URL,
-        image: event.image_128_url || event.image_url || "",
-        rows: JSON.stringify(rows.length ? [primaryRow] : rows),
+        th: "b",
+        t: event.title || primaryRow.title || "Bayse market",
+        m: formatEventMeta(event),
+        c: formatEndsLabel(event),
+        yp: primaryRow.yesPrice,
+        np: primaryRow.noPrice,
       });
+
+      if (primaryRow.title) params.set("f", primaryRow.title);
+      if (primaryRow.yesLabel && primaryRow.yesLabel !== "Yes") params.set("yl", primaryRow.yesLabel);
+      if (primaryRow.noLabel && primaryRow.noLabel !== "No") params.set("nl", primaryRow.noLabel);
+      if (event.id) params.set("e", event.id);
+      else if (event.url) params.set("u", event.url);
+      else params.set("u", INSTALL_URL);
 
       const shareLink = `${window.location.origin}/api/share?${params}`;
       const leadOdds = primaryMarket ? formatOddsPercent(primaryMarket.outcome1_display) : null;
