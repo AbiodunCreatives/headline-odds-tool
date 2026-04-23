@@ -1,9 +1,5 @@
 import { ImageResponse } from "@vercel/og";
 
-export const config = {
-  runtime: "edge",
-};
-
 function getHeader(req, key) {
   const headers = req?.headers;
   if (!headers) return "";
