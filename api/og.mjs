@@ -529,12 +529,21 @@ function buildBayseCard(searchParams) {
   };
 }
 
-export default function handler(req) {
+export default async function handler(req, res) {
   const { searchParams } = getRequestUrl(req);
   const theme = getTheme(searchParams);
   const card = theme === "bayse"
     ? buildBayseCard(searchParams)
     : buildLegacyCard(searchParams);
 
-  return new ImageResponse(card, { width: 1200, height: 630 });
+  const image = new ImageResponse(card, { width: 1200, height: 630 });
+
+  if (!res) {
+    return image;
+  }
+
+  const arrayBuffer = await image.arrayBuffer();
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300");
+  return res.status(200).send(Buffer.from(arrayBuffer));
 }
